@@ -1,0 +1,8 @@
+c:\users\valerii_fedorenko\source\repos\ObjectComparator\ObjectComparator\obj\Debug\netcoreapp2.1\ObjectComparator.csproj.CoreCompileInputs.cache
+c:\users\valerii_fedorenko\source\repos\ObjectComparator\ObjectComparator\obj\Debug\netcoreapp2.1\ObjectComparator.AssemblyInfoInputs.cache
+c:\users\valerii_fedorenko\source\repos\ObjectComparator\ObjectComparator\obj\Debug\netcoreapp2.1\ObjectComparator.AssemblyInfo.cs
+c:\users\valerii_fedorenko\source\repos\ObjectComparator\ObjectComparator\bin\Debug\netcoreapp2.1\ObjectComparator.deps.json
+c:\users\valerii_fedorenko\source\repos\ObjectComparator\ObjectComparator\bin\Debug\netcoreapp2.1\ObjectComparator.dll
+c:\users\valerii_fedorenko\source\repos\ObjectComparator\ObjectComparator\bin\Debug\netcoreapp2.1\ObjectComparator.pdb
+c:\users\valerii_fedorenko\source\repos\ObjectComparator\ObjectComparator\obj\Debug\netcoreapp2.1\ObjectComparator.dll
+c:\users\valerii_fedorenko\source\repos\ObjectComparator\ObjectComparator\obj\Debug\netcoreapp2.1\ObjectComparator.pdb
