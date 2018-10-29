@@ -2,10 +2,10 @@
 
 **This tool allows comparing objects furthermore provide distinctions. What is more, this tool can set compare strategy for certain properties or fields.**
 
-## Compare objects
+## Example:
 
  
-
+```csharp
         var actual = new Student
                 {
                     Name = "Alex",
@@ -70,9 +70,10 @@
 	    Expected Value :Liter
 	    Actually Value :Literature 
 	    */
+	    ```
    ## Define strategies 
    
-
+```csharp
         var result = actual.GetDifferenceBetweenObjects(expected,
         strategy => strategy
        .Set(x => x.Vehicle.Model,(act, exp) => act.Length == exp.Length)
@@ -88,12 +89,13 @@
             Actually Value :03:00:00
             */
     
-    
+    ```
 
 ## Ignore 
-
+```csharp
      var ignore = new[] {"Name", "Courses", "Vehicle" };
      var result = actual.GetDifferenceBetweenObjects(expected,ignore);
     /*
     There are no Distinction
     */
+```
