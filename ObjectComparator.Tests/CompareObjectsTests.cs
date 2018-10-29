@@ -247,10 +247,8 @@ namespace ObjectComparator.Tests
                 InnerClass = new[] {new SomeClass {Foo = "some"}, new SomeClass {Foo = data}}
             };
 
-            var str = new StrategiesCertainProperties<ClassA>().Set(x => x.InnerClass[0].Foo,
-                (s, s1) => s == data);
-
-            var res = act.GetDifferenceBetweenObjects(exp, str);
+            var res = act.GetDifferenceBetweenObjects(exp, str => str.Set(x => x.InnerClass[0].Foo,
+                (s, s1) => s == data));
             res.Should().BeEmpty();
         }
 
@@ -274,10 +272,8 @@ namespace ObjectComparator.Tests
                 InnerClass = new[] {new SomeClass {Foo = "some"}, new SomeClass {Foo = "someFail"}}
             };
 
-            var str = new StrategiesCertainProperties<ClassA>().Set(x => x.InnerClass[0].Foo,
-                (s, s1) => s == data);
-
-            var res = act.GetDifferenceBetweenObjects(exp, str);
+            var res = act.GetDifferenceBetweenObjects(exp, str => str.Set(x => x.InnerClass[0].Foo,
+                (s, s1) => s == data));
 
             var expected = new DistinctionsCollection()
                 .Add(new Distinction("ArrayThird[0]", "sss", "error"))
@@ -308,10 +304,8 @@ namespace ObjectComparator.Tests
                 InnerClass = new[] {new SomeClass {Foo = "some"}, new SomeClass {Foo = "some2"}}
             };
 
-            var str = new StrategiesCertainProperties<ClassA>().Set(x => x.Two,
-                (s, s1) => s == 5);
-
-            var res = act.GetDifferenceBetweenObjects(exp, str);
+            var res = act.GetDifferenceBetweenObjects(exp, st => st.Set(x => x.Two,
+                (s, s1) => s == 5));
             res.Should().BeEmpty();
         }
 
@@ -334,10 +328,8 @@ namespace ObjectComparator.Tests
 
             };
 
-            var str = new StrategiesCertainProperties<ClassB>().Set(x => x.Third,
-                (s, s1) => s.Foo == "yes");
-
-            var res = act.GetDifferenceBetweenObjects(exp, str);
+            var res = act.GetDifferenceBetweenObjects(exp, str => str.Set(x => x.Third,
+                (s, s1) => s.Foo == "yes"));
             res.Should().BeEmpty();
         }
     }

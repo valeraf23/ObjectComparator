@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -16,6 +17,15 @@ namespace ObjectComparator.Comparator
             StrategiesCertainProperties<T> custom,
             params string[] ignore)
             where T : class => BaseGetDifferenceBetweenObjects(valueA, valueB, custom.ToArray(), null, ignore);
+
+        public static DistinctionsCollection GetDifferenceBetweenObjects<T>(this T valueA, T valueB,
+            Func<StrategiesCertainProperties<T>, IEnumerable<IMemberStrategy>> strategies,
+            params string[] ignore)
+            where T : class
+        {
+            var customStr = strategies(new StrategiesCertainProperties<T>());
+            return BaseGetDifferenceBetweenObjects(valueA, valueB, customStr.ToArray(), null, ignore);
+        }
 
         public static DistinctionsCollection BaseGetDifferenceBetweenObjects<T>(T objectA, T objectB,
             IList<IMemberStrategy> custom, string propertyName, IList<string> ignore)

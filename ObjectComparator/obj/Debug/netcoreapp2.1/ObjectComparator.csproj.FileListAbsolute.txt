@@ -6,3 +6,4 @@ c:\users\valerii_fedorenko\source\repos\ObjectComparator\ObjectComparator\bin\De
 c:\users\valerii_fedorenko\source\repos\ObjectComparator\ObjectComparator\bin\Debug\netcoreapp2.1\ObjectComparator.pdb
 c:\users\valerii_fedorenko\source\repos\ObjectComparator\ObjectComparator\obj\Debug\netcoreapp2.1\ObjectComparator.dll
 c:\users\valerii_fedorenko\source\repos\ObjectComparator\ObjectComparator\obj\Debug\netcoreapp2.1\ObjectComparator.pdb
+C:\Users\valerii_fedorenko\source\repos\ObjectComparator\ObjectComparator\obj\Debug\netcoreapp2.1\ObjectComparator.csprojAssemblyReference.cache
