@@ -103,7 +103,7 @@
     
 ```
 
-## Display distinctions for properties/fields which have custom strategy
+## Display distinctions for properties/fields which have the custom strategy
 
 ```csharp
 
