@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using FluentAssertions;
 using NUnit.Framework;
@@ -61,7 +62,8 @@ namespace ObjectComparator.Tests
                 new Calendar(3, new Time("wrong", 1.5F, 3, 1.2, new List<string> {"", ""}, 4, 34)), "2015", 1.2F, 11,
                 1.12,
                 new List<string> {"df", "asd"}, 1, 9);
-            var resultNoDiffTime1 = _dDigitalClock.GetDifferenceBetweenObjects(d2DigitalClock, "PropYear");
+            var resultNoDiffTime1 =
+                _dDigitalClock.GetDifferenceBetweenObjects(d2DigitalClock, "PropCalendar.PropTimePanel.PropYear");
             resultNoDiffTime1.Should().BeEmpty();
         }
 
@@ -339,6 +341,66 @@ namespace ObjectComparator.Tests
             var res = act.GetDifferenceBetweenObjects(exp, str => str.Set(x => x.Third,
                 (s, s1) => s.Foo == "yes"));
             res.Should().BeEmpty();
+        }
+
+        [Test]
+        public void DisplayCustomErrorMsg()
+        {
+            var actual = new Student
+            {
+                Name = "Alex",
+                Age = 20,
+                Vehicle = new Vehicle
+                {
+                    Model = "Audi"
+                },
+                Courses = new[]
+                {
+                    new Course
+                    {
+                        Name = "Math",
+                        Duration = TimeSpan.FromHours(4)
+                    },
+                    new Course
+                    {
+                        Name = "Liter",
+                        Duration = TimeSpan.FromHours(4)
+                    }
+                }
+            };
+
+            var expected = new Student
+            {
+                Name = "Bob",
+                Age = 20,
+                Vehicle = new Vehicle
+                {
+                    Model = "Opel"
+                },
+                Courses = new[]
+                {
+                    new Course
+                    {
+                        Name = "Math",
+                        Duration = TimeSpan.FromHours(3)
+                    },
+                    new Course
+                    {
+                        Name = "Literature",
+                        Duration = TimeSpan.FromHours(4)
+                    }
+                }
+            };
+
+            var skip = new[] {"Vehicle", "Name", "Courses[1].Name"};
+            var result = expected.GetDifferenceBetweenObjects(actual,
+                str => str.Set(x => x.Courses[0].Duration, (act, exp) => act > TimeSpan.FromHours(3),
+                    new Display {Expected = "Expected that Duration should be more that 3 hours"}), skip);
+            var expectedDistinctionsCollection = new DistinctionsCollection()
+                .Add(new Distinction("Courses[0].Duration", "Expected that Duration should be more that 3 hours",
+                    "04:00:00"));
+
+            CollectionAssert.AreEquivalent(result, expectedDistinctionsCollection);
         }
     }
 }

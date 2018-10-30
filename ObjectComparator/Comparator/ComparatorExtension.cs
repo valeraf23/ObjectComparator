@@ -48,14 +48,18 @@ namespace ObjectComparator.Comparator
             var ignoreList = SetIgnoreList(ignore, compareTypes);
             SetStrategies(custom, compareTypes);
             foreach (var mi in type.GetMembers(BindingFlags.Public | BindingFlags.Instance).Where(x =>
-                    x.MemberType == MemberTypes.Property || x.MemberType == MemberTypes.Field)
-                .Where(m => !ignoreList.Contains(m.Name)))
-            {
-                object valueA = null;
-                object valueB = null;
-
+                    x.MemberType == MemberTypes.Property || x.MemberType == MemberTypes.Field))
+            {             
                 var name = mi.Name;
                 var actualPropertyPath = MemberPathBuilder.BuildMemberPath(propertyName, mi);
+
+                if (ignoreList.Contains(actualPropertyPath))
+                {
+                    continue;
+                }
+
+                object valueA = null;
+                object valueB = null;
 
                 switch (mi.MemberType)
                 {
