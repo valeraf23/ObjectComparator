@@ -75,11 +75,10 @@
    ## Define strategies 
    
 ```csharp
-        var result = actual.GetDifferenceBetweenObjects(expected,
-        strategy => strategy
-       .Set(x => x.Vehicle.Model,(act, exp) => act.Length == exp.Length)
-       .Set(x => x.Courses[1].Name, (act, exp) => act.StartsWith('L') && exp.StartsWith('L')));
-           
+         var result = actual.GetDifferenceBetweenObjects(expected,
+                strategy => strategy
+                    .Set(x => x.Vehicle.Model, (act, exp) => act.Length == exp.Length)
+                    .Set(x => x.Courses[1].Name, (act, exp) => act.StartsWith('L') && exp.StartsWith('L')));           
            /* 
             Property name "Name":
             Expected Value :Alex
