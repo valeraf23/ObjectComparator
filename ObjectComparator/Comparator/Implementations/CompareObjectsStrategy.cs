@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using ObjectComparator.Comparator.Interfaces;
-using ObjectComparator.Comparator.StrategiesForCertainProperties;
 
 namespace ObjectComparator.Comparator.Implementations
 {
@@ -13,6 +12,6 @@ namespace ObjectComparator.Comparator.Implementations
 
         public bool IsValid(Type member) => member.IsClass && member != typeof(string);
         public IList<string> Ignore { get; set; } = new List<string>();
-        public IList<IMemberStrategy> Strategies { get; set; } = new List<IMemberStrategy>();
+        public IDictionary<string, ICompareValues> Strategies { get; set; } = new Dictionary<string, ICompareValues>();
     }
 }

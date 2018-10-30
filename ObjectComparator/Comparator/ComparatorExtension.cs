@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using ObjectComparator.Comparator.Interfaces;
 using ObjectComparator.Comparator.StrategiesForCertainProperties;
 using ObjectComparator.Helpers.Extensions;
 
@@ -14,21 +15,23 @@ namespace ObjectComparator.Comparator
             where T : class => BaseGetDifferenceBetweenObjects(valueA, valueB, null, null, ignore);
 
         public static DistinctionsCollection GetDifferenceBetweenObjects<T>(this T valueA, T valueB,
-            StrategiesCertainProperties<T> custom,
+            Strategies<T> custom,
             params string[] ignore)
-            where T : class => BaseGetDifferenceBetweenObjects(valueA, valueB, custom.ToArray(), null, ignore);
+            where T : class => BaseGetDifferenceBetweenObjects(valueA, valueB,
+            custom.ToDictionary(x => x.Key, x => x.Value), null, ignore);
 
         public static DistinctionsCollection GetDifferenceBetweenObjects<T>(this T valueA, T valueB,
-            Func<StrategiesCertainProperties<T>, IEnumerable<IMemberStrategy>> strategies,
+            Func<Strategies<T>, IEnumerable<KeyValuePair<string, ICompareValues>>> strategies,
             params string[] ignore)
             where T : class
         {
-            var customStr = strategies(new StrategiesCertainProperties<T>());
-            return BaseGetDifferenceBetweenObjects(valueA, valueB, customStr.ToArray(), null, ignore);
+            var customStr = strategies(new Strategies<T>());
+            return BaseGetDifferenceBetweenObjects(valueA, valueB, customStr.ToDictionary(x => x.Key, x => x.Value),
+                null, ignore);
         }
 
         public static DistinctionsCollection BaseGetDifferenceBetweenObjects<T>(T objectA, T objectB,
-            IList<IMemberStrategy> custom, string propertyName, IList<string> ignore)
+            IDictionary<string, ICompareValues> custom, string propertyName, IList<string> ignore)
             where T : class
         {
             if (objectA != null && objectB == null || objectA == null && objectB != null)
@@ -76,13 +79,8 @@ namespace ObjectComparator.Comparator
             return diff;
         }
 
-        private static void SetStrategies(IList<IMemberStrategy> custom, CompareTypes compareTypes)
-        {
-            if (custom.IsNotEmpty())
-            {
-                compareTypes.SetStrategies(custom.ToList());
-            }
-        }
+        private static void SetStrategies(IDictionary<string, ICompareValues> custom, CompareTypes compareTypes) =>
+            compareTypes.SetStrategies(custom);
 
         private static List<string> SetIgnoreList(IList<string> ignore, CompareTypes compareTypes)
         {
@@ -95,10 +93,9 @@ namespace ObjectComparator.Comparator
         }
 
         private static DistinctionsCollection Compare(CompareTypes comparesTypes,
-            IList<IMemberStrategy> custom, string propertyName, dynamic valueA, dynamic valueB)
+            IDictionary<string, ICompareValues> custom, string propertyName, dynamic valueA, dynamic valueB)
         {
-            bool Predicate(IMemberStrategy strategy) => strategy.MemberName == propertyName;
-            if (custom.IsEmpty() || !custom.Any(Predicate))
+            if (custom.IsEmpty() || custom.All(x => x.Key != propertyName))
             {
                 var diff = new DistinctionsCollection();
                 if (valueA == null && valueB != null)
@@ -116,7 +113,7 @@ namespace ObjectComparator.Comparator
                     : (DistinctionsCollection) comparesTypes.Compare(valueA, valueB, propertyName);
             }
 
-            var customStrategy = custom.First(Predicate);
+            var customStrategy = custom[propertyName];
             return customStrategy.Compare((object) valueA, (object) valueB, propertyName);
         }
     }

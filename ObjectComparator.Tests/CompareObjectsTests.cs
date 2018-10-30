@@ -34,6 +34,14 @@ namespace ObjectComparator.Tests
         }
 
         [Test]
+        public void DistinctionExist()
+        {
+            var time1 = new Time("wrong", 1.5F, 3, 1.2, new List<string> {"", ""}, 4, 34);
+            var resultNoDiffTime1 = _time.GetDifferenceBetweenObjects(time1);
+            resultNoDiffTime1.Should().NotBeEmpty();
+        }
+
+        [Test]
         public void ProperlyNamePropertiesForInnerObjects()
         {
             var d2DigitalClock = new DigitalClock(true, new[] {1, 2},
@@ -65,7 +73,7 @@ namespace ObjectComparator.Tests
                 new Calendar(4, new Time("2016", 1.5F, 3, 1.2, new List<string> {"", ""}, 4, 34)), "2015", 1.2F, 11,
                 1.12,
                 new List<string> {"df", "asd"}, 1, 9);
-            var str = new StrategiesCertainProperties<DigitalClock>().Set(x => x.PropCalendar.Page,
+            var str = new Strategies<DigitalClock>().Set(x => x.PropCalendar.Page,
                 (s, s1) => s1 == page);
             var resultNoDiffTime1 = _dDigitalClock.GetDifferenceBetweenObjects(d2DigitalClock, str);
             resultNoDiffTime1.Should().BeEmpty();
