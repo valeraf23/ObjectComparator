@@ -103,3 +103,19 @@
     */
     
 ```
+
+## Display distinctions for member strategies 
+
+```csharp
+
+     var result = actual.GetDifferenceBetweenObjects(expected,
+                strategy => strategy
+                    .Set(x => x.Vehicle.Model, (act, exp) => act.StartsWith('A') && exp.StartsWith('A')), "Name", "Courses");
+    /*
+ 	 Name: Vehicle.Model
+	 Expected Value :Audi
+	 Actually Value :Opel
+ 	 LambdaExpression :(act, exp) => (act.StartsWith(A) AndAlso exp.StartsWith(A))
+    */
+    
+```
