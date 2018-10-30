@@ -6,51 +6,51 @@
 
  
 ```csharp
-        var actual = new Student
+         var actual = new Student
+            {
+                Name = "Alex",
+                Age = 20,
+                Vehicle = new Vehicle
                 {
-                    Name = "Alex",
-                    Age = 20,
-                    Vehicle = new Vehicle
-                    {
-                        Model = "Audi"
-                    },
-                    Courses = new[]
-                    {
-                        new Cours
-                        {
-                            Name = "Math",
-                            Duration = TimeSpan.FromHours(4)
-                        },
-                        new Cours
-                        {
-                            Name = "Liter",
-                            Duration = TimeSpan.FromHours(4)
-                        }
-                    }
-                };
-    
-                var expected = new Student
+                    Model = "Audi"
+                },
+                Courses = new[]
                 {
-                    Name = "Bob",
-                    Age = 20,
-                    Vehicle = new Vehicle
+                    new Course
                     {
-                        Model = "Opel"
+                        Name = "Math",
+                        Duration = TimeSpan.FromHours(4)
                     },
-                    Courses = new []
+                    new Course
                     {
-                        new Cours
-                        {
-                            Name = "Math",
-                            Duration = TimeSpan.FromHours(3)
-                        },
-                        new Cours
-                        {
-                            Name = "Literature",
-                            Duration = TimeSpan.FromHours(4)
-                        }
+                        Name = "Liter",
+                        Duration = TimeSpan.FromHours(4)
                     }
-                };
+                }
+            };
+
+            var expected = new Student
+            {
+                Name = "Bob",
+                Age = 20,
+                Vehicle = new Vehicle
+                {
+                    Model = "Opel"
+                },
+                Courses = new[]
+                {
+                    new Course
+                    {
+                        Name = "Math",
+                        Duration = TimeSpan.FromHours(3)
+                    },
+                    new Course
+                    {
+                        Name = "Literature",
+                        Duration = TimeSpan.FromHours(4)
+                    }
+                }
+            };
                 
                var result = actual.GetDifferenceBetweenObjects(expected); 
 	/*   
@@ -126,6 +126,6 @@
 	 Expected Value :Expected that Duration should be more that 3 hours
 	 Actually Value :04:00:00
 	 LambdaExpression :(act, exp) => (act > 03:00:00)
-  */
+   */
   
 ```
