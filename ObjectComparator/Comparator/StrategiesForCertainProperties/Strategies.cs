@@ -43,14 +43,8 @@ namespace ObjectComparator.Comparator.StrategiesForCertainProperties
             return propName;
         }
 
-        public IEnumerator<KeyValuePair<string, ICompareValues>> GetEnumerator()
-        {
-            return _strategies.GetEnumerator();
-        }
+        public IEnumerator<KeyValuePair<string, ICompareValues>> GetEnumerator() => _strategies.GetEnumerator();
 
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
 }
