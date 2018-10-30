@@ -72,7 +72,7 @@
 	*/
 	    
 ```
-   ## Define strategies 
+   ## Set strategies for certain properties/fields
    
 ```csharp
          var result = actual.GetDifferenceBetweenObjects(expected,
@@ -91,7 +91,7 @@
     
   ```
 
-## Ignore 
+## Set Ignore list for properties/fields
 
 ```csharp
 
@@ -103,7 +103,7 @@
     
 ```
 
-## Display distinctions for member strategies 
+## Display distinctions for properties/fields which have custom strategy
 
 ```csharp
 
