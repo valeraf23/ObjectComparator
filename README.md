@@ -117,4 +117,15 @@
  	 LambdaExpression :(act, exp) => (act.StartsWith(A) AndAlso exp.StartsWith(A))
     */
     
+    var skip = new[] {"Vehicle", "Name", "Courses[1].Name"};
+            var result = expected.GetDifferenceBetweenObjects(actual,
+                str => str.Set(x => x.Courses[0].Duration, (act, exp) => act > TimeSpan.FromHours(3),
+                    new Display {Expected = "Expected that Duration should be more that 3 hours"}), skip);
+    /*	    
+	 Name: Courses[0].Duration
+	 Expected Value :Expected that Duration should be more that 3 hours
+	 Actually Value :04:00:00
+	 LambdaExpression :(act, exp) => (act > 03:00:00)
+  */
+  
 ```
