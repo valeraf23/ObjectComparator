@@ -5,14 +5,13 @@ namespace ObjectComparator.Comparator.StrategiesForCertainProperties
         public string Expected { get; set; }
         public string Actually { get; set; }
 
-        public Distinction GetDistinction(string expected, string actual, string propertyName, string lambdaExpression)
+        public Distinction GetDistinction<T>(T expected, T actual, string propertyName, string lambdaExpression)
         {
-            var expectedValue = string.IsNullOrEmpty(Expected) ? expected : Expected;
-            var actuallyValue = string.IsNullOrEmpty(Actually) ? actual : Actually;
+            var expectedValue = string.IsNullOrEmpty(Expected) ? ReplaceNull(expected) : Expected;
+            var actuallyValue = string.IsNullOrEmpty(Actually) ? ReplaceNull(actual) : Actually;
             return new DistinctionForStrategy(lambdaExpression, propertyName, expectedValue, actuallyValue);
         }
 
-        public Distinction GetDistinction<T>(T expected, T actual, string propertyName, string lambdaExpression)
-            where T : struct => GetDistinction(expected.ToString(), actual.ToString(), propertyName, lambdaExpression);
+        private static string ReplaceNull(object value) => value == null ? "null" : value.ToString();
     }
 }

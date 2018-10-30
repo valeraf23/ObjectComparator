@@ -26,7 +26,7 @@ namespace ObjectComparator.Comparator.StrategiesForCertainProperties
                 ? new DistinctionsCollection()
                 : new DistinctionsCollection(new[]
                 {
-                    _display.GetDistinction(a.ToString(), b.ToString(), propertyName,
+                    _display.GetDistinction(a, b, propertyName,
                         BodyExpression.Get(CompareFunc).ToString())
                 });
         }
