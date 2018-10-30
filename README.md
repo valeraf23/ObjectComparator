@@ -53,7 +53,7 @@
                 };
                 
                var result = actual.GetDifferenceBetweenObjects(expected); 
-	    /*   
+	/*   
 	    Property name "Name":
 	    Expected Value :Alex
 	    Actually Value :Bob
@@ -69,7 +69,7 @@
 	    Property name "Courses[1].Name":
 	    Expected Value :Liter
 	    Actually Value :Literature 
-	    */
+	*/
 	    
 ```
    ## Define strategies 
@@ -79,7 +79,7 @@
                 strategy => strategy
                     .Set(x => x.Vehicle.Model, (act, exp) => act.Length == exp.Length)
                     .Set(x => x.Courses[1].Name, (act, exp) => act.StartsWith('L') && exp.StartsWith('L')));           
-           /* 
+        /* 
             Property name "Name":
             Expected Value :Alex
             Actually Value :Bob
@@ -87,7 +87,7 @@
             Property name "Courses[0].Duration":
             Expected Value :04:00:00
             Actually Value :03:00:00
-            */
+        */
     
   ```
 
@@ -97,9 +97,9 @@
 
      var ignore = new[] {"Name", "Courses", "Vehicle" };
      var result = actual.GetDifferenceBetweenObjects(expected,ignore);
-    /*
-    There are no Distinction
-    */
+ /*
+     There are no Distinction
+ */
     
 ```
 
