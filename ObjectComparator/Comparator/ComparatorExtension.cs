@@ -69,7 +69,7 @@ namespace ObjectComparator.Comparator
                         break;
                 }
 
-                var diffRes = Compare(compareTypes, custom, actualPropertyPath, valueA, valueB);
+                var diffRes = CompareValuesForMember(compareTypes, custom, actualPropertyPath, valueA, valueB);
                 if (diffRes.IsNotEmpty())
                 {
                     diff.AddRange(diffRes);
@@ -92,7 +92,7 @@ namespace ObjectComparator.Comparator
             return ignoreList;
         }
 
-        private static DistinctionsCollection Compare(CompareTypes comparesTypes,
+        private static DistinctionsCollection CompareValuesForMember(CompareTypes comparesTypes,
             IDictionary<string, ICompareValues> custom, string propertyName, dynamic valueA, dynamic valueB)
         {
             if (custom.IsEmpty() || custom.All(x => x.Key != propertyName))
