@@ -2,6 +2,8 @@
 
 **This tool allows comparing objects furthermore provide distinctions. What is more, this tool can set compare strategy for certain properties or fields.**
 
+[![FluentBootstrapNuGet](https://img.shields.io/nuget/v/FluentBootstrap.svg?style=flat-square&label=FluentBootstrap)](https://www.nuget.org/packages/ObjectComparator/)<br />
+
 ## Example:
 
  
