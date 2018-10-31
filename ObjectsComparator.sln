@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27703.2042
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ObjectComparator", "ObjectComparator\ObjectComparator.csproj", "{BBDC40C9-3B7F-4050-9890-CA9467CA8CD3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ObjectsComparator", "ObjectComparator\ObjectsComparator.csproj", "{BBDC40C9-3B7F-4050-9890-CA9467CA8CD3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ObjectComparator.Tests", "ObjectComparator.Tests\ObjectComparator.Tests.csproj", "{C66FFD06-744E-4B44-8B50-97722268EDC0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ObjectsComparator.Tests", "ObjectComparator.Tests\ObjectsComparator.Tests.csproj", "{C66FFD06-744E-4B44-8B50-97722268EDC0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

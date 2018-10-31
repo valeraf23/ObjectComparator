@@ -12,7 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ObjectComparator\ObjectComparator.csproj" />
+    <ProjectReference Include="..\ObjectComparator\ObjectsComparator.csproj" />
   </ItemGroup>
 
 </Project>
