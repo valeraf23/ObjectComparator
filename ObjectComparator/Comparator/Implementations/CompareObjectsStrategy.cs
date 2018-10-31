@@ -22,11 +22,9 @@ namespace ObjectComparator.Comparator.Implementations
         public Rule<ICompareStructStrategy> RuleForValuesTypes { get; }
         public Rule<ICollectionsCompareStrategy> RuleForCollectionTypes { get; }
 
-
         public bool IsValid(Type member) => member.IsClass && member != typeof(string);
         public IList<string> Ignore { get; set; } = new List<string>();
         public IDictionary<string, ICompareValues> Strategies { get; set; } = new Dictionary<string, ICompareValues>();
-
 
         public DistinctionsCollection GetDifference<T>(T valueA, T valueB, string propertyName) => RuleFactory
             .Create(RuleForCollectionTypes, RuleForReferenceTypes, RuleForValuesTypes).Get(valueB.GetType())
