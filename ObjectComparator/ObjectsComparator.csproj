@@ -4,11 +4,11 @@
     <TargetFramework>netcoreapp2.1</TargetFramework>
     <Authors>Valerii_Fedorenko</Authors>
     <PackageProjectUrl>https://github.com/valeraf23/ObjectComparator</PackageProjectUrl>
-    <Description>This tool allows comparing objects furthermore provide distinctions. What is more, this tool can set compare strategy for certain properties or fields.</Description>
+    <Description>This library allows comparing objects and provide distinctions. What is more, this tool can set compare strategy for certain properties or fields and types</Description>
     <RepositoryUrl>https://github.com/valeraf23/ObjectComparator</RepositoryUrl>
-    <PackageTags>objects compare Comparator</PackageTags>
+    <PackageTags>Diff objects compare Comparator Equals classes distinctions</PackageTags>
     <PackageReleaseNotes>This tool allows comparing objects furthermore provide distinctions. What is more, this tool can set compare strategy for certain properties or fields.</PackageReleaseNotes>
-    <Version>1.0.3</Version>
+    <Version>1.0.4</Version>
   </PropertyGroup>
 
   <ItemGroup>
