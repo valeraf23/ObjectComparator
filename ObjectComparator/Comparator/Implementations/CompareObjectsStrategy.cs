@@ -75,7 +75,6 @@ namespace ObjectComparator.Comparator.Implementations
                     diff.AddRange(diffRes);
                 }
             }
-
             return diff;
         }
 
