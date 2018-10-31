@@ -9,9 +9,6 @@
     <PackageTags>objects compare Comparator</PackageTags>
     <PackageReleaseNotes>This tool allows comparing objects furthermore provide distinctions. What is more, this tool can set compare strategy for certain properties or fields.</PackageReleaseNotes>
     <Version>1.0.3</Version>
-    <dependencies>
-      <dependency id="Microsoft.NETCore.App" version="2.1.0" />
-    </dependencies>
   </PropertyGroup>
 
   <ItemGroup>
