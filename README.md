@@ -2,8 +2,8 @@
 
 **This tool allows comparing objects furthermore provide distinctions. What is more, this tool can set compare strategy for certain properties or fields.**
 
-[![NuGet.org](https://img.shields.io/nuget/v/ObjectComparator.svg?style=flat-square&label=ObjectComparator)](https://www.nuget.org/packages/ObjectComparator/)<br />
-[![Travis](https://img.shields.io/badge/test-passing-green.svg)](https://travis-ci.org/valeraf23/ObjectComparator.svg?branch=master)<br />
+[![NuGet.org](https://img.shields.io/nuget/v/ObjectComparator.svg?style=flat-square&label=NuGet.org)](https://www.nuget.org/packages/ObjectComparator/)<br />
+[![Travis](https://img.shields.io/badge/test-passing-green.svg)](https://travis-ci.org/valeraf23/ObjectComparator.svg?branch=master)
 
 ## Example:
 
