@@ -1,6 +1,6 @@
 language: csharp
 
-dotnet: 2.1.2
+dotnet: 2.1.4
 sudo: false
 
 env:
