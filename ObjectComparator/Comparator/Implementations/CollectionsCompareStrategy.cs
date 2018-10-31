@@ -7,8 +7,8 @@ namespace ObjectComparator.Comparator.Implementations
 {
     public sealed class CollectionsCompareStrategy : ICollectionsCompareStrategy
     {
-        private readonly CompareTypes _compareTypes;
-        public CollectionsCompareStrategy(CompareTypes compareTypes) => _compareTypes = compareTypes;
+        private readonly CompareObjectsStrategy _compareObjectsStrategy;
+        public CollectionsCompareStrategy(CompareObjectsStrategy compareObjectsStrategy) => _compareObjectsStrategy = compareObjectsStrategy;
 
         public DistinctionsCollection Compare<T>(T valueA, T valueB, string propertyName)
         {
@@ -25,7 +25,7 @@ namespace ObjectComparator.Comparator.Implementations
             }
 
             return Enumerable.Range(0, listA.Count).Aggregate(new DistinctionsCollection(),
-                (dc, i) => dc.AddRange(_compareTypes.Compare(listA[i], listB[i], $"{propertyName}[{i}]")));
+                (dc, i) => dc.AddRange(_compareObjectsStrategy.GetDifference(listA[i], listB[i], $"{propertyName}[{i}]")));
         }
 
         public bool IsValid(Type member) =>
