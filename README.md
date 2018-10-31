@@ -2,9 +2,10 @@
 
 **This tool allows comparing objects furthermore provide distinctions. What is more, this tool can set compare strategy for certain properties or fields.**
 
+[![ObjectComparator](https://img.shields.io/nuget/v/ObjectComparator.svg?style=flat-square&label=ObjectComparator)](https://www.nuget.org/packages/ObjectComparator/)<br />
+
 ## Example:
 
- 
 ```csharp
          var actual = new Student
             {
