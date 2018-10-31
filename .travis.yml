@@ -8,6 +8,6 @@ env:
         - DOTNET_CLI_TELEMETRY_OPTOUT: 1
 
 script:
-    - dotnet build ObjectComparator.sln -c Release
+    - dotnet build ObjectsComparator.sln -c Release
     - dotnet test -c Release --no-build ObjectComparator.Tests/ObjectComparator.Tests.csproj /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
 
