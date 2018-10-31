@@ -1,4 +1,4 @@
-# ObjectComparator
+# ObjectsComparator
 
 **This tool allows comparing objects furthermore provide distinctions. What is more, this tool can set compare rule for certain properties or fields and types.**
 
