@@ -6,6 +6,6 @@ namespace ObjectComparator.Comparator.Rules.Implementations
 {
     internal class NotSatisfiedRule : IGetRule<ICompareValues>
     {
-        public ICompareValues Get<T>() => throw new NotSupportedException();
+        public ICompareValues Get(Type memberType) => throw new NotSupportedException($"Not Satisfied Rule for {memberType.FullName}");
     }
 }

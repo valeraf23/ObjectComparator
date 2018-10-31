@@ -29,7 +29,7 @@ namespace ObjectComparator.Comparator.Implementations
 
 
         public DistinctionsCollection GetDifference<T>(T valueA, T valueB, string propertyName) => RuleFactory
-            .Create(RuleForCollectionTypes, RuleForReferenceTypes, RuleForValuesTypes).Get<T>()
+            .Create(RuleForCollectionTypes, RuleForReferenceTypes, RuleForValuesTypes).Get(valueB.GetType())
             .Compare(valueA, valueB, propertyName);
 
         public DistinctionsCollection Compare<T>(T objectA, T objectB) => Compare(objectA, objectB, null);
@@ -59,12 +59,11 @@ namespace ObjectComparator.Comparator.Implementations
 
                 object valueA = null;
                 object valueB = null;
-
                 switch (mi.MemberType)
                 {
                     case MemberTypes.Field:
                         valueA = type.GetField(name).GetValue(objectA);
-                        valueB = type.GetField(mi.Name).GetValue(objectB);
+                        valueB = type.GetField(name).GetValue(objectB);
                         break;
                     case MemberTypes.Property:
                         valueA = type.GetProperty(name).GetValue(objectA);

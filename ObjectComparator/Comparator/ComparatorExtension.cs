@@ -39,7 +39,7 @@ namespace ObjectComparator.Comparator
             return GetDifferenceBetweenObjects(objectA, objectB, compareTypes);
         }
 
-        public static DistinctionsCollection GetDifferenceBetweenObjects<T>(T objectA, T objectB, ICompareObjectStrategy compareObject)
+        public static DistinctionsCollection GetDifferenceBetweenObjects<T>(T objectA, T objectB, CompareObjectsStrategy compareObject)
             where T : class => compareObject.Compare(objectA, objectB);
     }
 }

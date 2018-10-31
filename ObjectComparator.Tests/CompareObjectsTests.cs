@@ -4,6 +4,7 @@ using System.Linq;
 using FluentAssertions;
 using NUnit.Framework;
 using ObjectComparator.Comparator;
+using ObjectComparator.Comparator.Implementations;
 using ObjectComparator.Comparator.StrategiesForCertainProperties;
 using ObjectComparator.Tests.TestModels;
 
@@ -401,6 +402,65 @@ namespace ObjectComparator.Tests
                     "04:00:00"));
 
             CollectionAssert.AreEquivalent(result, expectedDistinctionsCollection);
+        }
+
+        [Test]
+        public void CheckWithCustomRule()
+        {
+            var actual = new Student
+            {
+                Name = "Alex",
+                Age = 20,
+                Vehicle = new Vehicle
+                {
+                    Model = "Audi"
+                },
+                Courses = new[]
+                {
+                    new Course
+                    {
+                        Name = "Math",
+                        Duration = TimeSpan.FromHours(4)
+                    },
+                    new Course
+                    {
+                        Name = "Math",
+                        Duration = TimeSpan.FromHours(5)
+                    }
+                }
+            };
+
+            var expected = new Student
+            {
+                Name = "Alex",
+                Age = 20,
+                Vehicle = new Vehicle
+                {
+                    Model = "Audi"
+                },
+                Courses = new[]
+                {
+                    new Course
+                    {
+                        Name = "Math",
+                        Duration = TimeSpan.FromHours(3)
+                    },
+                    new Course
+                    {
+                        Name = "Fake",
+                        Duration = TimeSpan.FromHours(4)
+                    }
+                }
+            };
+
+            var newRule = new CompareObjectsStrategy();
+            newRule.RuleForReferenceTypes.Add(new CourseRule());
+            var result = ComparatorExtension.GetDifferenceBetweenObjects(expected, actual, newRule);
+            var expectedDistinctionsCollection =
+                new DistinctionsCollection().Add(new Distinction("Courses[1]", "Fake", "Math"));
+
+            CollectionAssert.AreEquivalent(result, expectedDistinctionsCollection);
+
         }
     }
 }

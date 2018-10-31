@@ -39,7 +39,7 @@ namespace ObjectComparator.Comparator.Rules.Implementations
 
         public T Default { get; }
         public List<T> Others { get; }
-        public ICompareValues Get<T1>() => Others.FirstOrDefault(x => x.IsValid(typeof(T1))) ?? Default;
+        public ICompareValues Get(Type memberType) => Others.FirstOrDefault(x => x.IsValid(memberType)) ?? Default;
         public bool IsValid(Type member) => Default.IsValid(member);
     }
 }
