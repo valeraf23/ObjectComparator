@@ -12,12 +12,12 @@ namespace ObjectComparator.Comparator
     {
         public static DistinctionsCollection GetDifferenceBetweenObjects<T>(this T valueA, T valueB,
             params string[] ignore)
-            where T : class => BaseGetDifferenceBetweenObjects(valueA, valueB, null, null, ignore);
+            where T : class => GetDifferenceBetweenObjects(valueA, valueB, null, null, ignore);
 
         public static DistinctionsCollection GetDifferenceBetweenObjects<T>(this T valueA, T valueB,
             Strategies<T> custom,
             params string[] ignore)
-            where T : class => BaseGetDifferenceBetweenObjects(valueA, valueB,
+            where T : class => GetDifferenceBetweenObjects(valueA, valueB,
             custom.ToDictionary(x => x.Key, x => x.Value), null, ignore);
 
         public static DistinctionsCollection GetDifferenceBetweenObjects<T>(this T valueA, T valueB,
@@ -26,11 +26,11 @@ namespace ObjectComparator.Comparator
             where T : class
         {
             var customStr = strategies(new Strategies<T>());
-            return BaseGetDifferenceBetweenObjects(valueA, valueB, customStr.ToDictionary(x => x.Key, x => x.Value),
+            return GetDifferenceBetweenObjects(valueA, valueB, customStr.ToDictionary(x => x.Key, x => x.Value),
                 null, ignore);
         }
 
-        public static DistinctionsCollection BaseGetDifferenceBetweenObjects<T>(T objectA, T objectB,
+        internal static DistinctionsCollection GetDifferenceBetweenObjects<T>(T objectA, T objectB,
             IDictionary<string, ICompareValues> custom, string propertyName, IList<string> ignore)
             where T : class
         {
