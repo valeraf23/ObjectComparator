@@ -6,7 +6,6 @@
 
 ## Example:
 
- 
 ```csharp
          var actual = new Student
             {
