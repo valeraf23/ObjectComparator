@@ -9,5 +9,5 @@ env:
 
 script:
     - dotnet build ObjectsComparator.sln -c Release
-    - dotnet test -c Release --no-build ObjectComparator.Tests/ObjectComparator.Tests.csproj /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
+    - dotnet test -c Release --no-build ObjectComparator.Tests/ObjectsComparator.Tests.csproj /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
 
