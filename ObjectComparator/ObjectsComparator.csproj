@@ -8,7 +8,7 @@
     <RepositoryUrl>https://github.com/valeraf23/ObjectComparator</RepositoryUrl>
     <PackageTags>Diff objects compare Comparator Equals classes distinctions</PackageTags>
     <PackageReleaseNotes>This tool allows comparing objects furthermore provide distinctions. What is more, this tool can set compare strategy for certain properties or fields.</PackageReleaseNotes>
-    <Version>1.0.4</Version>
+    <Version>1.0.5</Version>
   </PropertyGroup>
 
   <ItemGroup>
