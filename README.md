@@ -5,6 +5,17 @@
 [![NuGet.org](https://img.shields.io/nuget/v/ObjectsComparator.svg?style=flat-square&label=NuGet.org)](https://www.nuget.org/packages/ObjectsComparator/)
 [![Build Status](https://travis-ci.org/valeraf23/ObjectComparator.svg?branch=master)](https://travis-ci.org/valeraf23/ObjectComparator)
 
+## Installation
+
+Install with NuGet Package Manager Console
+```
+Install-Package ObjectsComparator
+```
+Install with .NET CLI
+```
+dotnet add package ObjectsComparator
+```
+
 ## Example:
 
 ```csharp
