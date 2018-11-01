@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ObjectComparator.Helpers.GuardArgument
+namespace ObjectsComparator.Helpers.GuardArgument
 {
     public static class GuardArgument
     {

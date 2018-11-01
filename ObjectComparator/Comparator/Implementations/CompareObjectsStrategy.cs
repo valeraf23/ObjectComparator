@@ -2,12 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using ObjectComparator.Comparator.Interfaces;
-using ObjectComparator.Comparator.Rules;
-using ObjectComparator.Comparator.Rules.Implementations;
-using ObjectComparator.Helpers.Extensions;
+using ObjectsComparator.Comparator.Interfaces;
+using ObjectsComparator.Comparator.Rules;
+using ObjectsComparator.Comparator.Rules.Implementations;
+using ObjectsComparator.Helpers.Extensions;
 
-namespace ObjectComparator.Comparator.Implementations
+namespace ObjectsComparator.Comparator.Implementations
 {
     public sealed class CompareObjectsStrategy : ICompareObjectStrategy
     {
@@ -36,7 +36,7 @@ namespace ObjectComparator.Comparator.Implementations
         {
             if (objectA != null && objectB == null || objectA == null && objectB != null)
             {
-                return new DistinctionsCollection {new Distinction(typeof(T).Name, objectA, objectB)};
+                return DistinctionsCollection.Create(new Distinction(typeof(T).Name, objectA, objectB));
             }
 
             var diff = new DistinctionsCollection();

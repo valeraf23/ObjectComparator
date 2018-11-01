@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ObjectComparator.Tests.TestModels
+namespace ObjectsComparator.Tests.TestModels
 {
     internal class Course
     {

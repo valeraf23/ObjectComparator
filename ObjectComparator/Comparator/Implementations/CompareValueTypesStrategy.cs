@@ -1,7 +1,7 @@
 ﻿using System;
-using ObjectComparator.Comparator.Interfaces;
+using ObjectsComparator.Comparator.Interfaces;
 
-namespace ObjectComparator.Comparator.Implementations
+namespace ObjectsComparator.Comparator.Implementations
 {
     public sealed class CompareValueTypesStrategy : ICompareStructStrategy
     {
@@ -10,12 +10,7 @@ namespace ObjectComparator.Comparator.Implementations
         public DistinctionsCollection Compare<T>(T valueA, T valueB, string propertyName) =>
             Compare(propertyName, valueA, valueB);
 
-        public DistinctionsCollection Compare<T>(string propertyName, T valueA, T valueB)
-        {
-            var distinctionsCollection = new DistinctionsCollection();
-            return valueA.Equals(valueB)
-                ? distinctionsCollection
-                : distinctionsCollection.Add(new Distinction(propertyName, valueA, valueB));
-        }
+        public DistinctionsCollection Compare<T>(string propertyName, T valueA, T valueB) => DistinctionsCollection
+            .CreateFor<T>(propertyName, valueA, valueB).WhenNot((a, b) => a.Equals(b));
     }
 }

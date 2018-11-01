@@ -1,6 +1,6 @@
-﻿namespace ObjectComparator.Tests.TestModels
+﻿namespace ObjectsComparator.Tests.TestModels
 {
-    class Calendar
+    internal class Calendar
     {
 
         public int Page { get; set; }

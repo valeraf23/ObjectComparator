@@ -1,6 +1,6 @@
-﻿using ObjectComparator.Comparator.Interfaces;
+﻿using ObjectsComparator.Comparator.Interfaces;
 
-namespace ObjectComparator.Comparator.Rules.Interfaces
+namespace ObjectsComparator.Comparator.Rules.Interfaces
 {
     public interface IGetProperlyRule: IGetRule<ICompareValues>, IValidator{}
 }

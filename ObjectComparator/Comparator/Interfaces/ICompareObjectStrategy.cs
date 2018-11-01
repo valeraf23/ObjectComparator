@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace ObjectComparator.Comparator.Interfaces
+namespace ObjectsComparator.Comparator.Interfaces
 {
     public interface ICompareObjectStrategy : IStrategy
     {

@@ -1,4 +1,4 @@
-namespace ObjectComparator.Comparator.Interfaces
+namespace ObjectsComparator.Comparator.Interfaces
 {
     public interface ICompareStructStrategy : IStrategy {}
 }

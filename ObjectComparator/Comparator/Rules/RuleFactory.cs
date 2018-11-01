@@ -1,8 +1,8 @@
-using ObjectComparator.Comparator.Interfaces;
-using ObjectComparator.Comparator.Rules.Implementations;
-using ObjectComparator.Comparator.Rules.Interfaces;
+using ObjectsComparator.Comparator.Interfaces;
+using ObjectsComparator.Comparator.Rules.Implementations;
+using ObjectsComparator.Comparator.Rules.Interfaces;
 
-namespace ObjectComparator.Comparator.Rules
+namespace ObjectsComparator.Comparator.Rules
 {
     public static class RuleFactory
     {

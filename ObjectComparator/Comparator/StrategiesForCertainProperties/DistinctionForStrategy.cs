@@ -1,6 +1,6 @@
-using ObjectComparator.Helpers.GuardArgument;
+using ObjectsComparator.Helpers.GuardArgument;
 
-namespace ObjectComparator.Comparator.StrategiesForCertainProperties
+namespace ObjectsComparator.Comparator.StrategiesForCertainProperties
 {
     public class DistinctionForStrategy : Distinction
     {

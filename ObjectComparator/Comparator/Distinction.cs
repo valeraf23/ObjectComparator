@@ -1,7 +1,7 @@
 ﻿using System;
-using ObjectComparator.Helpers.GuardArgument;
+using ObjectsComparator.Helpers.GuardArgument;
 
-namespace ObjectComparator.Comparator
+namespace ObjectsComparator.Comparator
 {
     public class Distinction : IEquatable<Distinction>
     {
@@ -44,8 +44,8 @@ namespace ObjectComparator.Comparator
         public override bool Equals(object obj) => Equals(obj as Distinction);
 
         public static bool operator ==(Distinction a, Distinction b) =>
-            ReferenceEquals(a, null) && ReferenceEquals(b, null) ||
-            !ReferenceEquals(a, null) && a.Equals(b);
+            a is null && b is null ||
+            a?.Equals(b) == true;
 
         public static bool operator !=(Distinction a, Distinction b) => !(a == b);
 

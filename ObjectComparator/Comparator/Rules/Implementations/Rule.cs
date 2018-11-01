@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using ObjectComparator.Comparator.Interfaces;
-using ObjectComparator.Comparator.Rules.Interfaces;
-using ObjectComparator.Helpers.GuardArgument;
+using ObjectsComparator.Comparator.Interfaces;
+using ObjectsComparator.Comparator.Rules.Interfaces;
+using ObjectsComparator.Helpers.GuardArgument;
 
-namespace ObjectComparator.Comparator.Rules.Implementations
+namespace ObjectsComparator.Comparator.Rules.Implementations
 {
     public class Rule<T> : IGetProperlyRule where T : class, IStrategy
     {

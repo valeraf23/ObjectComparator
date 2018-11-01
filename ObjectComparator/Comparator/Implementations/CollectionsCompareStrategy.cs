@@ -1,9 +1,9 @@
 using System;
 using System.Collections;
 using System.Linq;
-using ObjectComparator.Comparator.Interfaces;
+using ObjectsComparator.Comparator.Interfaces;
 
-namespace ObjectComparator.Comparator.Implementations
+namespace ObjectsComparator.Comparator.Implementations
 {
     public sealed class CollectionsCompareStrategy : ICollectionsCompareStrategy
     {

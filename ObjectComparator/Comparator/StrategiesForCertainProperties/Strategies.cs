@@ -3,9 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Text.RegularExpressions;
-using ObjectComparator.Comparator.Interfaces;
+using ObjectsComparator.Comparator.Interfaces;
 
-namespace ObjectComparator.Comparator.StrategiesForCertainProperties
+namespace ObjectsComparator.Comparator.StrategiesForCertainProperties
 {
     /// <summary>
     /// define a comparison strategy for certain properties

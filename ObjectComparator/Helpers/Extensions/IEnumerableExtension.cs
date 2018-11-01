@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace ObjectComparator.Helpers.Extensions
+namespace ObjectsComparator.Helpers.Extensions
 {
     public static class EnumerableExtension
     {      

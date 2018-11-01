@@ -1,11 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using ObjectComparator.Comparator.Implementations;
-using ObjectComparator.Comparator.Interfaces;
-using ObjectComparator.Comparator.StrategiesForCertainProperties;
+using ObjectsComparator.Comparator.Implementations;
+using ObjectsComparator.Comparator.Interfaces;
+using ObjectsComparator.Comparator.StrategiesForCertainProperties;
 
-namespace ObjectComparator.Comparator
+namespace ObjectsComparator.Comparator
 {
     public static class ComparatorExtension
     {
@@ -39,7 +39,8 @@ namespace ObjectComparator.Comparator
             return GetDifferenceBetweenObjects(objectA, objectB, compareTypes);
         }
 
-        public static DistinctionsCollection GetDifferenceBetweenObjects<T>(T objectA, T objectB, CompareObjectsStrategy compareObject)
+        public static DistinctionsCollection GetDifferenceBetweenObjects<T>(T objectA, T objectB,
+            CompareObjectsStrategy compareObject)
             where T : class => compareObject.Compare(objectA, objectB);
     }
 }

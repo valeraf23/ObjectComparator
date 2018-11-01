@@ -1,6 +1,6 @@
 using System;
 
-namespace ObjectComparator.Comparator.Rules.Interfaces
+namespace ObjectsComparator.Comparator.Rules.Interfaces
 {
     public interface IGetRule<out T>
     {

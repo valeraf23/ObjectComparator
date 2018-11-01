@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Linq.Expressions;
-using ObjectComparator.Comparator.Interfaces;
-using ObjectComparator.Helpers.Extensions;
+using ObjectsComparator.Comparator.Interfaces;
+using ObjectsComparator.Helpers.Extensions;
 
-namespace ObjectComparator.Comparator.StrategiesForCertainProperties
+namespace ObjectsComparator.Comparator.StrategiesForCertainProperties
 {
     public class MemberStrategy<T> : ICompareValues
     {

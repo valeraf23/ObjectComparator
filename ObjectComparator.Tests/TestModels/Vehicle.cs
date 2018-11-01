@@ -1,4 +1,4 @@
-﻿namespace ObjectComparator.Tests.TestModels
+﻿namespace ObjectsComparator.Tests.TestModels
 {
     internal class Vehicle
     {

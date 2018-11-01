@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using FluentAssertions;
 using NUnit.Framework;
-using ObjectComparator.Comparator;
-using ObjectComparator.Comparator.Implementations;
-using ObjectComparator.Comparator.StrategiesForCertainProperties;
-using ObjectComparator.Tests.TestModels;
+using ObjectsComparator.Comparator;
+using ObjectsComparator.Comparator.Implementations;
+using ObjectsComparator.Comparator.StrategiesForCertainProperties;
+using ObjectsComparator.Tests.TestModels;
 
-namespace ObjectComparator.Tests
+namespace ObjectsComparator.Tests
 {
     [TestFixture]
     public class CompareObjectsTests

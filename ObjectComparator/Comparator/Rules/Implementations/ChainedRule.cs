@@ -1,8 +1,8 @@
 using System;
-using ObjectComparator.Comparator.Interfaces;
-using ObjectComparator.Comparator.Rules.Interfaces;
+using ObjectsComparator.Comparator.Interfaces;
+using ObjectsComparator.Comparator.Rules.Interfaces;
 
-namespace ObjectComparator.Comparator.Rules.Implementations
+namespace ObjectsComparator.Comparator.Rules.Implementations
 {
     internal abstract class ChainedRule : IGetRule<ICompareValues>
     {

@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 
-namespace ObjectComparator.Helpers.Extensions
+namespace ObjectsComparator.Helpers.Extensions
 {
     public static class BodyExpression
     {

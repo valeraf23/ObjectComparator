@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ObjectComparator.Comparator.Interfaces
+namespace ObjectsComparator.Comparator.Interfaces
 {
     public interface IValidator
     {

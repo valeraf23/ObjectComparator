@@ -1,4 +1,4 @@
-namespace ObjectComparator.Comparator.StrategiesForCertainProperties
+namespace ObjectsComparator.Comparator.StrategiesForCertainProperties
 {
     public sealed class Display
     {
