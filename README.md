@@ -7,11 +7,11 @@
 
 ## Installation
 
-Install with NuGet Package Manager Console
+#### Install with NuGet Package Manager Console
 ```
 Install-Package ObjectsComparator
 ```
-Install with .NET CLI
+#### Install with .NET CLI
 ```
 dotnet add package ObjectsComparator
 ```
