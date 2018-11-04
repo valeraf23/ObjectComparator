@@ -9,11 +9,11 @@
 
 #### Install with NuGet Package Manager Console
 ```
-Install-Package ObjectsComparator
+Install-Package ObjectComparator
 ```
 #### Install with .NET CLI
 ```
-dotnet add package ObjectsComparator
+dotnet add package ObjectComparator
 ```
 
 ## Example:
