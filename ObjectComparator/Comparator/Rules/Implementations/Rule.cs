@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using ObjectsComparator.Comparator.Interfaces;
 using ObjectsComparator.Comparator.Rules.Interfaces;
+using ObjectsComparator.Helpers.Extensions;
 using ObjectsComparator.Helpers.GuardArgument;
 
 namespace ObjectsComparator.Comparator.Rules.Implementations
@@ -12,34 +13,33 @@ namespace ObjectsComparator.Comparator.Rules.Implementations
         public Rule(T defaultRule)
         {
             GuardArgument.ArgumentIsNotNull(defaultRule);
-
             Default = defaultRule;
-            Others = new List<T>();
+            Strategies = new Stack<T>();
+            Strategies.Push(defaultRule);
         }
 
         public Rule(T defaultRule, IList<T> others) : this(defaultRule)
         {
             GuardArgument.ArgumentIsNotNull(others);
-
-            Default = defaultRule;
-            Others = others.ToList();
+            others.ForEach(x => Strategies.Push(x));
         }
+
+        public T Default { get; }
 
         public Rule<T> Add(T newRule)
         {
-            Others.Add(newRule);
+            Strategies.Push(newRule);
             return this;
         }
 
         public Rule<T> AddRange(IEnumerable<T> newRules)
         {
-            Others.AddRange(newRules);
+            newRules.ForEach(x => Strategies.Push(x));
             return this;
         }
 
-        public T Default { get; }
-        public List<T> Others { get; }
-        public ICompareValues Get(Type memberType) => Others.FirstOrDefault(x => x.IsValid(memberType)) ?? Default;
+        public Stack<T> Strategies { get; }
+        public ICompareValues Get(Type memberType) => Strategies.First(x => x.IsValid(memberType)) ?? Default;
         public bool IsValid(Type member) => Default.IsValid(member);
     }
 }

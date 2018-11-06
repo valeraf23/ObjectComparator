@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using ObjectsComparator.Comparator.Implementations;
 using ObjectsComparator.Comparator.Interfaces;
 using ObjectsComparator.Comparator.StrategiesForCertainProperties;
 
@@ -33,14 +32,14 @@ namespace ObjectsComparator.Comparator
             IDictionary<string, ICompareValues> custom, string propertyName, IList<string> ignore)
             where T : class
         {
-            var compareTypes = new CompareObjectsStrategy();
+            var compareTypes = new Implementations.Comparator();
             compareTypes.SetIgnore(ignore);
             compareTypes.SetStrategies(custom);
             return GetDifferenceBetweenObjects(objectA, objectB, compareTypes);
         }
 
         public static DistinctionsCollection GetDifferenceBetweenObjects<T>(T objectA, T objectB,
-            CompareObjectsStrategy compareObject)
+            Implementations.Comparator compareObject)
             where T : class => compareObject.Compare(objectA, objectB);
     }
 }

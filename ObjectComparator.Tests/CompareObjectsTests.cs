@@ -4,7 +4,6 @@ using System.Linq;
 using FluentAssertions;
 using NUnit.Framework;
 using ObjectsComparator.Comparator;
-using ObjectsComparator.Comparator.Implementations;
 using ObjectsComparator.Comparator.StrategiesForCertainProperties;
 using ObjectsComparator.Tests.TestModels;
 
@@ -453,7 +452,7 @@ namespace ObjectsComparator.Tests
                 }
             };
 
-            var newRule = new CompareObjectsStrategy();
+            var newRule = new Comparator.Implementations.Comparator();
             newRule.RuleForReferenceTypes.Add(new CourseRule());
             var result = ComparatorExtension.GetDifferenceBetweenObjects(expected, actual, newRule);
             var expectedDistinctionsCollection =
@@ -461,6 +460,37 @@ namespace ObjectsComparator.Tests
 
             CollectionAssert.AreEquivalent(result, expectedDistinctionsCollection);
 
+        }
+
+        [Test]
+        public void DictionaryVerifications()
+        {
+            var exp = new Library
+            {
+                Books = new Dictionary<string, Book>
+                {
+                    ["hobbit"] = new Book {Pages = 1000, Text = "hobbit Text"},
+                    ["murder in orient express"] = new Book {Pages = 500, Text = "murder in orient express Text"},
+                    ["Shantaram"] = new Book {Pages = 500, Text = "Shantaram Text"}
+                }
+            };
+
+            var act = new Library
+            {
+                Books = new Dictionary<string, Book>
+                {
+                    ["hobbit"] = new Book {Pages = 1, Text = "hobbit Text"},
+                    ["murder in orient express"] = new Book {Pages = 500, Text = "murder in orient express Text1"},
+                    ["Shantaram"] = new Book {Pages = 500, Text = "Shantaram Text"}
+                }
+            };
+
+            var result = exp.GetDifferenceBetweenObjects(act);
+            var expectedDistinctionsCollection = new DistinctionsCollection()
+                .Add(new Distinction("Books[hobbit].Pages", 1000, 1)).Add(new Distinction(
+                    "Books[murder in orient express].Text", "murder in orient express Text",
+                    "murder in orient express Text1"));
+            CollectionAssert.AreEquivalent(result, expectedDistinctionsCollection);
         }
     }
 }

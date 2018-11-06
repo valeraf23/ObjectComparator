@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace ObjectsComparator.Helpers.Extensions
@@ -9,5 +10,12 @@ namespace ObjectsComparator.Helpers.Extensions
 
         public static bool IsNotEmpty<T>(this IEnumerable<T> collection) => !IsEmpty(collection);
 
+        public static void ForEach<T>(this IEnumerable<T> source, Action<T> action)
+        {
+            foreach (var item in source)
+            {
+                action(item);
+            }
+        }
     }
 }

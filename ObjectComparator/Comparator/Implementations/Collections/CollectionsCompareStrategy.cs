@@ -1,16 +1,12 @@
 using System;
 using System.Collections;
 using System.Linq;
-using ObjectsComparator.Comparator.Interfaces;
 
-namespace ObjectsComparator.Comparator.Implementations
+namespace ObjectsComparator.Comparator.Implementations.Collections
 {
-    public sealed class CollectionsCompareStrategy : ICollectionsCompareStrategy
+    public class CollectionsCompareStrategy : BaseCollectionsCompareStrategy
     {
-        private readonly CompareObjectsStrategy _compareObjectsStrategy;
-        public CollectionsCompareStrategy(CompareObjectsStrategy compareObjectsStrategy) => _compareObjectsStrategy = compareObjectsStrategy;
-
-        public DistinctionsCollection Compare<T>(T valueA, T valueB, string propertyName)
+        public override DistinctionsCollection Compare<T>(T valueA, T valueB, string propertyName)
         {
             var listA = ((IEnumerable) valueA).Cast<dynamic>().ToList();
             var listB = ((IEnumerable) valueB).Cast<dynamic>().ToList();
@@ -25,10 +21,11 @@ namespace ObjectsComparator.Comparator.Implementations
             }
 
             return Enumerable.Range(0, listA.Count).Aggregate(new DistinctionsCollection(),
-                (dc, i) => dc.AddRange(_compareObjectsStrategy.GetDifference(listA[i], listB[i], $"{propertyName}[{i}]")));
+                (dc, i) => dc.AddRange(
+                    Comparator.GetDifference(listA[i], listB[i], $"{propertyName}[{i}]")));
         }
 
-        public bool IsValid(Type member) =>
+        public override bool IsValid(Type member) =>
             member.GetInterfaces().Contains(typeof(IEnumerable)) && member != typeof(string);
     }
 }

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using ObjectsComparator.Comparator.Implementations.Collections;
 using ObjectsComparator.Comparator.Interfaces;
 using ObjectsComparator.Comparator.Rules;
 using ObjectsComparator.Comparator.Rules.Implementations;
@@ -9,18 +10,19 @@ using ObjectsComparator.Helpers.Extensions;
 
 namespace ObjectsComparator.Comparator.Implementations
 {
-    public sealed class CompareObjectsStrategy : ICompareObjectStrategy
+    public sealed class Comparator : ICompareObjectStrategy
     {
-        public CompareObjectsStrategy()
+        public Comparator()
         {
             RuleForValuesTypes = new Rule<ICompareStructStrategy>(new CompareValueTypesStrategy());
-            RuleForCollectionTypes = new Rule<ICollectionsCompareStrategy>(new CollectionsCompareStrategy(this));
+            RuleForCollectionTypes = new CollectionRule(this, new CollectionsCompareStrategy(),
+                new List<BaseCollectionsCompareStrategy> {new DictionaryCompareStrategy()});
             RuleForReferenceTypes = new Rule<ICompareObjectStrategy>(this);
         }
 
         public Rule<ICompareObjectStrategy> RuleForReferenceTypes { get; }
         public Rule<ICompareStructStrategy> RuleForValuesTypes { get; }
-        public Rule<ICollectionsCompareStrategy> RuleForCollectionTypes { get; }
+        public CollectionRule RuleForCollectionTypes { get; }
 
         public bool IsValid(Type member) => member.IsClass && member != typeof(string);
         public IList<string> Ignore { get; set; } = new List<string>();
@@ -75,6 +77,7 @@ namespace ObjectsComparator.Comparator.Implementations
                     diff.AddRange(diffRes);
                 }
             }
+
             return diff;
         }
 
@@ -107,14 +110,14 @@ namespace ObjectsComparator.Comparator.Implementations
         {
             if (ignore.IsEmpty()) return;
             RuleForReferenceTypes.Default.Ignore = ignore;
-            RuleForReferenceTypes.Others.ForEach(x => x.Ignore = ignore);
+            RuleForReferenceTypes.Strategies.ForEach(x => x.Ignore = ignore);
         }
 
         public void SetStrategies(IDictionary<string, ICompareValues> strategies)
         {
             if (strategies.IsEmpty()) return;
             RuleForReferenceTypes.Default.Strategies = strategies;
-            RuleForReferenceTypes.Others.ForEach(x => x.Strategies = strategies);
+            RuleForReferenceTypes.Strategies.ForEach(x => x.Strategies = strategies);
         }
     }
 }
