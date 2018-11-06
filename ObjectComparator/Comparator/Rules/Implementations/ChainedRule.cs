@@ -9,6 +9,6 @@ namespace ObjectsComparator.Comparator.Rules.Implementations
         protected IGetProperlyRule Rule { get; set; }
         protected IGetRule<ICompareValues> Next { get; }
         protected ChainedRule(IGetRule<ICompareValues> next) => Next = next;
-        public virtual ICompareValues Get(Type memberType) => Rule.IsValid(memberType) ? Rule.Get(memberType) : Next.Get(memberType);
+        public virtual ICompareValues GetFor(Type memberType) => Rule.IsValid(memberType) ? Rule.GetFor(memberType) : Next.GetFor(memberType);
     }
 }

@@ -31,7 +31,8 @@ namespace ObjectsComparator.Comparator
         public IDictionary<string, ICompareValues> Strategies { get; set; } = new Dictionary<string, ICompareValues>();
 
         public DistinctionsCollection GetDifference<T>(T valueA, T valueB, string propertyName) => RuleFactory
-            .Create(RuleForCollectionTypes, RuleForReferenceTypes, RuleForValuesTypes).Get(valueB.GetType())
+            .Create(RuleForCollectionTypes, RuleForReferenceTypes, RuleForValuesTypes)
+            .GetFor(valueB.GetType())
             .Compare(valueA, valueB, propertyName);
 
         public DistinctionsCollection Compare<T>(T objectA, T objectB) => Compare(objectA, objectB, null);

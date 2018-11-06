@@ -39,7 +39,7 @@ namespace ObjectsComparator.Comparator.Rules.Implementations
         }
 
         public Stack<T> Strategies { get; }
-        public ICompareValues Get(Type memberType) => Strategies.FirstOrDefault(x => x.IsValid(memberType)) ?? Default;
+        public ICompareValues GetFor(Type memberType) => Strategies.FirstOrDefault(x => x.IsValid(memberType)) ?? Default;
         public bool IsValid(Type member) => Default.IsValid(member);
     }
 }
