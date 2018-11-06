@@ -1,19 +1,19 @@
-# ObjectsComparator
+# ObjectComparator
 
 **This tool allows comparing objects furthermore provide distinctions. What is more, this tool can set compare rule for certain properties or fields and types.**
 
-[![NuGet.org](https://img.shields.io/nuget/v/ObjectsComparator.svg?style=flat-square&label=NuGet.org)](https://www.nuget.org/packages/ObjectsComparator/)
+[![NuGet.org](https://img.shields.io/nuget/v/ObjectComparator.svg?style=flat-square&label=NuGet.org)](https://www.nuget.org/packages/ObjectComparator/)
 [![Build Status](https://travis-ci.org/valeraf23/ObjectComparator.svg?branch=master)](https://travis-ci.org/valeraf23/ObjectComparator)
 
 ## Installation
 
-Install with NuGet Package Manager Console
+#### Install with NuGet Package Manager Console
 ```
-Install-Package ObjectsComparator
+Install-Package ObjectComparator
 ```
-Install with .NET CLI
+#### Install with .NET CLI
 ```
-dotnet add package ObjectsComparator
+dotnet add package ObjectComparator
 ```
 
 ## Example:
