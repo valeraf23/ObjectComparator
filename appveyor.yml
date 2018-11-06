@@ -1,0 +1,18 @@
+version: '2.0.{build}'
+image: Visual Studio 2017
+branches:
+  only:
+  - master
+init:
+  - cmd: git config --global core.autocrlf true
+  
+before_build:
+  # Display .NET Core version
+  - cmd: dotnet --version
+  
+build_script:
+  - cmd: dotnet build ObjectsComparator.sln -c Release
+
+test_script:
+  - cmd: dotnet test -c Release --no-build ObjectComparator.Tests/ObjectsComparator.Tests.csproj
+  
