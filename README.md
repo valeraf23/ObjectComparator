@@ -143,3 +143,40 @@ dotnet add package ObjectComparator
    */
   
 ```
+
+## Display distinctions for properties/fields which have a Dictionary type
+
+```csharp
+
+    var expected = new Library
+            {
+                Books = new Dictionary<string, Book>
+                {
+                    ["hobbit"] = new Book {Pages = 1000, Text = "hobbit Text"},
+                    ["murder in orient express"] = new Book {Pages = 500, Text = "murder in orient express Text"},
+                    ["Shantaram"] = new Book {Pages = 500, Text = "Shantaram Text"}
+                }
+            };
+
+            var actual = new Library
+            {
+                Books = new Dictionary<string, Book>
+                {
+                    ["hobbit"] = new Book {Pages = 1, Text = "hobbit Text"},
+                    ["murder in orient express"] = new Book {Pages = 500, Text = "murder in orient express Text1"},
+                    ["Shantaram"] = new Book {Pages = 500, Text = "Shantaram Text"}
+                }
+            };
+
+            var result = expected.GetDifferenceBetweenObjects(actual);
+    /*
+        Property name "Books[hobbit].Pages":
+        Expected Value :1000
+        Actually Value :1
+
+        Property name "Books[murder in orient express].Text":
+        Expected Value :murder in orient express Text
+        Actually Value :murder in orient express Text1
+   */
+  
+```
