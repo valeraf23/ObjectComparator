@@ -7,8 +7,8 @@
     <Description>This library allows comparing objects and provide distinctions. What is more, this tool can set compare strategy for certain properties or fields and types</Description>
     <RepositoryUrl>https://github.com/valeraf23/ObjectComparator</RepositoryUrl>
     <PackageTags>Diff objects compare Comparator Equals classes distinctions</PackageTags>
-    <PackageReleaseNotes>remove unnecessary dependencies</PackageReleaseNotes>
-    <Version>2.0.1</Version>
+    <PackageReleaseNotes></PackageReleaseNotes>
+    <Version>2.0.2</Version>
     <PackageId>ObjectComparator</PackageId>
   </PropertyGroup>
 
