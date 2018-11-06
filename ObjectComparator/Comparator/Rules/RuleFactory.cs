@@ -1,6 +1,6 @@
-using ObjectsComparator.Comparator.Interfaces;
 using ObjectsComparator.Comparator.Rules.Implementations;
 using ObjectsComparator.Comparator.Rules.Interfaces;
+using ObjectsComparator.Comparator.Strategies.Interfaces;
 
 namespace ObjectsComparator.Comparator.Rules
 {

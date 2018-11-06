@@ -1,4 +1,6 @@
-namespace ObjectsComparator.Comparator.Interfaces
+using ObjectsComparator.Comparator.RepresentationDistinction;
+
+namespace ObjectsComparator.Comparator.Strategies.Interfaces
 {
     public interface ICompareValues
     {

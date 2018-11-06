@@ -1,4 +1,4 @@
-﻿using ObjectsComparator.Comparator.Interfaces;
+﻿using ObjectsComparator.Comparator.Strategies.Interfaces;
 
 namespace ObjectsComparator.Comparator.Rules.Interfaces
 {

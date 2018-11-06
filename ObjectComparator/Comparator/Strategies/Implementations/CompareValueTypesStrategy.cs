@@ -1,7 +1,8 @@
 ﻿using System;
-using ObjectsComparator.Comparator.Interfaces;
+using ObjectsComparator.Comparator.RepresentationDistinction;
+using ObjectsComparator.Comparator.Strategies.Interfaces;
 
-namespace ObjectsComparator.Comparator.Implementations
+namespace ObjectsComparator.Comparator.Strategies.Implementations
 {
     public sealed class CompareValueTypesStrategy : ICompareStructStrategy
     {

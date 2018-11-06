@@ -1,4 +1,6 @@
-namespace ObjectsComparator.Comparator.StrategiesForCertainProperties
+using ObjectsComparator.Comparator.RepresentationDistinction;
+
+namespace ObjectsComparator.Comparator.Strategies.StrategiesForCertainProperties
 {
     public sealed class Display
     {

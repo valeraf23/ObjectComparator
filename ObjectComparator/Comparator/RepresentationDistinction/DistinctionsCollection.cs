@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 
-namespace ObjectsComparator.Comparator
+namespace ObjectsComparator.Comparator.RepresentationDistinction
 {
     [DebuggerDisplay("{" + nameof(ToString) + "()}")]
     public sealed class DistinctionsCollection : IEnumerable<Distinction>

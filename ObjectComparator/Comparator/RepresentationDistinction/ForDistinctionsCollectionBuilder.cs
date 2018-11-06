@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ObjectsComparator.Comparator
+namespace ObjectsComparator.Comparator.RepresentationDistinction
 {
     public class ForDistinctionsCollectionBuilder<T>
     {

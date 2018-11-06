@@ -1,7 +1,7 @@
 ﻿using System;
 using ObjectsComparator.Helpers.GuardArgument;
 
-namespace ObjectsComparator.Comparator
+namespace ObjectsComparator.Comparator.RepresentationDistinction
 {
     public class Distinction : IEquatable<Distinction>
     {

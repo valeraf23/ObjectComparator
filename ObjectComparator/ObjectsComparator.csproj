@@ -12,7 +12,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Comparator\StrategiesForCertainProperties\IMemberStrategy.cs" />
+    <Compile Remove="Comparator\Strategies\StrategiesForCertainProperties\IMemberStrategy.cs" />
   </ItemGroup>
 
   <ItemGroup>

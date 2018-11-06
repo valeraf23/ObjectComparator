@@ -1,7 +1,8 @@
 using System;
 using System.Collections.Generic;
+using ObjectsComparator.Comparator.RepresentationDistinction;
 
-namespace ObjectsComparator.Comparator.Implementations.Collections
+namespace ObjectsComparator.Comparator.Strategies.Implementations.Collections
 {
     public class DictionaryCompareStrategy : BaseCollectionsCompareStrategy
     {

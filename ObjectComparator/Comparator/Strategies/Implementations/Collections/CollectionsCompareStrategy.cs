@@ -1,8 +1,9 @@
 using System;
 using System.Collections;
 using System.Linq;
+using ObjectsComparator.Comparator.RepresentationDistinction;
 
-namespace ObjectsComparator.Comparator.Implementations.Collections
+namespace ObjectsComparator.Comparator.Strategies.Implementations.Collections
 {
     public class CollectionsCompareStrategy : BaseCollectionsCompareStrategy
     {

@@ -4,7 +4,8 @@ using System.Linq;
 using FluentAssertions;
 using NUnit.Framework;
 using ObjectsComparator.Comparator;
-using ObjectsComparator.Comparator.StrategiesForCertainProperties;
+using ObjectsComparator.Comparator.RepresentationDistinction;
+using ObjectsComparator.Comparator.Strategies.StrategiesForCertainProperties;
 using ObjectsComparator.Tests.TestModels;
 
 namespace ObjectsComparator.Tests
@@ -452,7 +453,7 @@ namespace ObjectsComparator.Tests
                 }
             };
 
-            var newRule = new Comparator.Implementations.Comparator();
+            var newRule = new Comparator.Comparator();
             newRule.RuleForReferenceTypes.Add(new CourseRule());
             var result = ComparatorExtension.GetDifferenceBetweenObjects(expected, actual, newRule);
             var expectedDistinctionsCollection =

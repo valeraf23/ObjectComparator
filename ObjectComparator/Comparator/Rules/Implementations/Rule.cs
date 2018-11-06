@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using ObjectsComparator.Comparator.Interfaces;
 using ObjectsComparator.Comparator.Rules.Interfaces;
+using ObjectsComparator.Comparator.Strategies.Interfaces;
 using ObjectsComparator.Helpers.Extensions;
 using ObjectsComparator.Helpers.GuardArgument;
 

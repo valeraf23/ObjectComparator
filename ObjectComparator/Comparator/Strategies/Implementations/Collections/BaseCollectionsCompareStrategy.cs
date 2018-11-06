@@ -1,7 +1,8 @@
 using System;
-using ObjectsComparator.Comparator.Interfaces;
+using ObjectsComparator.Comparator.RepresentationDistinction;
+using ObjectsComparator.Comparator.Strategies.Interfaces;
 
-namespace ObjectsComparator.Comparator.Implementations.Collections
+namespace ObjectsComparator.Comparator.Strategies.Implementations.Collections
 {
     public abstract class BaseCollectionsCompareStrategy : ICollectionsCompareStrategy
     {

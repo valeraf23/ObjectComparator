@@ -1,4 +1,4 @@
-namespace ObjectsComparator.Comparator.Interfaces
+namespace ObjectsComparator.Comparator.Strategies.Interfaces
 {
     public interface IStrategy : ICompareValues, IValidator {}
 }

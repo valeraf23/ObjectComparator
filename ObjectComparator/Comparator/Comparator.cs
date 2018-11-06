@@ -2,13 +2,15 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using ObjectsComparator.Comparator.Implementations.Collections;
-using ObjectsComparator.Comparator.Interfaces;
+using ObjectsComparator.Comparator.RepresentationDistinction;
 using ObjectsComparator.Comparator.Rules;
 using ObjectsComparator.Comparator.Rules.Implementations;
+using ObjectsComparator.Comparator.Strategies.Implementations;
+using ObjectsComparator.Comparator.Strategies.Implementations.Collections;
+using ObjectsComparator.Comparator.Strategies.Interfaces;
 using ObjectsComparator.Helpers.Extensions;
 
-namespace ObjectsComparator.Comparator.Implementations
+namespace ObjectsComparator.Comparator
 {
     public sealed class Comparator : ICompareObjectStrategy
     {
