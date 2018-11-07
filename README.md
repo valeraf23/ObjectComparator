@@ -107,12 +107,12 @@ dotnet add package ObjectComparator
 
 ```csharp
 
-   var ignore = new[] {"Name", "Courses", "Vehicle" };
-   var result = actual.GetDifferenceBetweenObjects(expected,ignore);
+    var ignore = new[] {"Name", "Courses", "Vehicle" };
+    var result = actual.GetDifferenceBetweenObjects(expected,ignore);
    
- /*
-     There are no Distinction
- */
+     /*
+     	There are no Distinction
+    */
     
 ```
 
