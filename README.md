@@ -65,6 +65,7 @@ dotnet add package ObjectComparator
             };
                 
                var result = actual.GetDifferenceBetweenObjects(expected); 
+	       
 	/*   
 	    Property name "Name":
 	    Expected Value :Alex
@@ -90,7 +91,8 @@ dotnet add package ObjectComparator
          var result = actual.GetDifferenceBetweenObjects(expected,
                 strategy => strategy
                     .Set(x => x.Vehicle.Model, (act, exp) => act.Length == exp.Length)
-                    .Set(x => x.Courses[1].Name, (act, exp) => act.StartsWith('L') && exp.StartsWith('L')));           
+                    .Set(x => x.Courses[1].Name, (act, exp) => act.StartsWith('L') && exp.StartsWith('L')));  
+		    
         /* 
             Property name "Name":
             Expected Value :Alex
@@ -123,6 +125,7 @@ dotnet add package ObjectComparator
      var result = actual.GetDifferenceBetweenObjects(expected,
                 strategy => strategy
                     .Set(x => x.Vehicle.Model, (act, exp) => act.StartsWith('A') && exp.StartsWith('A')), "Name", "Courses");
+		    
     /*
  	 Name: Vehicle.Model
 	 Expected Value :Audi
@@ -134,6 +137,7 @@ dotnet add package ObjectComparator
             var result = expected.GetDifferenceBetweenObjects(actual,
                 str => str.Set(x => x.Courses[0].Duration, (act, exp) => act > TimeSpan.FromHours(3),
                     new Display {Expected = "Expected that Duration should be more that 3 hours"}), skip);
+		    
     /*	    
 	 Name: Courses[0].Duration
 	 Expected Value :Expected that Duration should be more that 3 hours
@@ -168,6 +172,7 @@ dotnet add package ObjectComparator
             };
 
             var result = expected.GetDifferenceBetweenObjects(actual);
+	    
     /*
         Property name "Books[hobbit].Pages":
         Expected Value :1000
