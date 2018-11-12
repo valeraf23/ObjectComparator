@@ -7,21 +7,21 @@ namespace ObjectsComparator.Comparator.Strategies.Implementations.Collections
 {
     public class CollectionsCompareStrategy : BaseCollectionsCompareStrategy
     {
-        public override DistinctionsCollection Compare<T>(T valueA, T valueB, string propertyName)
+        public override Distinctions Compare<T>(T valueA, T valueB, string propertyName)
         {
             var listA = ((IEnumerable) valueA).Cast<dynamic>().ToList();
             var listB = ((IEnumerable) valueB).Cast<dynamic>().ToList();
 
             if (listA.Count != listB.Count)
             {
-                return new DistinctionsCollection
+                return new Distinctions
                 {
                     new Distinction("Collection has different length", $"{listA.Count}",
                         $"{listB.Count}")
                 };
             }
 
-            return Enumerable.Range(0, listA.Count).Aggregate(new DistinctionsCollection(),
+            return Enumerable.Range(0, listA.Count).Aggregate(new Distinctions(),
                 (dc, i) => dc.AddRange(
                     Comparator.GetDifference(listA[i], listB[i], $"{propertyName}[{i}]")));
         }

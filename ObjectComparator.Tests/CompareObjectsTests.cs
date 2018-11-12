@@ -286,7 +286,7 @@ namespace ObjectsComparator.Tests
             var res = act.GetDistinctions(exp, str => str.Set(x => x.InnerClass[0].Foo,
                 (s, s1) => s == data));
 
-            var expected = new DistinctionsCollection()
+            var expected = new Distinctions()
                 .Add(new Distinction("ArrayThird[0]", "sss", "error"))
                 .Add(new Distinction("ArrayThird[1]", "ggg", "error1"))
                 .Add(new Distinction("InnerClass[1].Foo", "actual", "someFail"));
@@ -397,7 +397,7 @@ namespace ObjectsComparator.Tests
             var result = expected.GetDistinctions(actual,
                 str => str.Set(x => x.Courses[0].Duration, (act, exp) => act > TimeSpan.FromHours(3),
                     new Display {Expected = "Expected that Duration should be more that 3 hours"}), skip);
-            var expectedDistinctionsCollection = new DistinctionsCollection()
+            var expectedDistinctionsCollection = new Distinctions()
                 .Add(new Distinction("Courses[0].Duration", "Expected that Duration should be more that 3 hours",
                     "04:00:00"));
 
@@ -457,7 +457,7 @@ namespace ObjectsComparator.Tests
             newRule.RuleForReferenceTypes.Add(new CourseRule());
             var result = ComparatorExtension.GetDistinctions(expected, actual, newRule);
             var expectedDistinctionsCollection =
-                new DistinctionsCollection().Add(new Distinction("Courses[1]", "Fake", "Math"));
+                new Distinctions().Add(new Distinction("Courses[1]", "Fake", "Math"));
 
             CollectionAssert.AreEquivalent(result, expectedDistinctionsCollection);
 
@@ -487,7 +487,7 @@ namespace ObjectsComparator.Tests
             };
 
             var result = exp.GetDistinctions(act);
-            var expectedDistinctionsCollection = new DistinctionsCollection()
+            var expectedDistinctionsCollection = new Distinctions()
                 .Add(new Distinction("Books[hobbit].Pages", 1000, 1)).Add(new Distinction(
                     "Books[murder in orient express].Text", "murder in orient express Text",
                     "murder in orient express Text1"));

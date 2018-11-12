@@ -7,13 +7,13 @@ using System.Text;
 namespace ObjectsComparator.Comparator.RepresentationDistinction
 {
     [DebuggerDisplay("{" + nameof(ToString) + "()}")]
-    public sealed class DistinctionsCollection : IEnumerable<Distinction>
+    public sealed class Distinctions : IEnumerable<Distinction>
     {
         private readonly List<Distinction> _list;
 
-        public DistinctionsCollection() => _list = new List<Distinction>();
+        public Distinctions() => _list = new List<Distinction>();
 
-        public DistinctionsCollection(IEnumerable<Distinction> collection) => _list = new List<Distinction>(collection);
+        public Distinctions(IEnumerable<Distinction> collection) => _list = new List<Distinction>(collection);
 
         public Distinction this[int i]
         {
@@ -21,26 +21,26 @@ namespace ObjectsComparator.Comparator.RepresentationDistinction
             set => _list.Add(value);
         }
 
-        public static DistinctionsCollection Create(string name, object expectedValue, object actuallyValue) =>
-            new DistinctionsCollection(new[] {new Distinction(name, expectedValue, actuallyValue)});
+        public static Distinctions Create(string name, object expectedValue, object actuallyValue) =>
+            new Distinctions(new[] {new Distinction(name, expectedValue, actuallyValue)});
 
-        public static DistinctionsCollection Create(IEnumerable<Distinction> collection) =>
-            new DistinctionsCollection(collection);
+        public static Distinctions Create(IEnumerable<Distinction> collection) =>
+            new Distinctions(collection);
 
-        public static DistinctionsCollection Create(Distinction collection) =>
-            new DistinctionsCollection(new[] {collection});
+        public static Distinctions Create(Distinction collection) =>
+            new Distinctions(new[] {collection});
 
         public static ForDistinctionsCollectionBuilder<T> CreateFor<T>(string name, object expectedValue,
             object actuallyValue) =>
             new ForDistinctionsCollectionBuilder<T>(name, expectedValue, actuallyValue);
 
-        public DistinctionsCollection Add(Distinction input)
+        public Distinctions Add(Distinction input)
         {
             _list.Add(input);
             return this;
         }
 
-        public DistinctionsCollection AddRange(IEnumerable<Distinction> collection)
+        public Distinctions AddRange(IEnumerable<Distinction> collection)
         {
             _list.AddRange(collection);
             return this;

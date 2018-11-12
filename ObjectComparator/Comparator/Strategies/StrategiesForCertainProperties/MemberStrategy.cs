@@ -19,13 +19,13 @@ namespace ObjectsComparator.Comparator.Strategies.StrategiesForCertainProperties
             CompareFunc = compareFunc;
         }
 
-        public DistinctionsCollection Compare<T1>(T1 valueA, T1 valueB, string propertyName)
+        public Distinctions Compare<T1>(T1 valueA, T1 valueB, string propertyName)
         {
             var a = (T) (object) valueA;
             var b = (T) (object) valueB;
             return CompareFunc.Compile()(a, b)
-                ? new DistinctionsCollection()
-                : new DistinctionsCollection(new[]
+                ? new Distinctions()
+                : new Distinctions(new[]
                 {
                     _display.GetDistinction(a, b, propertyName,
                         BodyExpression.Get(CompareFunc).ToString())

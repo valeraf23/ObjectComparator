@@ -15,8 +15,8 @@ namespace ObjectsComparator.Comparator.RepresentationDistinction
             _actuallyValue = (T)actuallyValue;
         }
 
-        public DistinctionsCollection WhenNot(Func<T, T, bool> func) => func(_expectedValue, _actuallyValue)
-            ? new DistinctionsCollection()
-            : new DistinctionsCollection(new[] {new Distinction(_name, _expectedValue, _actuallyValue)});
+        public Distinctions WhenNot(Func<T, T, bool> func) => func(_expectedValue, _actuallyValue)
+            ? new Distinctions()
+            : new Distinctions(new[] {new Distinction(_name, _expectedValue, _actuallyValue)});
     }
 }

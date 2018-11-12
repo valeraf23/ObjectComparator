@@ -9,12 +9,12 @@ namespace ObjectsComparator.Tests.TestModels
 {
     public class CourseRule : ICompareObjectStrategy
     {
-        public DistinctionsCollection Compare<T>(T valueA, T valueB, string propertyName)
+        public Distinctions Compare<T>(T valueA, T valueB, string propertyName)
         {
             var a = valueA.ChangeType<Course>();
             var b = valueB.ChangeType<Course>();
             return
-                DistinctionsCollection
+                Distinctions
                     .CreateFor<string>(propertyName, a.Name, b.Name).WhenNot((x, y) => x == y);
         }
 
