@@ -64,7 +64,7 @@ dotnet add package ObjectComparator
                 }
             };
                 
-               var result = actual.GetDifferenceBetweenObjects(expected); 
+               var result = actual.GetDistinctions(expected); 
 	       
 	/*   
 	    Property name "Name":
@@ -88,7 +88,7 @@ dotnet add package ObjectComparator
    ## Set strategies for certain properties/fields
    
 ```csharp
-         var result = actual.GetDifferenceBetweenObjects(expected,
+         var result = actual.GetDistinctions(expected,
                 strategy => strategy
                     .Set(x => x.Vehicle.Model, (act, exp) => act.Length == exp.Length)
                     .Set(x => x.Courses[1].Name, (act, exp) => act.StartsWith('L') && exp.StartsWith('L')));  
@@ -110,7 +110,7 @@ dotnet add package ObjectComparator
 ```csharp
 
     var ignore = new[] {"Name", "Courses", "Vehicle" };
-    var result = actual.GetDifferenceBetweenObjects(expected,ignore);
+    var result = actual.GetDistinctions(expected,ignore);
    
      /*
      	There are no Distinction
@@ -122,7 +122,7 @@ dotnet add package ObjectComparator
 
 ```csharp
 
-     var result = actual.GetDifferenceBetweenObjects(expected,
+     var result = actual.GetDistinctions(expected,
                 strategy => strategy
                     .Set(x => x.Vehicle.Model, (act, exp) => act.StartsWith('A') && exp.StartsWith('A')), "Name", "Courses");
 		    
@@ -134,7 +134,7 @@ dotnet add package ObjectComparator
     */
     
     var skip = new[] {"Vehicle", "Name", "Courses[1].Name"};
-            var result = expected.GetDifferenceBetweenObjects(actual,
+            var result = expected.GetDistinctions(actual,
                 str => str.Set(x => x.Courses[0].Duration, (act, exp) => act > TimeSpan.FromHours(3),
                     new Display {Expected = "Expected that Duration should be more that 3 hours"}), skip);
 		    
@@ -171,7 +171,7 @@ dotnet add package ObjectComparator
                 }
             };
 
-            var result = expected.GetDifferenceBetweenObjects(actual);
+            var result = expected.GetDistinctions(actual);
 	    
     /*
         Property name "Books[hobbit].Pages":
