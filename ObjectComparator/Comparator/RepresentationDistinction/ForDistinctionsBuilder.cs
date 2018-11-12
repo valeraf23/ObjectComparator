@@ -2,13 +2,13 @@
 
 namespace ObjectsComparator.Comparator.RepresentationDistinction
 {
-    public class ForDistinctionsCollectionBuilder<T>
+    public class ForDistinctionsBuilder<T>
     {
         private readonly string _name;
         private readonly T _expectedValue;
         private readonly T _actuallyValue;
 
-        public ForDistinctionsCollectionBuilder(string name, object expectedValue, object actuallyValue)
+        public ForDistinctionsBuilder(string name, object expectedValue, object actuallyValue)
         {
             _name = name;
             _expectedValue = (T)expectedValue;

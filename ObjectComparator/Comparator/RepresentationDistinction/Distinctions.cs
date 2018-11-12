@@ -30,9 +30,9 @@ namespace ObjectsComparator.Comparator.RepresentationDistinction
         public static Distinctions Create(Distinction collection) =>
             new Distinctions(new[] {collection});
 
-        public static ForDistinctionsCollectionBuilder<T> CreateFor<T>(string name, object expectedValue,
+        public static ForDistinctionsBuilder<T> CreateFor<T>(string name, object expectedValue,
             object actuallyValue) =>
-            new ForDistinctionsCollectionBuilder<T>(name, expectedValue, actuallyValue);
+            new ForDistinctionsBuilder<T>(name, expectedValue, actuallyValue);
 
         public Distinctions Add(Distinction input)
         {
