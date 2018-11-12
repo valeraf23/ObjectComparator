@@ -12,8 +12,4 @@
     <PackageId>ObjectComparator</PackageId>
   </PropertyGroup>
 
-  <ItemGroup>
-    <Compile Remove="Comparator\Strategies\StrategiesForCertainProperties\IMemberStrategy.cs" />
-  </ItemGroup>
-
 </Project>

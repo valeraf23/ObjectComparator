@@ -23,7 +23,7 @@ namespace ObjectsComparator.Tests
         public void IsObjectsEqualTest()
         {
             var time1 = new Time("2016", 1.5F, 3, 1.2, new List<string> {"", ""}, 4, 34);
-            var resultNoDiffTime1 = _time.GetDifferenceBetweenObjects(time1);
+            var resultNoDiffTime1 = _time.GetDistinctions(time1);
             resultNoDiffTime1.Should().BeEmpty();
         }
 
@@ -31,7 +31,7 @@ namespace ObjectsComparator.Tests
         public void IsObjectsEqualTestWhenIgnore()
         {
             var time1 = new Time("wrong", 1.5F, 3, 1.2, new List<string> {"", ""}, 4, 34);
-            var resultNoDiffTime1 = _time.GetDifferenceBetweenObjects(time1, "PropYear");
+            var resultNoDiffTime1 = _time.GetDistinctions(time1, "PropYear");
             resultNoDiffTime1.Should().BeEmpty();
         }
 
@@ -39,7 +39,7 @@ namespace ObjectsComparator.Tests
         public void DistinctionExist()
         {
             var time1 = new Time("wrong", 1.5F, 3, 1.2, new List<string> {"", ""}, 4, 34);
-            var resultNoDiffTime1 = _time.GetDifferenceBetweenObjects(time1);
+            var resultNoDiffTime1 = _time.GetDistinctions(time1);
             resultNoDiffTime1.Should().NotBeEmpty();
         }
 
@@ -50,7 +50,7 @@ namespace ObjectsComparator.Tests
                 new Calendar(3, new Time("wrong", 1.5F, 3, 1.2, new List<string> {"", ""}, 4, 34)), "2015", 1.2F, 11,
                 1.12,
                 new List<string> {"df", "asd"}, 1, 9);
-            var resultNoDiffTime1 = _dDigitalClock.GetDifferenceBetweenObjects(d2DigitalClock);
+            var resultNoDiffTime1 = _dDigitalClock.GetDistinctions(d2DigitalClock);
             resultNoDiffTime1.Should().NotBeEmpty().And.ContainSingle(x =>
                 x.Name ==
                 $"{nameof(d2DigitalClock.PropCalendar)}.{nameof(d2DigitalClock.PropCalendar.PropTimePanel)}.{nameof(d2DigitalClock.PropCalendar.PropTimePanel.PropYear)}");
@@ -64,7 +64,7 @@ namespace ObjectsComparator.Tests
                 1.12,
                 new List<string> {"df", "asd"}, 1, 9);
             var resultNoDiffTime1 =
-                _dDigitalClock.GetDifferenceBetweenObjects(d2DigitalClock, "PropCalendar.PropTimePanel.PropYear");
+                _dDigitalClock.GetDistinctions(d2DigitalClock, "PropCalendar.PropTimePanel.PropYear");
             resultNoDiffTime1.Should().BeEmpty();
         }
 
@@ -78,7 +78,7 @@ namespace ObjectsComparator.Tests
                 new List<string> {"df", "asd"}, 1, 9);
             var str = new Strategies<DigitalClock>().Set(x => x.PropCalendar.Page,
                 (s, s1) => s1 == page);
-            var resultNoDiffTime1 = _dDigitalClock.GetDifferenceBetweenObjects(d2DigitalClock, str);
+            var resultNoDiffTime1 = _dDigitalClock.GetDistinctions(d2DigitalClock, str);
             resultNoDiffTime1.Should().BeEmpty();
         }
 
@@ -86,7 +86,7 @@ namespace ObjectsComparator.Tests
         public void IsObjectsEqualTestWhenSeveralIgnore()
         {
             var time1 = new Time("wrong", 1.5F, 77, 1.2, new List<string> {"", ""}, 4, 34);
-            var resultNoDiffTime1 = _time.GetDifferenceBetweenObjects(time1, "PropYear", "Day");
+            var resultNoDiffTime1 = _time.GetDistinctions(time1, "PropYear", "Day");
             resultNoDiffTime1.Should().BeEmpty();
         }
 
@@ -95,7 +95,7 @@ namespace ObjectsComparator.Tests
         {
             const string actual = "2015";
             var time2 = new Time(actual, 1.5F, 3, 1.2, new List<string> {"", ""}, 4, 34);
-            var resultStringDiffTime1 = _time.GetDifferenceBetweenObjects(time2);
+            var resultStringDiffTime1 = _time.GetDistinctions(time2);
             resultStringDiffTime1.Should().NotBeEmpty();
             var diff = resultStringDiffTime1.First();
             diff.Name.Should().BeEquivalentTo(nameof(time2.PropYear));
@@ -108,7 +108,7 @@ namespace ObjectsComparator.Tests
         {
             const float actual = 2.5F;
             var time3 = new Time("2016", actual, 3, 1.2, new List<string> {"", ""}, 4, 34);
-            var resultFloatDiffTime1 = _time.GetDifferenceBetweenObjects(time3);
+            var resultFloatDiffTime1 = _time.GetDistinctions(time3);
             resultFloatDiffTime1.Should().NotBeEmpty();
             var diff = resultFloatDiffTime1.First();
             diff.ActuallyValue.Should().Be(actual);
@@ -120,7 +120,7 @@ namespace ObjectsComparator.Tests
         {
             const short actual = 1;
             var time4 = new Time("2016", 1.5F, actual, 1.2, new List<string> {"", ""}, 4, 34);
-            var resultShortDiffTime = _time.GetDifferenceBetweenObjects(time4);
+            var resultShortDiffTime = _time.GetDistinctions(time4);
             resultShortDiffTime.Should().NotBeEmpty();
             var diff = resultShortDiffTime.First();
             diff.ActuallyValue.Should().Be(actual);
@@ -132,7 +132,7 @@ namespace ObjectsComparator.Tests
         {
             const string actual = "ddd";
             var time6 = new Time("2016", 1.5F, 3, 1.2, new List<string> {"ddd", ""}, 4, 34);
-            var resultCollectionDiffTime = _time.GetDifferenceBetweenObjects(time6);
+            var resultCollectionDiffTime = _time.GetDistinctions(time6);
             resultCollectionDiffTime.Should().NotBeEmpty();
             var diff = resultCollectionDiffTime.First();
             diff.ActuallyValue.Should().Be(actual);
@@ -146,7 +146,7 @@ namespace ObjectsComparator.Tests
                 new Calendar(3, new Time("2016", 1.5F, 3, 1.2, new List<string> {"", ""}, 4, 34)), "2015", 1.2F, 11,
                 1.12,
                 new List<string> {"df", "asd"}, 1, 9);
-            var resultNoDiffClock = _dDigitalClock.GetDifferenceBetweenObjects(d1DigitalClock);
+            var resultNoDiffClock = _dDigitalClock.GetDistinctions(d1DigitalClock);
             resultNoDiffClock.Should().BeEmpty();
         }
 
@@ -158,7 +158,7 @@ namespace ObjectsComparator.Tests
                 new Calendar(3, new Time("2016", 1.5F, 3, 1.2, new List<string> {"", ""}, 4, 34)), "2015", 1.2F, 11,
                 1.12,
                 new List<string> {"df", "asd"}, 1, 9);
-            var resultBoolDiffClock = _dDigitalClock.GetDifferenceBetweenObjects(d2DigitalClock);
+            var resultBoolDiffClock = _dDigitalClock.GetDistinctions(d2DigitalClock);
             resultBoolDiffClock.Should().NotBeEmpty();
             var diff = resultBoolDiffClock.First();
             diff.ActuallyValue.Should().Be(act);
@@ -173,7 +173,7 @@ namespace ObjectsComparator.Tests
                 new Calendar(3, new Time("2016", 1.5F, 3, 1.2, new List<string> {"", ""}, 4, 34)), "2015", 1.2F, 11,
                 1.12,
                 new List<string> {"df", "asd"}, 1, 9);
-            var resultArrayDiffClock = _dDigitalClock.GetDifferenceBetweenObjects(d3DigitalClock);
+            var resultArrayDiffClock = _dDigitalClock.GetDistinctions(d3DigitalClock);
             resultArrayDiffClock.Should().NotBeEmpty();
             var diff = resultArrayDiffClock.First();
             diff.Name.Should().BeEquivalentTo(nameof(d3DigitalClock.NumberMonth) + "[0]");
@@ -200,7 +200,7 @@ namespace ObjectsComparator.Tests
                 InnerClass = new[] {new SomeClass {Foo = "ttt"}, new SomeClass {Foo = "ttt2"}}
             };
 
-            var res = act.GetDifferenceBetweenObjects(exp);
+            var res = act.GetDistinctions(exp);
             res.Should().NotBeEmpty();
             var diff = res.First();
             diff.ActuallyValue.Should().Be(exp.Two);
@@ -226,7 +226,7 @@ namespace ObjectsComparator.Tests
                 InnerClass = new[] {new SomeClass {Foo = "ttt"}, new SomeClass {Foo = "tt"}}
             };
 
-            var res = act.GetDifferenceBetweenObjects(exp);
+            var res = act.GetDistinctions(exp);
             res.Count().Should().Be(2);
             var diff = res.First();
             diff.Name.Should().Be(nameof(act.Two));
@@ -258,7 +258,7 @@ namespace ObjectsComparator.Tests
                 InnerClass = new[] {new SomeClass {Foo = "some"}, new SomeClass {Foo = data}}
             };
 
-            var res = act.GetDifferenceBetweenObjects(exp, str => str.Set(x => x.InnerClass[0].Foo,
+            var res = act.GetDistinctions(exp, str => str.Set(x => x.InnerClass[0].Foo,
                 (s, s1) => s == data));
             res.Should().BeEmpty();
         }
@@ -283,7 +283,7 @@ namespace ObjectsComparator.Tests
                 InnerClass = new[] {new SomeClass {Foo = "some"}, new SomeClass {Foo = "someFail"}}
             };
 
-            var res = act.GetDifferenceBetweenObjects(exp, str => str.Set(x => x.InnerClass[0].Foo,
+            var res = act.GetDistinctions(exp, str => str.Set(x => x.InnerClass[0].Foo,
                 (s, s1) => s == data));
 
             var expected = new DistinctionsCollection()
@@ -315,7 +315,7 @@ namespace ObjectsComparator.Tests
                 InnerClass = new[] {new SomeClass {Foo = "some"}, new SomeClass {Foo = "some2"}}
             };
 
-            var res = act.GetDifferenceBetweenObjects(exp, st => st.Set(x => x.Two,
+            var res = act.GetDistinctions(exp, st => st.Set(x => x.Two,
                 (s, s1) => s == 5));
             res.Should().BeEmpty();
         }
@@ -339,7 +339,7 @@ namespace ObjectsComparator.Tests
 
             };
 
-            var res = act.GetDifferenceBetweenObjects(exp, str => str.Set(x => x.Third,
+            var res = act.GetDistinctions(exp, str => str.Set(x => x.Third,
                 (s, s1) => s.Foo == "yes"));
             res.Should().BeEmpty();
         }
@@ -394,7 +394,7 @@ namespace ObjectsComparator.Tests
             };
 
             var skip = new[] {"Vehicle", "Name", "Courses[1].Name"};
-            var result = expected.GetDifferenceBetweenObjects(actual,
+            var result = expected.GetDistinctions(actual,
                 str => str.Set(x => x.Courses[0].Duration, (act, exp) => act > TimeSpan.FromHours(3),
                     new Display {Expected = "Expected that Duration should be more that 3 hours"}), skip);
             var expectedDistinctionsCollection = new DistinctionsCollection()
@@ -455,7 +455,7 @@ namespace ObjectsComparator.Tests
 
             var newRule = new Comparator.Comparator();
             newRule.RuleForReferenceTypes.Add(new CourseRule());
-            var result = ComparatorExtension.GetDifferenceBetweenObjects(expected, actual, newRule);
+            var result = ComparatorExtension.GetDistinctions(expected, actual, newRule);
             var expectedDistinctionsCollection =
                 new DistinctionsCollection().Add(new Distinction("Courses[1]", "Fake", "Math"));
 
@@ -486,7 +486,7 @@ namespace ObjectsComparator.Tests
                 }
             };
 
-            var result = exp.GetDifferenceBetweenObjects(act);
+            var result = exp.GetDistinctions(act);
             var expectedDistinctionsCollection = new DistinctionsCollection()
                 .Add(new Distinction("Books[hobbit].Pages", 1000, 1)).Add(new Distinction(
                     "Books[murder in orient express].Text", "murder in orient express Text",
