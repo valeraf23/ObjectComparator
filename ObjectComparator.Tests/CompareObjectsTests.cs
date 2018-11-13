@@ -493,7 +493,7 @@ namespace ObjectsComparator.Tests
         [Test]
         public void Set_Strategy_For_Member_Array()
         {
-            var act = new Building()
+            var act = new Building
             {
                 Address = "NY, First Street",
                 ListOfAppNumbers = new[] {32, 25, 14, 89}
