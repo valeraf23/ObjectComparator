@@ -30,10 +30,18 @@ namespace ObjectsComparator.Comparator
         public IList<string> Ignore { get; set; } = new List<string>();
         public IDictionary<string, ICompareValues> Strategies { get; set; } = new Dictionary<string, ICompareValues>();
 
-        public Distinctions GetDifference<T>(T valueA, T valueB, string propertyName) => RuleFactory
-            .Create(RuleForCollectionTypes, RuleForReferenceTypes, RuleForValuesTypes)
-            .GetFor(valueB.GetType())
-            .Compare(valueA, valueB, propertyName);
+        public Distinctions GetDifference<T>(T valueA, T valueB, string propertyName)
+        {
+            if (Strategies.IsNotEmpty() && Strategies.Any(x => x.Key == propertyName))
+            {
+                return Strategies[propertyName].Compare(valueA, valueB, propertyName);
+            }
+
+            return RuleFactory
+                .Create(RuleForCollectionTypes, RuleForReferenceTypes, RuleForValuesTypes)
+                .GetFor(valueB.GetType())
+                .Compare(valueA, valueB, propertyName);
+        }
 
         public Distinctions Compare<T>(T objectA, T objectB) => Compare(objectA, objectB, null);
 
@@ -74,7 +82,7 @@ namespace ObjectsComparator.Comparator
                         break;
                 }
 
-                var diffRes = CompareValuesForMember(Strategies, actualPropertyPath, valueA, valueB);
+                var diffRes = CompareValuesForMember(actualPropertyPath, valueA, valueB);
                 if (diffRes.IsNotEmpty())
                 {
                     diff.AddRange(diffRes);
@@ -84,29 +92,22 @@ namespace ObjectsComparator.Comparator
             return diff;
         }
 
-        private Distinctions CompareValuesForMember(IDictionary<string, ICompareValues> custom,
-            string propertyName, dynamic valueA, dynamic valueB)
+        private Distinctions CompareValuesForMember(string propertyName, dynamic valueA, dynamic valueB)
         {
-            if (custom.IsEmpty() || custom.All(x => x.Key != propertyName))
+            var diff = new Distinctions();
+            if (valueA == null && valueB != null)
             {
-                var diff = new Distinctions();
-                if (valueA == null && valueB != null)
-                {
-                    return Distinctions.Create(propertyName, "null", valueB);
-                }
-
-                if (valueA != null && valueB == null)
-                {
-                    return Distinctions.Create(propertyName, valueA, "null");
-                }
-
-                return valueA == null
-                    ? diff
-                    : (Distinctions) GetDifference(valueA, valueB, propertyName);
+                return Distinctions.Create(propertyName, "null", valueB);
             }
 
-            var customStrategy = custom[propertyName];
-            return customStrategy.Compare((object) valueA, (object) valueB, propertyName);
+            if (valueA != null && valueB == null)
+            {
+                return Distinctions.Create(propertyName, valueA, "null");
+            }
+
+            return valueA == null
+                ? diff
+                : (Distinctions) GetDifference(valueA, valueB, propertyName);
         }
 
         public void SetIgnore(IList<string> ignore)

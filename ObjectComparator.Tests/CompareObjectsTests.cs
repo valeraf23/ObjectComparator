@@ -298,7 +298,6 @@ namespace ObjectsComparator.Tests
         [Test]
         public void Set_Strategy_For_Member()
         {
-
             var act = new ClassA
             {
                 One = "f",
@@ -328,7 +327,6 @@ namespace ObjectsComparator.Tests
                 One = "f",
                 Two = new SomeClass {Foo = "no"},
                 Third = new SomeClass {Foo = "yes"}
-
             };
 
             var exp = new ClassB
@@ -336,7 +334,6 @@ namespace ObjectsComparator.Tests
                 One = "f",
                 Two = new SomeClass {Foo = "no"},
                 Third = new SomeClass {Foo = "no"}
-
             };
 
             var res = act.GetDistinctions(exp, str => str.Set(x => x.Third,
@@ -460,7 +457,6 @@ namespace ObjectsComparator.Tests
                 new Distinctions().Add(new Distinction("Courses[1]", "Fake", "Math"));
 
             CollectionAssert.AreEquivalent(result, expectedDistinctionsCollection);
-
         }
 
         [Test]
@@ -492,6 +488,30 @@ namespace ObjectsComparator.Tests
                     "Books[murder in orient express].Text", "murder in orient express Text",
                     "murder in orient express Text1"));
             CollectionAssert.AreEquivalent(result, expectedDistinctionsCollection);
+        }
+
+        [Test]
+        public void Set_Strategy_For_Member_Array()
+        {
+            var act = new Building()
+            {
+                Address = "NY, First Street",
+                ListOfAppNumbers = new[] {32, 25, 14, 89}
+            };
+
+            var exp = new Building
+            {
+                Address = "NY, First Street",
+                ListOfAppNumbers = new[] {555, 25, 14, 89}
+            };
+
+            const int expNumber = 32;
+
+            var str = new Strategies<Building>().Set(x => x.ListOfAppNumbers[0],
+                (ex, ac) => ex == expNumber);
+
+            var res = act.GetDistinctions(exp, str);
+            res.Should().BeEmpty();
         }
     }
 }
