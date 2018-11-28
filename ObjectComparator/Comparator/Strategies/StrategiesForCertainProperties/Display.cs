@@ -14,6 +14,9 @@ namespace ObjectsComparator.Comparator.Strategies.StrategiesForCertainProperties
             return new DistinctionForStrategy(lambdaExpression, propertyName, expectedValue, actuallyValue);
         }
 
-        private static string ReplaceNull(object value) => value == null ? "null" : value.ToString();
+        private static string ReplaceNull(object value)
+        {
+            return value == null ? "null" : value.ToString();
+        }
     }
 }

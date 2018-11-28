@@ -42,20 +42,14 @@ namespace ObjectsComparator.Helpers.Extensions
 
             public override Expression Visit(Expression exp)
             {
-                if (exp == null)
-                {
-                    return null;
-                }
+                if (exp == null) return null;
 
                 return _candidates.Contains(exp) ? Evaluate(exp) : base.Visit(exp);
             }
 
             private static Expression Evaluate(Expression e)
             {
-                if (e.NodeType == ExpressionType.Constant)
-                {
-                    return e;
-                }
+                if (e.NodeType == ExpressionType.Constant) return e;
 
                 var lambda = Expression.Lambda(e);
                 var fn = lambda.Compile();
@@ -92,17 +86,11 @@ namespace ObjectsComparator.Helpers.Extensions
 
                 if (!_cannotBeEvaluated)
                 {
-
                     if (_fnCanBeEvaluated(expression))
-                    {
                         _candidates.Add(expression);
-                    }
 
                     else
-                    {
                         _cannotBeEvaluated = true;
-
-                    }
                 }
 
                 _cannotBeEvaluated |= saveCannotBeEvaluated;

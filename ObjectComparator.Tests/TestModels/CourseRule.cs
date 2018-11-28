@@ -18,7 +18,11 @@ namespace ObjectsComparator.Tests.TestModels
         }
 
 
-        public bool IsValid(Type member) => member == typeof(Course);
+        public bool IsValid(Type member)
+        {
+            return member == typeof(Course);
+        }
+
         public IList<string> Ignore { get; set; }
         public IDictionary<string, ICompareValues> Strategies { get; set; }
     }

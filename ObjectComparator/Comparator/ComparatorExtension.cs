@@ -11,13 +11,19 @@ namespace ObjectsComparator.Comparator
     {
         public static Distinctions GetDistinctions<T>(this T valueA, T valueB,
             params string[] ignore)
-            where T : class => GetDistinctions(valueA, valueB, null, null, ignore);
+            where T : class
+        {
+            return GetDistinctions(valueA, valueB, null, null, ignore);
+        }
 
         public static Distinctions GetDistinctions<T>(this T valueA, T valueB,
             Strategies<T> custom,
             params string[] ignore)
-            where T : class => GetDistinctions(valueA, valueB,
-            custom.ToDictionary(x => x.Key, x => x.Value), null, ignore);
+            where T : class
+        {
+            return GetDistinctions(valueA, valueB,
+                custom.ToDictionary(x => x.Key, x => x.Value), null, ignore);
+        }
 
         public static Distinctions GetDistinctions<T>(this T valueA, T valueB,
             Func<Strategies<T>, IEnumerable<KeyValuePair<string, ICompareValues>>> strategies,
@@ -40,6 +46,9 @@ namespace ObjectsComparator.Comparator
         }
 
         public static Distinctions GetDistinctions<T>(T objectA, T objectB, Comparator compareObject)
-            where T : class => compareObject.Compare(objectA, objectB);
+            where T : class
+        {
+            return compareObject.Compare(objectA, objectB);
+        }
     }
 }

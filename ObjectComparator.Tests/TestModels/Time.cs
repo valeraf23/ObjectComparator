@@ -4,13 +4,12 @@ namespace ObjectsComparator.Tests.TestModels
 {
     internal class Time
     {
-        public float Seconds;
         public short Day;
-        public double Period;
-        public List<string> Week;
-        public int Month;
         public int Hours;
-        public string PropYear { get; set; }
+        public int Month;
+        public double Period;
+        public float Seconds;
+        public List<string> Week;
 
         public Time(string year1, float seconds1, short day1, double period1, List<string> week1, int month1,
             int hours1)
@@ -24,6 +23,6 @@ namespace ObjectsComparator.Tests.TestModels
             Hours = hours1;
         }
 
+        public string PropYear { get; set; }
     }
 }
-

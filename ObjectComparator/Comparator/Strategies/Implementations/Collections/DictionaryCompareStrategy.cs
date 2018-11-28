@@ -31,7 +31,9 @@ namespace ObjectsComparator.Comparator.Strategies.Implementations.Collections
                 .Invoke(this, new[] {(object) valueA, valueB, propertyName});
         }
 
-        public override bool IsValid(Type member) =>
-            member.IsGenericType && member.GetGenericTypeDefinition() == typeof(Dictionary<,>);
+        public override bool IsValid(Type member)
+        {
+            return member.IsGenericType && member.GetGenericTypeDefinition() == typeof(Dictionary<,>);
+        }
     }
 }

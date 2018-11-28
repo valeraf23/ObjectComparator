@@ -10,14 +10,14 @@ namespace ObjectsComparator.Comparator.Strategies.StrategiesForCertainProperties
     {
         private readonly Display _display;
 
-        public Expression<Func<T, T, bool>> CompareFunc { get; set; }
-
         public MemberStrategy(Expression<Func<T, T, bool>> compareFunc,
             Display display)
         {
             _display = display;
             CompareFunc = compareFunc;
         }
+
+        public Expression<Func<T, T, bool>> CompareFunc { get; set; }
 
         public Distinctions Compare<T1>(T1 valueA, T1 valueB, string propertyName)
         {

@@ -6,7 +6,6 @@ namespace ObjectsComparator.Tests.TestModels
     {
         public bool ClickTimer;
         public int[] NumberMonth;
-        public Calendar PropCalendar { get; set; }
 
         public DigitalClock(bool clickTimer, int[] numberMonth, Calendar calendar1, string year1, float seconds1,
             short day1, double period1, List<string> week1, int month1, int hours1)
@@ -17,5 +16,6 @@ namespace ObjectsComparator.Tests.TestModels
             PropCalendar = calendar1;
         }
 
+        public Calendar PropCalendar { get; set; }
     }
 }

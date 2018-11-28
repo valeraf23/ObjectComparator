@@ -26,36 +26,23 @@ namespace ObjectsComparator.Comparator
         public Rule<ICompareStructStrategy> RuleForValuesTypes { get; }
         public RuleForCollections RuleForCollectionTypes { get; }
 
-        public bool IsValid(Type member) => member.IsClass && member != typeof(string);
+        public bool IsValid(Type member)
+        {
+            return member.IsClass && member != typeof(string);
+        }
+
         public IList<string> Ignore { get; set; } = new List<string>();
         public IDictionary<string, ICompareValues> Strategies { get; set; } = new Dictionary<string, ICompareValues>();
 
-        public Distinctions GetDifference<T>(T valueA, T valueB, string propertyName)
+        public Distinctions Compare<T>(T valueA, T valueB, string propertyName)
         {
-            if (Strategies.IsNotEmpty() && Strategies.Any(x => x.Key == propertyName))
-            {
-                return Strategies[propertyName].Compare(valueA, valueB, propertyName);
-            }
-
-            return RuleFactory
-                .Create(RuleForCollectionTypes, RuleForReferenceTypes, RuleForValuesTypes)
-                .GetFor(valueB.GetType())
-                .Compare(valueA, valueB, propertyName);
-        }
-
-        public Distinctions Compare<T>(T objectA, T objectB) => Compare(objectA, objectB, null);
-
-        public Distinctions Compare<T>(T objectA, T objectB, string propertyName)
-        {
-            if (objectA != null && objectB == null || objectA == null && objectB != null)
-            {
-                return Distinctions.Create(new Distinction(typeof(T).Name, objectA, objectB));
-            }
+            if (valueA != null && valueB == null || valueA == null && valueB != null)
+                return Distinctions.Create(new Distinction(typeof(T).Name, valueA, valueB));
 
             var diff = new Distinctions();
-            if (ReferenceEquals(objectA, objectB)) return diff;
+            if (ReferenceEquals(valueA, valueB)) return diff;
 
-            var type = objectA.GetType();
+            var type = valueA.GetType();
 
             foreach (var mi in type.GetMembers(BindingFlags.Public | BindingFlags.Instance).Where(x =>
                 x.MemberType == MemberTypes.Property || x.MemberType == MemberTypes.Field))
@@ -63,47 +50,51 @@ namespace ObjectsComparator.Comparator
                 var name = mi.Name;
                 var actualPropertyPath = MemberPathBuilder.BuildMemberPath(propertyName, mi);
 
-                if (Ignore.Contains(actualPropertyPath))
-                {
-                    continue;
-                }
+                if (Ignore.Contains(actualPropertyPath)) continue;
 
-                object valueA = null;
-                object valueB = null;
+                object firstValue = null;
+                object secondValue = null;
                 switch (mi.MemberType)
                 {
                     case MemberTypes.Field:
-                        valueA = type.GetField(name).GetValue(objectA);
-                        valueB = type.GetField(name).GetValue(objectB);
+                        firstValue = type.GetField(name).GetValue(valueA);
+                        secondValue = type.GetField(name).GetValue(valueB);
                         break;
                     case MemberTypes.Property:
-                        valueA = type.GetProperty(name).GetValue(objectA);
-                        valueB = type.GetProperty(name).GetValue(objectB);
+                        firstValue = type.GetProperty(name).GetValue(valueA);
+                        secondValue = type.GetProperty(name).GetValue(valueB);
                         break;
                 }
 
-                var diffRes = CompareValuesForMember(actualPropertyPath, valueA, valueB);
-                if (diffRes.IsNotEmpty())
-                {
-                    diff.AddRange(diffRes);
-                }
+                var diffRes = CompareValuesForMember(actualPropertyPath, firstValue, secondValue);
+                if (diffRes.IsNotEmpty()) diff.AddRange(diffRes);
             }
 
             return diff;
         }
 
+        public Distinctions GetDifference<T>(T valueA, T valueB, string propertyName)
+        {
+            if (Strategies.IsNotEmpty() && Strategies.Any(x => x.Key == propertyName))
+                return Strategies[propertyName].Compare(valueA, valueB, propertyName);
+
+            return RuleFactory
+                .Create(RuleForCollectionTypes, RuleForReferenceTypes, RuleForValuesTypes)
+                .GetFor(valueB.GetType())
+                .Compare(valueA, valueB, propertyName);
+        }
+
+        public Distinctions Compare<T>(T objectA, T objectB)
+        {
+            return Compare(objectA, objectB, null);
+        }
+
         private Distinctions CompareValuesForMember(string propertyName, dynamic valueA, dynamic valueB)
         {
             var diff = new Distinctions();
-            if (valueA == null && valueB != null)
-            {
-                return Distinctions.Create(propertyName, "null", valueB);
-            }
+            if (valueA == null && valueB != null) return Distinctions.Create(propertyName, "null", valueB);
 
-            if (valueA != null && valueB == null)
-            {
-                return Distinctions.Create(propertyName, valueA, "null");
-            }
+            if (valueA != null && valueB == null) return Distinctions.Create(propertyName, valueA, "null");
 
             return valueA == null
                 ? diff

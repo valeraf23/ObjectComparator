@@ -5,8 +5,6 @@ namespace ObjectsComparator.Comparator.Strategies.StrategiesForCertainProperties
 {
     public class DistinctionForStrategy : Distinction
     {
-        public string LambdaExpression { get; }
-
         public DistinctionForStrategy(string lambdaExpression, string name, object expectedValue, object actuallyValue)
             : base(name, expectedValue, actuallyValue)
         {
@@ -14,7 +12,12 @@ namespace ObjectsComparator.Comparator.Strategies.StrategiesForCertainProperties
             LambdaExpression = lambdaExpression;
         }
 
-        public override string ToString() =>
-            $"Name: {Name}\n Expected Value :{ExpectedValue}\n Actually Value :{ActuallyValue}\n LambdaExpression :{LambdaExpression}";
+        public string LambdaExpression { get; }
+
+        public override string ToString()
+        {
+            return
+                $"Name: {Name}\n Expected Value :{ExpectedValue}\n Actually Value :{ActuallyValue}\n LambdaExpression :{LambdaExpression}";
+        }
     }
 }

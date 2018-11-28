@@ -13,20 +13,20 @@ namespace ObjectsComparator.Comparator.Strategies.Implementations.Collections
             var listB = ((IEnumerable) valueB).Cast<dynamic>().ToList();
 
             if (listA.Count != listB.Count)
-            {
                 return new Distinctions
                 {
                     new Distinction("Collection has different length", $"{listA.Count}",
                         $"{listB.Count}")
                 };
-            }
 
             return Enumerable.Range(0, listA.Count).Aggregate(new Distinctions(),
                 (dc, i) => dc.AddRange(
                     Comparator.GetDifference(listA[i], listB[i], $"{propertyName}[{i}]")));
         }
 
-        public override bool IsValid(Type member) =>
-            member.GetInterfaces().Contains(typeof(IEnumerable)) && member != typeof(string);
+        public override bool IsValid(Type member)
+        {
+            return member.GetInterfaces().Contains(typeof(IEnumerable)) && member != typeof(string);
+        }
     }
 }

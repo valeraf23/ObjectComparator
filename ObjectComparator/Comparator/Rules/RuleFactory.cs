@@ -10,10 +10,12 @@ namespace ObjectsComparator.Comparator.Rules
             IGetProperlyRule ruleForCollectionTypes,
             IGetProperlyRule ruleForReferenceTypes,
             IGetProperlyRule ruleForValuesTypes
-        ) =>
-            new CollectionTypeChained(ruleForCollectionTypes,
+        )
+        {
+            return new CollectionTypeChained(ruleForCollectionTypes,
                 new ReferenceTypeChained(ruleForReferenceTypes,
                     new StructTypeChained(ruleForValuesTypes,
                         new NotSatisfiedRule())));
+        }
     }
 }

@@ -26,6 +26,18 @@ namespace ObjectsComparator.Comparator.Rules.Implementations
 
         public T Default { get; }
 
+        public Stack<T> Strategies { get; }
+
+        public ICompareValues GetFor(Type memberType)
+        {
+            return Strategies.FirstOrDefault(x => x.IsValid(memberType)) ?? Default;
+        }
+
+        public bool IsValid(Type member)
+        {
+            return Default.IsValid(member);
+        }
+
         public Rule<T> Add(T newRule)
         {
             Strategies.Push(newRule);
@@ -37,9 +49,5 @@ namespace ObjectsComparator.Comparator.Rules.Implementations
             newRules.ForEach(x => Strategies.Push(x));
             return this;
         }
-
-        public Stack<T> Strategies { get; }
-        public ICompareValues GetFor(Type memberType) => Strategies.FirstOrDefault(x => x.IsValid(memberType)) ?? Default;
-        public bool IsValid(Type member) => Default.IsValid(member);
     }
 }

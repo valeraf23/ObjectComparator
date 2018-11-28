@@ -6,6 +6,9 @@ namespace ObjectsComparator.Comparator.Rules.Implementations
 {
     internal class NotSatisfiedRule : IGetRule<ICompareValues>
     {
-        public ICompareValues GetFor(Type memberType) => throw new NotSupportedException($"Not Satisfied Rule for {memberType.FullName}");
+        public ICompareValues GetFor(Type memberType)
+        {
+            throw new NotSupportedException($"Not Satisfied Rule for {memberType.FullName}");
+        }
     }
 }

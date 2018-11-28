@@ -11,9 +11,15 @@ namespace ObjectsComparator.Comparator.RepresentationDistinction
     {
         private readonly List<Distinction> _list;
 
-        public Distinctions() => _list = new List<Distinction>();
+        public Distinctions()
+        {
+            _list = new List<Distinction>();
+        }
 
-        public Distinctions(IEnumerable<Distinction> collection) => _list = new List<Distinction>(collection);
+        public Distinctions(IEnumerable<Distinction> collection)
+        {
+            _list = new List<Distinction>(collection);
+        }
 
         public Distinction this[int i]
         {
@@ -21,18 +27,36 @@ namespace ObjectsComparator.Comparator.RepresentationDistinction
             set => _list.Add(value);
         }
 
-        public static Distinctions Create(string name, object expectedValue, object actuallyValue) =>
-            new Distinctions(new[] {new Distinction(name, expectedValue, actuallyValue)});
+        public IEnumerator<Distinction> GetEnumerator()
+        {
+            return _list.GetEnumerator();
+        }
 
-        public static Distinctions Create(IEnumerable<Distinction> collection) =>
-            new Distinctions(collection);
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
 
-        public static Distinctions Create(Distinction collection) =>
-            new Distinctions(new[] {collection});
+        public static Distinctions Create(string name, object expectedValue, object actuallyValue)
+        {
+            return new Distinctions(new[] {new Distinction(name, expectedValue, actuallyValue)});
+        }
+
+        public static Distinctions Create(IEnumerable<Distinction> collection)
+        {
+            return new Distinctions(collection);
+        }
+
+        public static Distinctions Create(Distinction collection)
+        {
+            return new Distinctions(new[] {collection});
+        }
 
         public static ForDistinctionsBuilder<T> CreateFor<T>(string name, object expectedValue,
-            object actuallyValue) =>
-            new ForDistinctionsBuilder<T>(name, expectedValue, actuallyValue);
+            object actuallyValue)
+        {
+            return new ForDistinctionsBuilder<T>(name, expectedValue, actuallyValue);
+        }
 
         public Distinctions Add(Distinction input)
         {
@@ -46,10 +70,6 @@ namespace ObjectsComparator.Comparator.RepresentationDistinction
             return this;
         }
 
-        public IEnumerator<Distinction> GetEnumerator() => _list.GetEnumerator();
-
-        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-
         public override string ToString()
         {
             if (!_list.Any()) return "There are no Distinction";
@@ -60,7 +80,5 @@ namespace ObjectsComparator.Comparator.RepresentationDistinction
 
             return errorMessage;
         }
-
-
     }
 }
