@@ -2,7 +2,7 @@
 
 **This tool allows comparing objects furthermore provide distinctions. What is more, this tool can set compare rule for certain properties or fields and types.**
 
-[![NuGet.org](https://img.shields.io/nuget/v/VF.OptionType.svg?style=flat-square&label=NuGet.org)](https://www.nuget.org/packages/VF.OptionType/)
+[![NuGet.org](https://img.shields.io/nuget/v/ObjectComparator.svg?style=flat-square&label=NuGet.org)](https://www.nuget.org/packages/ObjectComparator/)
 [![Build status](https://ci.appveyor.com/api/projects/status/1i6lq6mft1jy94vx/branch/master?svg=true)](https://ci.appveyor.com/project/valeraf23/objectcomparator/branch/master)
 ## Installation
 
