@@ -12,12 +12,12 @@ namespace ObjectsComparator.Comparator.Strategies.Implementations.Collections
             var diff = new Distinctions();
             if (valueA.Count != valueB.Count)
                 return Distinctions.Create("Dictionary has different length", valueA.Count, valueB.Count);
-            foreach (var kvp in valueA)
+            foreach (var (key, value) in valueA)
             {
-                if (!valueB.TryGetValue(kvp.Key, out var secondValue))
-                    diff.Add(new Distinction(kvp.Key.ToString(), "Should be", "Does not exist"));
+                if (!valueB.TryGetValue(key, out var secondValue))
+                    diff.Add(new Distinction(key.ToString(), "Should be", "Does not exist"));
 
-                var diffRes = Comparator.Compare(kvp.Value, secondValue, $"{propertyName}[{kvp.Key}]");
+                var diffRes = Comparator.Compare(value, secondValue, $"{propertyName}[{key}]");
                 diff.AddRange(diffRes);
             }
 
@@ -31,9 +31,7 @@ namespace ObjectsComparator.Comparator.Strategies.Implementations.Collections
                 .Invoke(this, new[] {(object) valueA, valueB, propertyName});
         }
 
-        public override bool IsValid(Type member)
-        {
-            return member.IsGenericType && member.GetGenericTypeDefinition() == typeof(Dictionary<,>);
-        }
+        public override bool IsValid(Type member) =>
+            member.IsGenericType && member.GetGenericTypeDefinition() == typeof(Dictionary<,>);
     }
 }

@@ -26,10 +26,7 @@ namespace ObjectsComparator.Comparator
         public Rule<ICompareStructStrategy> RuleForValuesTypes { get; }
         public RuleForCollections RuleForCollectionTypes { get; }
 
-        public bool IsValid(Type member)
-        {
-            return member.IsClass && member != typeof(string);
-        }
+        public bool IsValid(Type member) => member.IsClass && member != typeof(string);
 
         public IList<string> Ignore { get; set; } = new List<string>();
         public IDictionary<string, ICompareValues> Strategies { get; set; } = new Dictionary<string, ICompareValues>();
@@ -73,18 +70,13 @@ namespace ObjectsComparator.Comparator
             return diff;
         }
 
-        private Distinctions GetDifference<T>(T valueA, T valueB, string propertyName)
-        {
-            return RuleFactory
+        private Distinctions GetDifference<T>(T valueA, T valueB, string propertyName) =>
+            RuleFactory
                 .Create(RuleForCollectionTypes, RuleForReferenceTypes, RuleForValuesTypes)
                 .GetFor(valueB.GetType())
                 .Compare(valueA, valueB, propertyName);
-        }
 
-        public Distinctions Compare<T>(T objectA, T objectB)
-        {
-            return Compare(objectA, objectB, null);
-        }
+        public Distinctions Compare<T>(T objectA, T objectB) => Compare(objectA, objectB, null);
 
         public Distinctions GetDistinctions(string propertyName, dynamic valueA, dynamic valueB)
         {
