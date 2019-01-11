@@ -66,18 +66,15 @@ namespace ObjectsComparator.Comparator
                         break;
                 }
 
-                var diffRes = CompareValuesForMember(actualPropertyPath, firstValue, secondValue);
+                var diffRes = GetDistinctions(actualPropertyPath, firstValue, secondValue);
                 if (diffRes.IsNotEmpty()) diff.AddRange(diffRes);
             }
 
             return diff;
         }
 
-        public Distinctions GetDifference<T>(T valueA, T valueB, string propertyName)
+        private Distinctions GetDifference<T>(T valueA, T valueB, string propertyName)
         {
-            if (Strategies.IsNotEmpty() && Strategies.Any(x => x.Key == propertyName))
-                return Strategies[propertyName].Compare(valueA, valueB, propertyName);
-
             return RuleFactory
                 .Create(RuleForCollectionTypes, RuleForReferenceTypes, RuleForValuesTypes)
                 .GetFor(valueB.GetType())
@@ -89,8 +86,11 @@ namespace ObjectsComparator.Comparator
             return Compare(objectA, objectB, null);
         }
 
-        private Distinctions CompareValuesForMember(string propertyName, dynamic valueA, dynamic valueB)
+        public Distinctions GetDistinctions(string propertyName, dynamic valueA, dynamic valueB)
         {
+            if (Strategies.IsNotEmpty() && Strategies.Any(x => x.Key == propertyName))
+                return Strategies[propertyName].Compare(valueA, valueB, propertyName);
+
             var diff = new Distinctions();
             if (valueA == null && valueB != null) return Distinctions.Create(propertyName, "null", valueB);
 

@@ -21,7 +21,7 @@ namespace ObjectsComparator.Comparator.Strategies.Implementations.Collections
 
             return Enumerable.Range(0, listA.Count).Aggregate(new Distinctions(),
                 (dc, i) => dc.AddRange(
-                    Comparator.GetDifference(listA[i], listB[i], $"{propertyName}[{i}]")));
+                    Comparator.GetDistinctions($"{propertyName}[{i}]", listA[i], listB[i])));
         }
 
         public override bool IsValid(Type member)

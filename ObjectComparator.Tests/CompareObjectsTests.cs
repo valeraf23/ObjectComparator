@@ -513,5 +513,27 @@ namespace ObjectsComparator.Tests
                 (s, s1) => s.Foo == "yes"));
             res.Should().BeEmpty();
         }
+
+        [Test]
+        public void Set_Strategy_For_Null_Member()
+        {
+            var act = new ClassB
+            {
+                One = "f",
+                Two = new SomeClass {Foo = "no"},
+                Third = null
+            };
+
+            var exp = new ClassB
+            {
+                One = "f",
+                Two = new SomeClass {Foo = "no"},
+                Third = new SomeClass {Foo = "yes"}
+            };
+
+            var res = act.GetDistinctions(exp, str => str.Set(x => x.Third,
+                (actual, expected) => expected.Foo == "yes"));
+            res.Should().BeEmpty();
+        }
     }
 }
