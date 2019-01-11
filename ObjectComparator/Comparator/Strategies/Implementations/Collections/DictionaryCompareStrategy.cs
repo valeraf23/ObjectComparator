@@ -12,12 +12,12 @@ namespace ObjectsComparator.Comparator.Strategies.Implementations.Collections
             var diff = new Distinctions();
             if (valueA.Count != valueB.Count)
                 return Distinctions.Create("Dictionary has different length", valueA.Count, valueB.Count);
-            foreach (var (key, value) in valueA)
+            foreach (var kvp in valueA)
             {
-                if (!valueB.TryGetValue(key, out var secondValue))
-                    diff.Add(new Distinction(key.ToString(), "Should be", "Does not exist"));
+                if (!valueB.TryGetValue(kvp.Key, out var secondValue))
+                    diff.Add(new Distinction(kvp.Key.ToString(), "Should be", "Does not exist"));
 
-                var diffRes = Comparator.Compare(value, secondValue, $"{propertyName}[{key}]");
+                var diffRes = Comparator.Compare(kvp.Value, secondValue, $"{propertyName}[{kvp.Key}]");
                 diff.AddRange(diffRes);
             }
 
