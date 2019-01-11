@@ -24,9 +24,7 @@ namespace ObjectsComparator.Comparator.Strategies.Implementations.Collections
                     Comparator.GetDistinctions($"{propertyName}[{i}]", listA[i], listB[i])));
         }
 
-        public override bool IsValid(Type member)
-        {
-            return member.GetInterfaces().Contains(typeof(IEnumerable)) && member != typeof(string);
-        }
+        public override bool IsValid(Type member) =>
+            member.GetInterfaces().Contains(typeof(IEnumerable)) && member != typeof(string);
     }
 }
