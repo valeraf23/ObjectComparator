@@ -493,6 +493,30 @@ namespace ObjectsComparator.Tests
         }
 
         [Test]
+        public void Set_Strategy_For_Member_List()
+        {
+            var act = new BuildingList
+            {
+                Address = "NY, First Street",
+                ListOfAppNumbers = new[] {32, 25, 14, 89}
+            };
+
+            var exp = new BuildingList
+            {
+                Address = "NY, First Street",
+                ListOfAppNumbers = new[] {555, 25, 14, 89}
+            };
+
+            const int expNumber = 32;
+
+            var str = new Strategies<BuildingList>().Set(x => x.ListOfAppNumbers[0],
+                (ex, ac) => ex == expNumber);
+
+            var res = act.GetDistinctions(exp, str);
+            res.Should().BeEmpty();
+        }
+
+        [Test]
         public void Set_Strategy_For_Member_RefType()
         {
             var act = new ClassB

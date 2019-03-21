@@ -1,14 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp2.1;net46</TargetFrameworks>
+    <TargetFrameworks>netcoreapp2.2;net46</TargetFrameworks>
     <Authors>Valerii_Fedorenko</Authors>
     <PackageProjectUrl>https://github.com/valeraf23/ObjectComparator</PackageProjectUrl>
     <Description>This library allows comparing objects and provide distinctions. What is more, this tool can set compare strategy for certain properties or fields and types</Description>
     <RepositoryUrl>https://github.com/valeraf23/ObjectComparator</RepositoryUrl>
     <PackageTags>Diff objects compare Comparator Equals classes distinctions</PackageTags>
-    <PackageReleaseNotes>add ability set strategies for members with null value</PackageReleaseNotes>
-    <Version>2.0.8</Version>
+    <PackageReleaseNotes>add ability set strategies for members with IList type</PackageReleaseNotes>
+    <Version>2.0.9</Version>
     <PackageId>ObjectComparator</PackageId>
   </PropertyGroup>
 

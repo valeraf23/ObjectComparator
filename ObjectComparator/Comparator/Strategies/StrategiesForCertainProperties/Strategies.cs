@@ -45,10 +45,11 @@ namespace ObjectsComparator.Comparator.Strategies.StrategiesForCertainProperties
 
         private static string ToPropertyInfo(LambdaExpression expression)
         {
+            var exp = ReplaceValuesDictionary.Replace(expression.ToString());
             //Foo.name => name
             //all after first dot Foo.name.second => name.second
             var reg = new Regex(@"(?<=\.).*");
-            var match = reg.Match(expression.ToString());
+            var match = reg.Match(exp);
             var propName = match.Success ? match.Value : throw new Exception($"We could not parse {expression}");
             return propName;
         }
