@@ -9,46 +9,46 @@ namespace ObjectsComparator.Comparator
 {
     public static class ComparatorExtension
     {
-        public static Distinctions GetDistinctions<T>(this T valueA, T valueB,
+        public static Distinctions GetDistinctions<T>(this T expected, T actual,
             params string[] ignore)
             where T : class
         {
-            return GetDistinctions(valueA, valueB, null, null, ignore);
+            return GetDistinctions(expected, actual, null, null, ignore);
         }
 
-        public static Distinctions GetDistinctions<T>(this T valueA, T valueB,
+        public static Distinctions GetDistinctions<T>(this T expected, T actual,
             Strategies<T> custom,
             params string[] ignore)
             where T : class
         {
-            return GetDistinctions(valueA, valueB,
+            return GetDistinctions(expected, actual,
                 custom.ToDictionary(x => x.Key, x => x.Value), null, ignore);
         }
 
-        public static Distinctions GetDistinctions<T>(this T valueA, T valueB,
+        public static Distinctions GetDistinctions<T>(this T expected, T actual,
             Func<Strategies<T>, IEnumerable<KeyValuePair<string, ICompareValues>>> strategies,
             params string[] ignore)
             where T : class
         {
             var customStr = strategies(new Strategies<T>());
-            return GetDistinctions(valueA, valueB, customStr.ToDictionary(x => x.Key, x => x.Value),
+            return GetDistinctions(expected, actual, customStr.ToDictionary(x => x.Key, x => x.Value),
                 null, ignore);
         }
 
-        public static Distinctions GetDistinctions<T>(T objectA, T objectB,
+        public static Distinctions GetDistinctions<T>(T expected, T actual,
             IDictionary<string, ICompareValues> custom, string propertyName, IList<string> ignore)
             where T : class
         {
             var compareTypes = new Comparator();
             compareTypes.SetIgnore(ignore);
             compareTypes.SetStrategies(custom);
-            return GetDistinctions(objectA, objectB, compareTypes);
+            return GetDistinctions(expected, actual, compareTypes);
         }
 
-        public static Distinctions GetDistinctions<T>(T objectA, T objectB, Comparator compareObject)
+        public static Distinctions GetDistinctions<T>(T expected, T actual, Comparator compareObject)
             where T : class
         {
-            return compareObject.Compare(objectA, objectB);
+            return compareObject.Compare(expected, actual);
         }
     }
 }

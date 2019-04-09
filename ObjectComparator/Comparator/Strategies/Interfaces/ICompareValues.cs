@@ -4,6 +4,6 @@ namespace ObjectsComparator.Comparator.Strategies.Interfaces
 {
     public interface ICompareValues
     {
-        Distinctions Compare<T>(T valueA, T valueB, string propertyName);
+        Distinctions Compare<T>(T expected, T actual, string propertyName);
     }
 }

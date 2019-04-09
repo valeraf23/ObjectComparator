@@ -19,10 +19,10 @@ namespace ObjectsComparator.Comparator.Strategies.StrategiesForCertainProperties
 
         public Expression<Func<T, T, bool>> CompareFunc { get; set; }
 
-        public Distinctions Compare<T1>(T1 valueA, T1 valueB, string propertyName)
+        public Distinctions Compare<T1>(T1 expected, T1 actual, string propertyName)
         {
-            var a = (T) (object) valueA;
-            var b = (T) (object) valueB;
+            var a = (T) (object) expected;
+            var b = (T) (object) actual;
             return CompareFunc.Compile()(a, b)
                 ? new Distinctions()
                 : new Distinctions(new[]
