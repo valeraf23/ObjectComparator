@@ -184,3 +184,38 @@ dotnet add package ObjectComparator
    */
   
 ```
+
+## Set ignore Strategy for properties/fields
+
+```csharp
+
+     var act = new Student
+            {
+                Name = "StudentName",
+                Age = 1,
+                Courses = new[]
+                {
+                    new Course
+                    {
+                        Name = "CourseName"
+                    }
+                }
+            };
+
+            var exp = new Student
+            {
+                Name = "StudentName1",
+                Age = 1,
+                Courses = new[]
+                {
+                    new Course
+                    {
+                        Name = "CourseName1"
+                    }
+                }
+            };
+
+            var res = act.GetDistinctions(exp, propName => propName.EndsWith("Name"));
+            res.Should().BeEmpty();
+  
+```
