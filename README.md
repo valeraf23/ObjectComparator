@@ -202,7 +202,7 @@ dotnet add package ObjectComparator
                 }
             };
 
-            var exp = new Student
+      var exp = new Student
             {
                 Name = "StudentName1",
                 Age = 1,
