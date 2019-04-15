@@ -216,6 +216,8 @@ dotnet add package ObjectComparator
             };
 
             var res = act.GetDistinctions(exp, propName => propName.EndsWith("Name"));
-            res.Should().BeEmpty();
+     /*
+     	There are no Distinction
+    */
   
 ```
