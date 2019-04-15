@@ -113,7 +113,7 @@ dotnet add package ObjectComparator
     var result = actual.GetDistinctions(expected,ignore);
    
      /*
-     	There are no Distinction
+     	There are no Distinctions
     */
     
 ```
@@ -182,5 +182,42 @@ dotnet add package ObjectComparator
         Expected Value :murder in orient express Text
         Actually Value :murder in orient express Text1
    */
+  
+```
+
+## Set ignore Strategy for properties/fields
+
+```csharp
+
+     var act = new Student
+            {
+                Name = "StudentName",
+                Age = 1,
+                Courses = new[]
+                {
+                    new Course
+                    {
+                        Name = "CourseName"
+                    }
+                }
+            };
+
+      var exp = new Student
+            {
+                Name = "StudentName1",
+                Age = 1,
+                Courses = new[]
+                {
+                    new Course
+                    {
+                        Name = "CourseName1"
+                    }
+                }
+            };
+
+            var distinctions = act.GetDistinctions(exp, propName => propName.EndsWith("Name"));
+    /*
+     	There are no Distinctions
+    */
   
 ```
