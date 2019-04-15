@@ -113,7 +113,7 @@ dotnet add package ObjectComparator
     var result = actual.GetDistinctions(expected,ignore);
    
      /*
-     	There are no Distinction
+     	There are no Distinctions
     */
     
 ```
@@ -215,9 +215,9 @@ dotnet add package ObjectComparator
                 }
             };
 
-            var res = act.GetDistinctions(exp, propName => propName.EndsWith("Name"));
+            var distinctions = act.GetDistinctions(exp, propName => propName.EndsWith("Name"));
     /*
-     	There are no Distinction
+     	There are no Distinctions
     */
   
 ```
