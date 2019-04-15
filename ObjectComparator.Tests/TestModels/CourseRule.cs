@@ -23,7 +23,7 @@ namespace ObjectsComparator.Tests.TestModels
             return member == typeof(Course);
         }
 
-        public IList<string> Ignore { get; set; }
+        public Func<string, bool> Ignore { get; set; }
         public IDictionary<string, ICompareValues> Strategies { get; set; }
     }
 }

@@ -29,19 +29,15 @@ namespace ObjectsComparator.Comparator.RepresentationDistinction
         public object ActuallyValue { get; set; }
 
 
-        public bool Equals(Distinction other)
-        {
-            return other != null &&
-                   (ReferenceEquals(this, other) ||
-                    Name.Equals(other.Name) &&
-                    ActuallyValue.Equals(other.ActuallyValue) &&
-                    ExpectedValue.Equals(other.ExpectedValue));
-        }
+        public bool Equals(Distinction other) =>
+            other != null &&
+            (ReferenceEquals(this, other) ||
+             Name.Equals(other.Name) &&
+             ActuallyValue.Equals(other.ActuallyValue) &&
+             ExpectedValue.Equals(other.ExpectedValue));
 
-        public override string ToString()
-        {
-            return $"\nProperty name \"{_name}\":\nExpected Value :{ExpectedValue}\nActually Value :{ActuallyValue}";
-        }
+        public override string ToString() =>
+            $"\nProperty name \"{_name}\":\nExpected Value :{ExpectedValue}\nActually Value :{ActuallyValue}";
 
         public override bool Equals(object obj)
         {

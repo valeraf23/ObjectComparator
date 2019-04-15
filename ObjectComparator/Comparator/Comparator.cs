@@ -28,7 +28,7 @@ namespace ObjectsComparator.Comparator
 
         public bool IsValid(Type member) => member.IsClass && member != typeof(string);
 
-        public IList<string> Ignore { get; set; } = new List<string>();
+        public Func<string, bool> Ignore { get; set; } = p => false;
         public IDictionary<string, ICompareValues> Strategies { get; set; } = new Dictionary<string, ICompareValues>();
 
         public Distinctions Compare<T>(T expected, T actual, string propertyName)
@@ -47,7 +47,7 @@ namespace ObjectsComparator.Comparator
                 var name = mi.Name;
                 var actualPropertyPath = MemberPathBuilder.BuildMemberPath(propertyName, mi);
 
-                if (Ignore.Contains(actualPropertyPath)) continue;
+                if (Ignore(actualPropertyPath)) continue;
 
                 object firstValue = null;
                 object secondValue = null;
@@ -93,10 +93,10 @@ namespace ObjectsComparator.Comparator
                 : (Distinctions) GetDifference(expected, actual, propertyName);
         }
 
-        public void SetIgnore(IList<string> ignore)
+        public void SetIgnore(Func<string, bool> ignoreStrategy)
         {
-            if (ignore.IsEmpty()) return;
-            RuleForReferenceTypes.Strategies.ForEach(x => x.Ignore = ignore);
+            if (ignoreStrategy == null) return;
+            RuleForReferenceTypes.Strategies.ForEach(x => x.Ignore = ignoreStrategy);
         }
 
         public void SetStrategies(IDictionary<string, ICompareValues> strategies)

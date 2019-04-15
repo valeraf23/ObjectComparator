@@ -559,5 +559,74 @@ namespace ObjectsComparator.Tests
                 (actual, expected) => expected.Foo == "yes"));
             res.Should().BeEmpty();
         }
+
+        [Test]
+        public void Set_StrategyIgnore()
+        {
+            var act = new Student
+            {
+                Name = "StudentName",
+                Age = 1,
+                Courses = new[]
+                {
+                    new Course
+                    {
+                        Name = "CourseName"
+                    }
+                }
+            };
+
+            var exp = new Student
+            {
+                Name = "StudentName1",
+                Age = 1,
+                Courses = new[]
+                {
+                    new Course
+                    {
+                        Name = "CourseName1"
+                    }
+                }
+            };
+
+            var res = act.GetDistinctions(exp, propName => propName.EndsWith("Name"));
+            res.Should().BeEmpty();
+        }
+
+        [Test]
+        public void Set_StrategyIgnore_Equal()
+        {
+            var act = new Student
+            {
+                Name = "StudentName",
+                Age = 1,
+                Courses = new[]
+                {
+                    new Course
+                    {
+                        Name = "CourseName"
+                    }
+                }
+            };
+
+            var exp = new Student
+            {
+                Name = "StudentName1",
+                Age = 1,
+                Courses = new[]
+                {
+                    new Course
+                    {
+                        Name = "CourseName1"
+                    }
+                }
+            };
+
+            var actual = act.GetDistinctions(exp, propName => propName == "Name");
+
+            var expected = new Distinctions()
+                .Add(new Distinction("Courses[0].Name", "CourseName", "CourseName1"));
+            CollectionAssert.AreEquivalent(expected, actual);
+        }
     }
 }

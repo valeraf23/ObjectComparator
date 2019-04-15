@@ -13,16 +13,15 @@ namespace ObjectsComparator.Comparator
             params string[] ignore)
             where T : class
         {
-            return GetDistinctions(expected, actual, null, null, ignore);
+            return GetDistinctions(expected, actual, new Strategies<T>(), ignore);
         }
 
         public static Distinctions GetDistinctions<T>(this T expected, T actual,
-            Strategies<T> custom,
-            params string[] ignore)
+            Strategies<T> custom, params string[] ignore)
             where T : class
         {
             return GetDistinctions(expected, actual,
-                custom.ToDictionary(x => x.Key, x => x.Value), null, ignore);
+                custom.ToDictionary(x => x.Key, x => x.Value), ignore.Contains);
         }
 
         public static Distinctions GetDistinctions<T>(this T expected, T actual,
@@ -31,16 +30,21 @@ namespace ObjectsComparator.Comparator
             where T : class
         {
             var customStr = strategies(new Strategies<T>());
-            return GetDistinctions(expected, actual, customStr.ToDictionary(x => x.Key, x => x.Value),
-                null, ignore);
+            return GetDistinctions(expected, actual, customStr.ToDictionary(x => x.Key, x => x.Value), ignore.Contains);
+        }
+
+        public static Distinctions GetDistinctions<T>(this T expected, T actual, Func<string, bool> ignoreStrategy)
+            where T : class
+        {
+            return GetDistinctions(expected, actual, null, ignoreStrategy);
         }
 
         public static Distinctions GetDistinctions<T>(T expected, T actual,
-            IDictionary<string, ICompareValues> custom, string propertyName, IList<string> ignore)
+            IDictionary<string, ICompareValues> custom, Func<string, bool> ignoreStrategy)
             where T : class
         {
             var compareTypes = new Comparator();
-            compareTypes.SetIgnore(ignore);
+            compareTypes.SetIgnore(ignoreStrategy);
             compareTypes.SetStrategies(custom);
             return GetDistinctions(expected, actual, compareTypes);
         }
