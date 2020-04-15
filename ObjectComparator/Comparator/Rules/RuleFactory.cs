@@ -1,3 +1,4 @@
+using ObjectsComparator.Comparator.Rules.ChainedRules;
 using ObjectsComparator.Comparator.Rules.Implementations;
 using ObjectsComparator.Comparator.Rules.Interfaces;
 using ObjectsComparator.Comparator.Strategies.Interfaces;
