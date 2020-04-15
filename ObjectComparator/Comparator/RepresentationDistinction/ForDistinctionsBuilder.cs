@@ -18,8 +18,8 @@ namespace ObjectsComparator.Comparator.RepresentationDistinction
         public Distinctions WhenNot(Func<T, T, bool> func)
         {
             return func(_expectedValue, _actuallyValue)
-                ? new Distinctions()
-                : new Distinctions(new[] {new Distinction(_name, _expectedValue, _actuallyValue)});
+                ? Distinctions.None()
+                : Distinctions.Create(new[] {new Distinction(_name, _expectedValue, _actuallyValue)});
         }
     }
 }

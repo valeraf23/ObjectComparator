@@ -24,8 +24,8 @@ namespace ObjectsComparator.Comparator.Strategies.StrategiesForCertainProperties
             var a = (T) (object) expected;
             var b = (T) (object) actual;
             return CompareFunc.Compile()(a, b)
-                ? new Distinctions()
-                : new Distinctions(new[]
+                ? Distinctions.None()
+                : Distinctions.Create(new[]
                 {
                     _display.GetDistinction(a, b, propertyName,
                         BodyExpression.Get(CompareFunc).ToString())

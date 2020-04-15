@@ -36,9 +36,8 @@ namespace ObjectsComparator.Comparator
             if (expected != null && actual == null || expected == null && actual != null)
                 return Distinctions.Create(new Distinction(typeof(T).Name, expected, actual));
 
-            var diff = new Distinctions();
-            if (ReferenceEquals(expected, actual)) return diff;
-
+            if (ReferenceEquals(expected, actual)) return Distinctions.None();
+            var diff = Distinctions.Create();
             var type = expected.GetType();
 
             foreach (var mi in type.GetMembers(BindingFlags.Public | BindingFlags.Instance).Where(x =>
@@ -58,8 +57,8 @@ namespace ObjectsComparator.Comparator
                         secondValue = type.GetField(name).GetValue(actual);
                         break;
                     case MemberTypes.Property:
-                        firstValue = type.GetProperty(name).GetValue(expected);
-                        secondValue = type.GetProperty(name).GetValue(actual);
+                        firstValue = type.GetProperty(name)?.GetValue(expected);
+                        secondValue = type.GetProperty(name)?.GetValue(actual);
                         break;
                 }
 
@@ -83,13 +82,12 @@ namespace ObjectsComparator.Comparator
             if (Strategies.IsNotEmpty() && Strategies.Any(x => x.Key == propertyName))
                 return Strategies[propertyName].Compare(expected, actual, propertyName);
 
-            var diff = new Distinctions();
             if (expected == null && actual != null) return Distinctions.Create(propertyName, "null", actual);
 
             if (expected != null && actual == null) return Distinctions.Create(propertyName, expected, "null");
 
             return expected == null
-                ? diff
+                ? Distinctions.None()
                 : (Distinctions) GetDifference(expected, actual, propertyName);
         }
 

@@ -21,10 +21,8 @@ namespace ObjectsComparator.Comparator.Strategies.StrategiesForCertainProperties
         {
             foreach (var sw in Swaps)
             {
-                foreach (var s in sw)
+                foreach (var (oldValue, newValue) in sw)
                 {
-                    var oldValue = s.Key;
-                    var newValue = s.Value;
                     str = str.Replace(oldValue, newValue);
                 }
             }

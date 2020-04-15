@@ -72,7 +72,7 @@ namespace ObjectsComparator.Tests
             newRule.RuleForReferenceTypes.Add(new CourseRule());
             var result = ComparatorExtension.GetDistinctions(expected, actual, newRule);
             var expectedDistinctionsCollection =
-                new Distinctions().Add(new Distinction("Courses[1]", "Fake", "Math"));
+                Distinctions.Create(new Distinction("Courses[1]", "Fake", "Math"));
 
             CollectionAssert.AreEquivalent(result, expectedDistinctionsCollection);
         }
@@ -101,10 +101,13 @@ namespace ObjectsComparator.Tests
             };
 
             var result = exp.GetDistinctions(act);
-            var expectedDistinctionsCollection = new Distinctions()
-                .Add(new Distinction("Books[hobbit].Pages", 1000, 1)).Add(new Distinction(
+            var expectedDistinctionsCollection = Distinctions.Create(new[]
+            {
+                new Distinction("Books[hobbit].Pages", 1000, 1),
+                new Distinction(
                     "Books[murder in orient express].Text", "murder in orient express Text",
-                    "murder in orient express Text1"));
+                    "murder in orient express Text1")
+            });
             CollectionAssert.AreEquivalent(result, expectedDistinctionsCollection);
         }
 
@@ -161,9 +164,9 @@ namespace ObjectsComparator.Tests
             var result = expected.GetDistinctions(actual,
                 str => str.Set(x => x.Courses[0].Duration, (act, exp) => act > TimeSpan.FromHours(3),
                     new Display {Expected = "Expected that Duration should be more that 3 hours"}), skip);
-            var expectedDistinctionsCollection = new Distinctions()
-                .Add(new Distinction("Courses[0].Duration", "Expected that Duration should be more that 3 hours",
-                    "04:00:00"));
+            var expectedDistinctionsCollection = Distinctions.Create(new Distinction("Courses[0].Duration",
+                "Expected that Duration should be more that 3 hours",
+                "04:00:00"));
 
             CollectionAssert.AreEquivalent(result, expectedDistinctionsCollection);
         }
@@ -435,11 +438,11 @@ namespace ObjectsComparator.Tests
             var res = act.GetDistinctions(exp, str => str.Set(x => x.InnerClass[0].Foo,
                 (s, s1) => s == data));
 
-            var expected = new Distinctions()
-                .Add(new Distinction("ArrayThird[0]", "sss", "error"))
-                .Add(new Distinction("ArrayThird[1]", "ggg", "error1"))
-                .Add(new Distinction("InnerClass[1].Foo", "actual", "someFail"));
-
+            var expected = Distinctions.Create(new[]
+            {
+                new Distinction("ArrayThird[0]", "sss", "error"), new Distinction("ArrayThird[1]", "ggg", "error1"),
+                new Distinction("InnerClass[1].Foo", "actual", "someFail")
+            });
 
             CollectionAssert.AreEquivalent(res, expected);
         }
@@ -624,8 +627,7 @@ namespace ObjectsComparator.Tests
 
             var actual = act.GetDistinctions(exp, propName => propName == "Name");
 
-            var expected = new Distinctions()
-                .Add(new Distinction("Courses[0].Name", "CourseName", "CourseName1"));
+            var expected = Distinctions.Create(new Distinction("Courses[0].Name", "CourseName", "CourseName1"));
             CollectionAssert.AreEquivalent(expected, actual);
         }
     }

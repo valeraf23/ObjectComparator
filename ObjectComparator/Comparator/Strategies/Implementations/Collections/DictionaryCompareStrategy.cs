@@ -9,15 +9,15 @@ namespace ObjectsComparator.Comparator.Strategies.Implementations.Collections
         public Distinctions CompareDictionary<TKey, TValue>(IDictionary<TKey, TValue> expected,
             IDictionary<TKey, TValue> actual, string propertyName)
         {
-            var diff = new Distinctions();
             if (expected.Count != actual.Count)
                 return Distinctions.Create("Dictionary has different length", expected.Count, actual.Count);
-            foreach (var kvp in expected)
+            var diff = Distinctions.Create();
+            foreach (var (key, value) in expected)
             {
-                if (!actual.TryGetValue(kvp.Key, out var secondValue))
-                    diff.Add(new Distinction(kvp.Key.ToString(), "Should be", "Does not exist"));
+                if (!actual.TryGetValue(key, out var secondValue))
+                    diff.Add(new Distinction(key.ToString(), "Should be", "Does not exist"));
 
-                var diffRes = Comparator.Compare(kvp.Value, secondValue, $"{propertyName}[{kvp.Key}]");
+                var diffRes = Comparator.Compare(value, secondValue, $"{propertyName}[{key}]");
                 diff.AddRange(diffRes);
             }
 
@@ -27,7 +27,7 @@ namespace ObjectsComparator.Comparator.Strategies.Implementations.Collections
         public override Distinctions Compare<T>(T expected, T actual, string propertyName)
         {
             var genericArguments = expected.GetType().GetGenericArguments();
-            return (Distinctions) GetType().GetMethod("CompareDictionary").MakeGenericMethod(genericArguments)
+            return (Distinctions) GetType().GetMethod("CompareDictionary")?.MakeGenericMethod(genericArguments)
                 .Invoke(this, new[] {(object) expected, actual, propertyName});
         }
 

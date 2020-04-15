@@ -5,8 +5,6 @@ namespace ObjectsComparator.Comparator.RepresentationDistinction
 {
     public class Distinction : IEquatable<Distinction>
     {
-        private string _name;
-
         public Distinction(string name, object expectedValue, object actuallyValue)
         {
             GuardArgument.ArgumentIsNotNull(name, $"{nameof(name)} can not be null or empty");
@@ -15,19 +13,11 @@ namespace ObjectsComparator.Comparator.RepresentationDistinction
             ActuallyValue = actuallyValue;
         }
 
-        public string Name
-        {
-            get => _name;
-            set
-            {
-                if (value != null) _name = value;
-            }
-        }
+        public string Name { get; }
 
-        public object ExpectedValue { get; set; }
+        public object ExpectedValue { get; }
 
-        public object ActuallyValue { get; set; }
-
+        public object ActuallyValue { get; }
 
         public bool Equals(Distinction other) =>
             other != null &&
@@ -37,12 +27,9 @@ namespace ObjectsComparator.Comparator.RepresentationDistinction
              ExpectedValue.Equals(other.ExpectedValue));
 
         public override string ToString() =>
-            $"\nProperty name \"{_name}\":\nExpected Value :{ExpectedValue}\nActually Value :{ActuallyValue}";
+            $"\nProperty name \"{Name}\":\nExpected Value :{ExpectedValue}\nActually Value :{ActuallyValue}";
 
-        public override bool Equals(object obj)
-        {
-            return Equals(obj as Distinction);
-        }
+        public override bool Equals(object obj) => Equals(obj as Distinction);
 
         public static bool operator ==(Distinction a, Distinction b)
         {
@@ -55,15 +42,6 @@ namespace ObjectsComparator.Comparator.RepresentationDistinction
             return !(a == b);
         }
 
-        public override int GetHashCode()
-        {
-            unchecked
-            {
-                var hashCode = _name != null ? _name.GetHashCode() : 0;
-                hashCode = (hashCode * 397) ^ (ExpectedValue != null ? ExpectedValue.GetHashCode() : 0);
-                hashCode = (hashCode * 397) ^ (ActuallyValue != null ? ActuallyValue.GetHashCode() : 0);
-                return hashCode;
-            }
-        }
+        public override int GetHashCode() => HashCode.Combine(Name, ExpectedValue, ActuallyValue);
     }
 }

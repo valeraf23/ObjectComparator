@@ -13,13 +13,12 @@ namespace ObjectsComparator.Comparator.Strategies.Implementations.Collections
             var listB = ((IEnumerable) actual).Cast<dynamic>().ToList();
 
             if (listA.Count != listB.Count)
-                return new Distinctions
-                {
-                    new Distinction($"Property \"{propertyName}\": Collection has different length", $"{listA.Count}",
-                        $"{listB.Count}")
-                };
+                return Distinctions.Create(new Distinction(
+                    $"Property \"{propertyName}\": Collection has different length",
+                    $"{listA.Count}",
+                    $"{listB.Count}"));
 
-            return Enumerable.Range(0, listA.Count).Aggregate(new Distinctions(),
+            return Enumerable.Range(0, listA.Count).Aggregate(Distinctions.Create(),
                 (dc, i) => dc.AddRange(
                     Comparator.GetDistinctions($"{propertyName}[{i}]", listA[i], listB[i])));
         }
