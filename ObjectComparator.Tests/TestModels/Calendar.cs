@@ -14,4 +14,4 @@ namespace ObjectsComparator.Tests.TestModels
         public int Page { get; set; }
         public Time PropTimePanel { get; set; }
     }
-}
+} 
