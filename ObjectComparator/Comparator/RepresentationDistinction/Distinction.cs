@@ -40,10 +40,7 @@ namespace ObjectsComparator.Comparator.RepresentationDistinction
             var info = $"\nProperty name \"{Name}\":\nExpected Value :{ExpectedValue}\nActually Value :{ActuallyValue}";
             return string.IsNullOrEmpty(Details) ? info : $"{info}\n{nameof(Details)} : {Details}";
         }
-       
-
-        //  public override bool Equals(object obj) => Equals(obj as Distinction);
-
+        
         public static bool operator ==(Distinction a, Distinction b)
         {
             return a.Equals(b);

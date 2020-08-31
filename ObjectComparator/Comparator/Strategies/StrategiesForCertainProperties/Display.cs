@@ -11,7 +11,7 @@ namespace ObjectsComparator.Comparator.Strategies.StrategiesForCertainProperties
         {
             var expectedValue = string.IsNullOrEmpty(Expected) ? ReplaceNull(expected) : Expected;
             var actuallyValue = string.IsNullOrEmpty(Actually) ? ReplaceNull(actual) : Actually;
-            return new Distinction(lambdaExpression, propertyName, expectedValue, actuallyValue);
+            return new Distinction(propertyName, expectedValue, actuallyValue, lambdaExpression);
         }
 
         private static string ReplaceNull(object value)
