@@ -32,11 +32,11 @@ namespace ObjectsComparator.Comparator.RepresentationDistinction
         public static Distinctions Create() => new Distinctions();
 
         public static Distinctions Create(string name, object expectedValue, object actuallyValue) =>
-            new Distinctions(new[] {new Distinction(name, expectedValue, actuallyValue)});
+            Create(new Distinction(name, expectedValue, actuallyValue));
 
         public static Distinctions Create(IEnumerable<Distinction> collection) => new Distinctions(collection);
 
-        public static Distinctions Create(Distinction collection) => new Distinctions(new[] {collection});
+        public static Distinctions Create(Distinction distinction) => new Distinctions(1) {distinction};
 
         public static ForDistinctionsBuilder<T> CreateFor<T>(string name, object expectedValue,
             object actuallyValue) =>

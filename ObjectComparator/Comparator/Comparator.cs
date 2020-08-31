@@ -77,18 +77,20 @@ namespace ObjectsComparator.Comparator
 
         public Distinctions Compare<T>(T expected, T actual) => Compare(expected, actual, null);
 
-        public Distinctions GetDistinctions(string propertyName, dynamic expected, dynamic actual)
+        public Distinctions GetDistinctions<T>(string propertyName, T expected, T actual)
         {
             if (Strategies.IsNotEmpty() && Strategies.Any(x => x.Key == propertyName))
                 return Strategies[propertyName].Compare(expected, actual, propertyName);
 
-            if (expected == null && actual != null) return Distinctions.Create(propertyName, "null", actual);
+            if (expected.IsDefault() && actual.IsNotDefault())
+                return Distinctions.Create(propertyName, "null", actual);
 
-            if (expected != null && actual == null) return Distinctions.Create(propertyName, expected, "null");
+            if (expected.IsNotDefault() && actual.IsDefault())
+                return Distinctions.Create(propertyName, expected, "null");
 
             return expected == null
                 ? Distinctions.None()
-                : (Distinctions) GetDifference(expected, actual, propertyName);
+                : GetDifference(expected, actual, propertyName);
         }
 
         public void SetIgnore(Func<string, bool> ignoreStrategy)

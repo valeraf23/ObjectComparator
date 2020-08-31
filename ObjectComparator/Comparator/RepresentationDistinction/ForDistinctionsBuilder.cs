@@ -19,7 +19,7 @@ namespace ObjectsComparator.Comparator.RepresentationDistinction
         {
             return func(_expectedValue, _actuallyValue)
                 ? Distinctions.None()
-                : Distinctions.Create(new[] {new Distinction(_name, _expectedValue, _actuallyValue)});
+                : Distinctions.Create(new Distinction(_name, _expectedValue, _actuallyValue));
         }
     }
 }
