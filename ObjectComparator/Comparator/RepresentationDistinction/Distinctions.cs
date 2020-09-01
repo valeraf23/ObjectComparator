@@ -60,6 +60,16 @@ namespace ObjectsComparator.Comparator.RepresentationDistinction
             return this;
         }
 
+        public Distinctions AddRange(Distinctions collection)
+        {
+            for (var i = 0; i < collection.Count(); i++)
+            {
+                _list.Add(collection[i]);
+            }
+
+            return this;
+        }
+
         public override string ToString()
         {
             if (!_list.Any()) return "There are no Distinction";
