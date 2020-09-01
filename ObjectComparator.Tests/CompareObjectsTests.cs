@@ -206,6 +206,32 @@ namespace ObjectsComparator.Tests
         }
 
         [Test]
+        public void Enumerable()
+        {
+            var act = new ClassC
+            {
+                One = "f",
+                Two = 5,
+                ArrayThird = new[] { "sss", "ggg" },
+                InnerClass =  new HashSet<string> { "ttt", "ttt2" }
+            };
+
+            var exp = new ClassC
+            {
+                One = "f",
+                Two = 5,
+                ArrayThird = new[] { "sss", "ggg" },
+                InnerClass = new HashSet<string>{"ttt1" , "ttt2" } 
+            };
+
+            var res = act.GetDistinctions(exp);
+            res.Should().NotBeEmpty();
+            var diff = res.First();
+            diff.ActuallyValue.Should().Be("ttt1");
+            diff.ExpectedValue.Should().Be("ttt");
+        }
+
+        [Test]
         public void IsObjects_Several_Diff()
         {
             var act = new ClassA

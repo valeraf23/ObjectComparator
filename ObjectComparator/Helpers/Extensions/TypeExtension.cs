@@ -1,4 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 
 namespace ObjectsComparator.Helpers.Extensions
 {
@@ -12,6 +15,14 @@ namespace ObjectsComparator.Helpers.Extensions
         public static bool IsNotDefault<T>(this T val)
         {
             return !IsDefault(val);
+        }
+
+        public static bool ImplementsGenericInterface(this Type type, Type interfaceType)
+        {
+            return type
+                .GetTypeInfo()
+                .ImplementedInterfaces
+                .Any(x => x.GetTypeInfo().IsGenericType && x.GetGenericTypeDefinition() == interfaceType);
         }
     }
 }

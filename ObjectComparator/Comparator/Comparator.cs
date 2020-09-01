@@ -48,8 +48,8 @@ namespace ObjectsComparator.Comparator
 
                 if (Ignore(actualPropertyPath)) continue;
 
-                object firstValue = null;
-                object secondValue = null;
+                dynamic firstValue = null;
+                dynamic secondValue = null;
                 switch (mi.MemberType)
                 {
                     case MemberTypes.Field:
@@ -61,7 +61,6 @@ namespace ObjectsComparator.Comparator
                         secondValue = type.GetProperty(name)?.GetValue(actual);
                         break;
                 }
-
                 var diffRes = GetDistinctions(actualPropertyPath, firstValue, secondValue);
                 if (diffRes.IsNotEmpty()) diff.AddRange(diffRes);
             }
@@ -77,15 +76,15 @@ namespace ObjectsComparator.Comparator
 
         public Distinctions Compare<T>(T expected, T actual) => Compare(expected, actual, null);
 
-        public Distinctions GetDistinctions<T>(string propertyName, T expected, T actual)
+        public Distinctions GetDistinctions(string propertyName, dynamic expected, dynamic actual)
         {
             if (Strategies.IsNotEmpty() && Strategies.Any(x => x.Key == propertyName))
                 return Strategies[propertyName].Compare(expected, actual, propertyName);
 
-            if (expected.IsDefault() && actual.IsNotDefault())
+            if (expected == null && actual != null)
                 return Distinctions.Create(propertyName, "null", actual);
 
-            if (expected.IsNotDefault() && actual.IsDefault())
+            if (expected != null && actual == null)
                 return Distinctions.Create(propertyName, expected, "null");
 
             return expected == null
