@@ -22,7 +22,6 @@ namespace PerformanceTests
     [MemoryDiagnoser]
     // [DisassemblyDiagnoser(maxDepth:3,exportCombinedDisassemblyReport:true)]
     //  [SimpleJob(RuntimeMoniker.NetCoreApp31,launchCount: 10, warmupCount: 0, targetCount: 100)]
-    [SimpleJob(RunStrategy.ColdStart, launchCount: 100)]
     public class PerformanceTests
     {
         private readonly Time _time = new Time("2016", 1.5F, 3, 1.2, new List<string> { "", "" }, 4, 34);
