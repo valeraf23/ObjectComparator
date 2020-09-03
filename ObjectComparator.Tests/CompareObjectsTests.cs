@@ -163,10 +163,10 @@ namespace ObjectsComparator.Tests
             var skip = new[] {"Vehicle", "Name", "Courses[1].Name"};
             var result = expected.GetDistinctions(actual,
                 str => str.Set(x => x.Courses[0].Duration, (act, exp) => act > TimeSpan.FromHours(3),
-                    new Display {Expected = "Expected that Duration should be more that 3 hours"}), skip);
+                    x => x.SetExpectedInformation("Expected that Duration should be more that 3 hours")), skip);
             var expectedDistinctionsCollection = Distinctions.Create(new Distinction("Courses[0].Duration",
                 "Expected that Duration should be more that 3 hours",
-                "04:00:00"));
+                "04:00:00", "(act, exp) => (act > 03:00:00)"));
 
             CollectionAssert.AreEquivalent(result, expectedDistinctionsCollection);
         }
@@ -177,6 +177,17 @@ namespace ObjectsComparator.Tests
             var time1 = new Time("wrong", 1.5F, 3, 1.2, new List<string> {"", ""}, 4, 34);
             var resultNoDiffTime1 = _time.GetDistinctions(time1);
             resultNoDiffTime1.Should().NotBeEmpty();
+        }
+
+        [Test]
+        public void DistinctionForEqualsOverride()
+        {
+            var time1 = new StudentEq {Age = 3, Courses = new[] {new CourseE {Name = "fff"}}};
+            var time2 = new StudentEq {Age = 3, Courses = new[] {new CourseE {Name = "222"}}};
+            var resultNoDiffTime1 = time1.GetDistinctions(time2);
+            resultNoDiffTime1.Should().NotBeEmpty();
+            resultNoDiffTime1[0].Details.Should()
+                .BeEquivalentTo("Was used override 'Equals' method, objects not equals");
         }
 
         [Test]
@@ -212,16 +223,16 @@ namespace ObjectsComparator.Tests
             {
                 One = "f",
                 Two = 5,
-                ArrayThird = new[] { "sss", "ggg" },
-                InnerClass =  new HashSet<string> { "ttt", "ttt2" }
+                ArrayThird = new[] {"sss", "ggg"},
+                InnerClass = new HashSet<string> {"ttt", "ttt2"}
             };
 
             var exp = new ClassC
             {
                 One = "f",
                 Two = 5,
-                ArrayThird = new[] { "sss", "ggg" },
-                InnerClass = new HashSet<string>{"ttt1" , "ttt2" } 
+                ArrayThird = new[] {"sss", "ggg"},
+                InnerClass = new HashSet<string> {"ttt1", "ttt2"}
             };
 
             var res = act.GetDistinctions(exp);
@@ -406,10 +417,10 @@ namespace ObjectsComparator.Tests
         [Test]
         public void ProperlyNamePropertiesForInnerObjects()
         {
-            var d2DigitalClock = new DigitalClock(true, new[] {1, 2},
-                new Calendar(3, new Time("wrong", 1.5F, 3, 1.2, new List<string> {"", ""}, 4, 34)), "2015", 1.2F, 11,
+            var d2DigitalClock = new DigitalClock(true, new[] { 1, 2 },
+                new Calendar(3, new Time("wrong", 1.5F, 3, 1.2, new List<string> { "", "" }, 4, 34)), "2015", 1.2F, 11,
                 1.12,
-                new List<string> {"df", "asd"}, 1, 9);
+                new List<string> { "df", "asd" }, 1, 9);
             var resultNoDiffTime1 = _dDigitalClock.GetDistinctions(d2DigitalClock);
             resultNoDiffTime1.Should().NotBeEmpty().And.ContainSingle(x =>
                 x.Name ==

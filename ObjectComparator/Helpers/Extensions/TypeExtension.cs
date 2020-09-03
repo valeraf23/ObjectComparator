@@ -9,7 +9,7 @@ namespace ObjectsComparator.Helpers.Extensions
     {
         public static bool IsDefault<T>(this T val)
         {
-            return EqualityComparer<T>.Default.Equals(val, y: default);
+            return EqualityComparer<T>.Default.Equals(val, default);
         }
 
         public static bool IsNotDefault<T>(this T val)
@@ -23,6 +23,25 @@ namespace ObjectsComparator.Helpers.Extensions
                 .GetTypeInfo()
                 .ImplementedInterfaces
                 .Any(x => x.GetTypeInfo().IsGenericType && x.GetGenericTypeDefinition() == interfaceType);
+        }
+
+        private static bool IsObjectEqualsMethod(MethodInfo m)
+        {
+            return m.Name == "Equals"
+                   && m.GetBaseDefinition().DeclaringType == typeof(object);
+        }
+
+        public static bool IsOverridesEqualsMethod(this Type type)
+        {
+            var equalsMethod = type.GetMethods()
+                .Single(IsObjectEqualsMethod);
+
+            return equalsMethod.DeclaringType != typeof(object);
+        }
+
+        public static bool IsClassAndNotString(this Type type)
+        {
+            return !type.IsValueType && type != typeof(string);
         }
     }
 }

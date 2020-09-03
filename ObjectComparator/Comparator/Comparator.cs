@@ -26,7 +26,10 @@ namespace ObjectsComparator.Comparator
         public Rule<ICompareStructStrategy> RuleForValuesTypes { get; }
         public RuleForCollections RuleForCollectionTypes { get; }
 
-        public bool IsValid(Type member) => member.IsClass && member != typeof(string);
+        public bool IsValid(Type member)
+        {
+            return member.IsClass && member != typeof(string);
+        }
 
         public Func<string, bool> Ignore { get; set; } = p => false;
         public IDictionary<string, ICompareValues> Strategies { get; set; } = new Dictionary<string, ICompareValues>();
@@ -48,8 +51,8 @@ namespace ObjectsComparator.Comparator
 
                 if (Ignore(actualPropertyPath)) continue;
 
-                dynamic firstValue = null;
-                dynamic secondValue = null;
+                object firstValue = null;
+                object secondValue = null;
                 switch (mi.MemberType)
                 {
                     case MemberTypes.Field:
@@ -61,6 +64,7 @@ namespace ObjectsComparator.Comparator
                         secondValue = type.GetProperty(name)?.GetValue(actual);
                         break;
                 }
+
                 var diffRes = GetDistinctions(actualPropertyPath, firstValue, secondValue);
                 if (diffRes.IsNotEmpty()) diff.AddRange(diffRes);
             }
@@ -68,13 +72,18 @@ namespace ObjectsComparator.Comparator
             return diff;
         }
 
-        private Distinctions GetDifference<T>(T expected, T actual, string propertyName) =>
-            RuleFactory
+        private Distinctions GetDifference<T>(T expected, T actual, string propertyName)
+        {
+            return RuleFactory
                 .Create(RuleForCollectionTypes, RuleForReferenceTypes, RuleForValuesTypes)
                 .GetFor(actual.GetType())
                 .Compare(expected, actual, propertyName);
+        }
 
-        public Distinctions Compare<T>(T expected, T actual) => Compare(expected, actual, null);
+        public Distinctions Compare<T>(T expected, T actual)
+        {
+            return Compare(expected, actual, null);
+        }
 
         public Distinctions GetDistinctions(string propertyName, dynamic expected, dynamic actual)
         {
@@ -87,9 +96,19 @@ namespace ObjectsComparator.Comparator
             if (expected != null && actual == null)
                 return Distinctions.Create(propertyName, expected, "null");
 
-            return expected == null
-                ? Distinctions.None()
-                : GetDifference(expected, actual, propertyName);
+            if (expected == null)
+                return Distinctions.None();
+
+            Type type = expected.GetType();
+            if (type.IsClassAndNotString() && type.IsOverridesEqualsMethod())
+            {
+                bool isNotEqual = !expected.Equals(actual);
+                if (isNotEqual)
+                    return Distinctions.Create(new Distinction(propertyName, "no info", "no info",
+                        "Was used override 'Equals' method, objects not equals"));
+            }
+
+            return GetDifference(expected, actual, propertyName);
         }
 
         public void SetIgnore(Func<string, bool> ignoreStrategy)

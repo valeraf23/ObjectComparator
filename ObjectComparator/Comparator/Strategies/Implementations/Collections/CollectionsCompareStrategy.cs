@@ -14,18 +14,15 @@ namespace ObjectsComparator.Comparator.Strategies.Implementations.Collections
             var diff = Distinctions.Create();
             var listA = (dynamic) expected;
             var listB = (dynamic) actual;
-            var type = typeof(T);
 
-            if (type.ImplementsGenericInterface(typeof(IList<>)))
+            if (typeof(T).ImplementsGenericInterface(typeof(IList<>)))
             {
                 var lengthA = Enumerable.Count(listA);
                 var lengthB = Enumerable.Count(listB);
                 if (lengthA != lengthB)
                     DistinctionsForCollectionsWithDifferentLength(propertyName, lengthA, lengthB);
                 for (var i = 0; i < lengthA; i++)
-                {
                     diff.AddRange(Comparator.GetDistinctions($"{propertyName}[{i}]", listA[i], listB[i]));
-                }
 
                 return diff;
             }
@@ -36,7 +33,6 @@ namespace ObjectsComparator.Comparator.Strategies.Implementations.Collections
 
         private void ForOtherCollection(dynamic a, dynamic b, string propertyName, Distinctions collectDistinctions)
         {
-
             var first = a.GetEnumerator();
             var second = b.GetEnumerator();
 
@@ -51,10 +47,7 @@ namespace ObjectsComparator.Comparator.Strategies.Implementations.Collections
                     return;
                 }
 
-                if (!isNextA)
-                {
-                    return;
-                }
+                if (!isNextA) return;
 
                 var value1 = first.Current;
                 var value2 = second.Current;
@@ -72,8 +65,9 @@ namespace ObjectsComparator.Comparator.Strategies.Implementations.Collections
                 $"{first}"));
         }
 
-        public override bool IsValid(Type member) =>
-            member.GetInterfaces().Contains(typeof(IEnumerable)) && member != typeof(string);
-
+        public override bool IsValid(Type member)
+        {
+            return member.GetInterfaces().Contains(typeof(IEnumerable)) && member != typeof(string);
+        }
     }
 }
