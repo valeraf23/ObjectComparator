@@ -67,8 +67,8 @@ namespace ObjectsComparator.Comparator.RepresentationDistinction
             return new Distinctions(1) {distinction};
         }
 
-        public static ForDistinctionsBuilder<T> CreateFor<T>(string name, object expectedValue,
-            object actuallyValue)
+        public static ForDistinctionsBuilder<T> CreateFor<T>(string name, T expectedValue,
+            T actuallyValue)
         {
             return new ForDistinctionsBuilder<T>(name, expectedValue, actuallyValue);
         }
