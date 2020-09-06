@@ -56,8 +56,8 @@ namespace ObjectsComparator.Comparator
                 switch (mi.MemberType)
                 {
                     case MemberTypes.Field:
-                        firstValue = type.GetField(name).GetValue(expected);
-                        secondValue = type.GetField(name).GetValue(actual);
+                        firstValue = type.GetField(name)!.GetValue(expected);
+                        secondValue = type.GetField(name)!.GetValue(actual);
                         break;
                     case MemberTypes.Property:
                         firstValue = type.GetProperty(name)?.GetValue(expected);
