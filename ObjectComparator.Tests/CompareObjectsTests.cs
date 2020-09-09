@@ -4,6 +4,7 @@ using System.Linq;
 using FluentAssertions;
 using NUnit.Framework;
 using ObjectsComparator.Comparator;
+using ObjectsComparator.Comparator.Helpers;
 using ObjectsComparator.Comparator.RepresentationDistinction;
 using ObjectsComparator.Comparator.Strategies.StrategiesForCertainProperties;
 using ObjectsComparator.Tests.TestModels;
@@ -671,6 +672,36 @@ namespace ObjectsComparator.Tests
         [Test]
         public void CompareInterfaceType()
         {
+            IName act = new StudentIName
+            {
+                Name = "StudentName",
+                Age = 1,
+                Courses = new[]
+                {
+                    new Course
+                    {
+                        Name = "CourseName"
+                    }
+                }
+            };
+
+            IName exp = new StudentIName
+            {
+                Name = "StudentName1",
+                Age = 1,
+                Courses = new[]
+                {
+                    new Course
+                    {
+                        Name = "CourseName1"
+                    }
+                }
+            };
+
+            var actual = act.GetDistinctions(exp, propName => propName == "Name");
+
+            var expected = Distinctions.Create(new Distinction("Courses[0].Name", "CourseName", "CourseName1"));
+            CollectionAssert.AreEquivalent(expected, actual);
         }
     }
 }

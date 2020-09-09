@@ -3,8 +3,7 @@ using System.Collections.Concurrent;
 using System.Reflection;
 
 #nullable enable
-
-namespace ObjectsComparator.Comparator
+namespace ObjectsComparator.Helpers
 {
     internal sealed class PropertyHelper
     {
@@ -28,12 +27,17 @@ namespace ObjectsComparator.Comparator
 
         public Func<object, object> ValueGetter => _valueGetter ??= MakeFastPropertyGetter(Property);
 
-        public object GetValue(object instance) => ValueGetter(instance);
+        public object GetValue(object instance)
+        {
+            return ValueGetter(instance);
+        }
 
-        public static Func<object, object> MakeFastPropertyGetter(PropertyInfo propertyInfo) =>
-            MakeFastPropertyGetter(
+        public static Func<object, object> MakeFastPropertyGetter(PropertyInfo propertyInfo)
+        {
+            return MakeFastPropertyGetter(
                 propertyInfo,
                 CallPropertyGetterOpenGenericMethod);
+        }
 
         private static Func<object, object> MakeFastPropertyGetter(
             PropertyInfo propertyInfo,
@@ -71,11 +75,16 @@ namespace ObjectsComparator.Comparator
             }, propertyGetMethod);
         }
 
-        public static PropertyHelper Instance(PropertyInfo property) => new PropertyHelper(property);
+        public static PropertyHelper Instance(PropertyInfo property)
+        {
+            return new PropertyHelper(property);
+        }
 
         private static object? CallPropertyGetter<TDeclaringType, TValue>(
             Func<TDeclaringType, TValue> getter,
-            object target) =>
-            getter((TDeclaringType) target);
+            object target)
+        {
+            return getter((TDeclaringType) target);
+        }
     }
 }

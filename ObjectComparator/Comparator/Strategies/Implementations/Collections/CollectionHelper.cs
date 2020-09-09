@@ -2,12 +2,13 @@ using System;
 using System.Reflection;
 using ObjectsComparator.Comparator.RepresentationDistinction;
 
+#nullable enable
 namespace ObjectsComparator.Comparator.Strategies.Implementations.Collections
 {
     internal class CollectionHelper
     {
         private static readonly MethodInfo CallWrapper =
-            typeof(CollectionHelper).GetTypeInfo().GetDeclaredMethod(nameof(Wrapper));
+            typeof(CollectionHelper).GetTypeInfo().GetDeclaredMethod(nameof(Wrapper))!;
 
         private static Distinctions Wrapper<TTarget>(Func<TTarget, TTarget, string, Comparator, Distinctions> func,
             object expected, object actual, string propertyName, Comparator comparator)

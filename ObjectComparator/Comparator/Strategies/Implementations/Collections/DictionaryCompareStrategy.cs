@@ -10,8 +10,8 @@ namespace ObjectsComparator.Comparator.Strategies.Implementations.Collections
         private static readonly MethodInfo CompareMethod = typeof(DictionaryCompareStrategy).GetTypeInfo()
             .GetDeclaredMethod(nameof(CompareDictionary));
 
-        public Distinctions CompareDictionary<TKey, TValue>(IDictionary<TKey, TValue> expected,
-            IDictionary<TKey, TValue> actual, string propertyName)
+        public Distinctions CompareDictionary<TKey, TValue>(Dictionary<TKey, TValue> expected,
+            Dictionary<TKey, TValue> actual, string propertyName)
         {
             if (expected.Count != actual.Count)
                 return Distinctions.Create("Dictionary has different length", expected.Count, actual.Count);

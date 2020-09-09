@@ -24,6 +24,6 @@ namespace ObjectsComparator.Tests.TestModels
         }
 
         public Func<string, bool> Ignore { get; set; }
-        public IDictionary<string, ICompareValues> Strategies { get; set; }
+        public Dictionary<string, ICompareValues> Strategies { get; set; }
     }
 }

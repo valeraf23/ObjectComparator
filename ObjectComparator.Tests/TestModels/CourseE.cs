@@ -19,7 +19,7 @@ namespace ObjectsComparator.Tests.TestModels
 
         public bool Equals(CourseE obj)
         {
-            return this.Name == obj.Name;
+            return Name == obj.Name;
         }
     }
 }

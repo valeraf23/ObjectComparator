@@ -2,18 +2,23 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using ObjectsComparator.Comparator.Helpers;
 using ObjectsComparator.Comparator.RepresentationDistinction;
 using ObjectsComparator.Comparator.Rules;
 using ObjectsComparator.Comparator.Rules.Implementations;
 using ObjectsComparator.Comparator.Strategies.Implementations;
 using ObjectsComparator.Comparator.Strategies.Implementations.Collections;
 using ObjectsComparator.Comparator.Strategies.Interfaces;
+using ObjectsComparator.Helpers;
 using ObjectsComparator.Helpers.Extensions;
 
 namespace ObjectsComparator.Comparator
 {
     public sealed class Comparator : ICompareObjectStrategy
     {
+        private static readonly MethodInfo CallGetDistinctions =
+            typeof(Comparator).GetTypeInfo().GetDeclaredMethod(nameof(GetDistinctions))!;
+
         public Comparator()
         {
             RuleForValuesTypes = new Rule<ICompareStructStrategy>(new CompareValueTypesStrategy());
@@ -26,13 +31,10 @@ namespace ObjectsComparator.Comparator
         public Rule<ICompareStructStrategy> RuleForValuesTypes { get; }
         public RuleForCollections RuleForCollectionTypes { get; }
 
-        public bool IsValid(Type member)
-        {
-            return member.IsClass && member != typeof(string);
-        }
+        public bool IsValid(Type member) => member.IsClass && member != typeof(string);
 
         public Func<string, bool> Ignore { get; set; } = p => false;
-        public IDictionary<string, ICompareValues> Strategies { get; set; } = new Dictionary<string, ICompareValues>();
+        public Dictionary<string, ICompareValues> Strategies { get; set; } = new Dictionary<string, ICompareValues>();
 
         public Distinctions Compare<T>(T expected, T actual, string propertyName)
         {
@@ -80,21 +82,25 @@ namespace ObjectsComparator.Comparator
             return diff;
         }
 
-        private Distinctions GetDifference<T>(T expected, T actual, string propertyName)
-        {
-            return RuleFactory
-                .Create(RuleForCollectionTypes, RuleForReferenceTypes, RuleForValuesTypes)
+        private Distinctions GetDifference<T>(T expected, T actual, string propertyName) =>
+            RuleFactory
+                .Create(RuleForValuesTypes, RuleForCollectionTypes, RuleForReferenceTypes)
                 .GetFor(actual.GetType())
                 .Compare(expected, actual, propertyName);
-        }
 
-        public Distinctions Compare<T>(T expected, T actual)
+        public Distinctions Compare<T>(T expected, T actual) => Compare(expected, actual, null);
+
+        public void SetIgnore(Func<string, bool> ignoreStrategy)
         {
-            return Compare(expected, actual, null);
+            if (ignoreStrategy == null) return;
+            RuleForReferenceTypes.Strategies.ForEach(x => x.Ignore = ignoreStrategy);
         }
 
-        private static readonly MethodInfo CallGetDistinctions =
-            typeof(Comparator).GetTypeInfo().GetDeclaredMethod(nameof(GetDistinctions))!;
+        public void SetStrategies(Dictionary<string, ICompareValues> strategies)
+        {
+            if (strategies.IsEmpty()) return;
+            RuleForReferenceTypes.Strategies.ForEach(x => x.Strategies = strategies);
+        }
 
         public Distinctions GetDistinctions<T>(string propertyName, T expected, T actual)
         {
@@ -120,18 +126,6 @@ namespace ObjectsComparator.Comparator
             }
 
             return GetDifference(expected, actual, propertyName);
-        }
-
-        public void SetIgnore(Func<string, bool> ignoreStrategy)
-        {
-            if (ignoreStrategy == null) return;
-            RuleForReferenceTypes.Strategies.ForEach(x => x.Ignore = ignoreStrategy);
-        }
-
-        public void SetStrategies(IDictionary<string, ICompareValues> strategies)
-        {
-            if (strategies.IsEmpty()) return;
-            RuleForReferenceTypes.Strategies.ForEach(x => x.Strategies = strategies);
         }
     }
 }

@@ -8,7 +8,7 @@ using ObjectsComparator.Comparator.Strategies.Interfaces;
 namespace ObjectsComparator.Comparator.Strategies.StrategiesForCertainProperties
 {
     /// <summary>
-    ///     define a comparison strategy for certain properties
+    ///  define a comparison strategy for certain properties
     /// </summary>
     /// <typeparam name="T"></typeparam>
     public sealed class Strategies<T> : IEnumerable<KeyValuePair<string, ICompareValues>>

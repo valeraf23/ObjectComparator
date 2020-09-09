@@ -2,6 +2,7 @@
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Running;
 using ObjectsComparator.Comparator;
+using ObjectsComparator.Comparator.Helpers;
 using ObjectsComparator.Tests.TestModels;
 
 namespace PerformanceTests

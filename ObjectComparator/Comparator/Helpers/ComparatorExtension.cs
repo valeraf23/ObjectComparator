@@ -5,7 +5,7 @@ using ObjectsComparator.Comparator.RepresentationDistinction;
 using ObjectsComparator.Comparator.Strategies.Interfaces;
 using ObjectsComparator.Comparator.Strategies.StrategiesForCertainProperties;
 
-namespace ObjectsComparator.Comparator
+namespace ObjectsComparator.Comparator.Helpers
 {
     public static class ComparatorExtension
     {
@@ -40,7 +40,7 @@ namespace ObjectsComparator.Comparator
         }
 
         public static Distinctions GetDistinctions<T>(T expected, T actual,
-            IDictionary<string, ICompareValues> custom, Func<string, bool> ignoreStrategy)
+            Dictionary<string, ICompareValues> custom, Func<string, bool> ignoreStrategy)
             where T : class
         {
             var compareTypes = new Comparator();
