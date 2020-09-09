@@ -53,20 +53,28 @@ namespace ObjectsComparator.Comparator
 
                 object firstValue = null;
                 object secondValue = null;
+                Type memberType = null;
+
                 switch (mi.MemberType)
                 {
                     case MemberTypes.Field:
-                        firstValue = type.GetField(name)!.GetValue(expected);
-                        secondValue = type.GetField(name)!.GetValue(actual);
+                        var field = type.GetField(name);
+                        firstValue = field!.GetValue(expected);
+                        secondValue = field.GetValue(actual);
+                        memberType = field.FieldType;
                         break;
                     case MemberTypes.Property:
-                        firstValue = type.GetProperty(name)?.GetValue(expected);
-                        secondValue = type.GetProperty(name)?.GetValue(actual);
+                        var del = PropertyHelper.Instance(type.GetProperty(name)!);
+                        firstValue = del.GetValue(expected);
+                        secondValue = del.GetValue(actual);
+                        memberType = del.Property.PropertyType;
                         break;
                 }
 
-                var diffRes = GetDistinctions(actualPropertyPath, firstValue, secondValue);
-                if (diffRes.IsNotEmpty()) diff.AddRange(diffRes);
+                var diffRes = (Distinctions) CallGetDistinctions.MakeGenericMethod(memberType!)
+                    .Invoke(this, new[] {actualPropertyPath, firstValue, secondValue});
+
+                if (diffRes!.IsNotEmpty()) diff.AddRange(diffRes);
             }
 
             return diff;
@@ -85,7 +93,10 @@ namespace ObjectsComparator.Comparator
             return Compare(expected, actual, null);
         }
 
-        public Distinctions GetDistinctions(string propertyName, dynamic expected, dynamic actual)
+        private static readonly MethodInfo CallGetDistinctions =
+            typeof(Comparator).GetTypeInfo().GetDeclaredMethod(nameof(GetDistinctions))!;
+
+        public Distinctions GetDistinctions<T>(string propertyName, T expected, T actual)
         {
             if (Strategies.IsNotEmpty() && Strategies.Any(x => x.Key == propertyName))
                 return Strategies[propertyName].Compare(expected, actual, propertyName);
@@ -99,10 +110,10 @@ namespace ObjectsComparator.Comparator
             if (expected == null)
                 return Distinctions.None();
 
-            Type type = expected.GetType();
+            var type = expected.GetType();
             if (type.IsClassAndNotString() && type.IsOverridesEqualsMethod())
             {
-                bool isNotEqual = !expected.Equals(actual);
+                var isNotEqual = !expected.Equals(actual);
                 if (isNotEqual)
                     return Distinctions.Create(new Distinction(propertyName, "no info", "no info",
                         "Was used override 'Equals' method, objects not equals"));

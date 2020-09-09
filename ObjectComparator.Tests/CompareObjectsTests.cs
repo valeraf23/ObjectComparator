@@ -417,10 +417,10 @@ namespace ObjectsComparator.Tests
         [Test]
         public void ProperlyNamePropertiesForInnerObjects()
         {
-            var d2DigitalClock = new DigitalClock(true, new[] { 1, 2 },
-                new Calendar(3, new Time("wrong", 1.5F, 3, 1.2, new List<string> { "", "" }, 4, 34)), "2015", 1.2F, 11,
+            var d2DigitalClock = new DigitalClock(true, new[] {1, 2},
+                new Calendar(3, new Time("wrong", 1.5F, 3, 1.2, new List<string> {"", ""}, 4, 34)), "2015", 1.2F, 11,
                 1.12,
-                new List<string> { "df", "asd" }, 1, 9);
+                new List<string> {"df", "asd"}, 1, 9);
             var resultNoDiffTime1 = _dDigitalClock.GetDistinctions(d2DigitalClock);
             resultNoDiffTime1.Should().NotBeEmpty().And.ContainSingle(x =>
                 x.Name ==
@@ -666,6 +666,11 @@ namespace ObjectsComparator.Tests
 
             var expected = Distinctions.Create(new Distinction("Courses[0].Name", "CourseName", "CourseName1"));
             CollectionAssert.AreEquivalent(expected, actual);
+        }
+
+        [Test]
+        public void CompareInterfaceType()
+        {
         }
     }
 }
