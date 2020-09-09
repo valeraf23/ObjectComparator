@@ -11,12 +11,24 @@ namespace ObjectsComparator.Comparator.Strategies.StrategiesForCertainProperties
         {
             var expectedValue = string.IsNullOrEmpty(Expected) ? ReplaceNull(expected) : Expected;
             var actuallyValue = string.IsNullOrEmpty(Actually) ? ReplaceNull(actual) : Actually;
-            return new DistinctionForStrategy(lambdaExpression, propertyName, expectedValue, actuallyValue);
+            return new Distinction(propertyName, expectedValue, actuallyValue, lambdaExpression);
         }
 
         private static string ReplaceNull(object value)
         {
             return value == null ? "null" : value.ToString();
+        }
+
+        public Display SetExpectedInformation(string text)
+        {
+            Expected = text;
+            return this;
+        }
+
+        public Display SetActuallyInformation(string text)
+        {
+            Actually = text;
+            return this;
         }
     }
 }

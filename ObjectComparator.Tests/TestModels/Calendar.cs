@@ -1,4 +1,7 @@
-﻿namespace ObjectsComparator.Tests.TestModels
+﻿using System.Runtime.CompilerServices;
+
+[assembly: InternalsVisibleTo("PerformanceTests")]
+namespace ObjectsComparator.Tests.TestModels
 {
     internal class Calendar
     {

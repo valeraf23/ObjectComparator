@@ -1,6 +1,6 @@
 using System.Reflection;
 
-namespace ObjectsComparator.Comparator
+namespace ObjectsComparator.Comparator.Helpers
 {
     public static class MemberPathBuilder
     {

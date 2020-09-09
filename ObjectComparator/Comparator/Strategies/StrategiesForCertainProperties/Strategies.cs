@@ -8,7 +8,7 @@ using ObjectsComparator.Comparator.Strategies.Interfaces;
 namespace ObjectsComparator.Comparator.Strategies.StrategiesForCertainProperties
 {
     /// <summary>
-    ///     define a comparison strategy for certain properties
+    ///  define a comparison strategy for certain properties
     /// </summary>
     /// <typeparam name="T"></typeparam>
     public sealed class Strategies<T> : IEnumerable<KeyValuePair<string, ICompareValues>>
@@ -29,6 +29,18 @@ namespace ObjectsComparator.Comparator.Strategies.StrategiesForCertainProperties
             Expression<Func<T1, T1, bool>> sourceValue)
         {
             return Set(targetAccessor, sourceValue, new Display());
+        }
+
+        public Strategies<T> Set<T1>(Expression<Func<T, T1>> targetAccessor,
+            Expression<Func<T1, T1, bool>> sourceValue, Func<Display, Display> displayBuilder)
+        {
+            var targetPropertyInfo = ToPropertyInfo(targetAccessor);
+            if (_strategies.ContainsKey(targetPropertyInfo))
+                throw new KeyNotFoundException($"Strategy for \"{targetPropertyInfo}\" has already contain");
+
+            _strategies.Add(targetPropertyInfo, new MemberStrategy<T1>(sourceValue, displayBuilder(new Display())));
+
+            return this;
         }
 
         public Strategies<T> Set<T1>(Expression<Func<T, T1>> targetAccessor,

@@ -8,10 +8,20 @@
     <Description>This library allows comparing objects and provide distinctions. What is more, this tool can set compare strategy for certain properties or fields and types</Description>
     <RepositoryUrl>https://github.com/valeraf23/ObjectComparator</RepositoryUrl>
     <PackageTags>Diff objects compare Comparator Equals classes distinctions</PackageTags>
-    <PackageReleaseNotes>netcore3, netstandard 2.1 and monor changes</PackageReleaseNotes>
-    <Version>2.13</Version>
+    <PackageReleaseNotes>improve performance</PackageReleaseNotes>
+    <Version>2.14</Version>
     <PackageId>ObjectComparator</PackageId>
+    <AssemblyVersion>2.14.0.0</AssemblyVersion>
+    <FileVersion>2.14.0.0</FileVersion>
   </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netcoreapp3.1|AnyCPU'">
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Comparator\Strategies\StrategiesForCertainProperties\DistinctionForStrategy.cs" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />

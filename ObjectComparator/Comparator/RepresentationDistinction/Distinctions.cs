@@ -11,11 +11,20 @@ namespace ObjectsComparator.Comparator.RepresentationDistinction
     {
         private readonly List<Distinction> _list;
 
-        private Distinctions() => _list = new List<Distinction>();
+        private Distinctions()
+        {
+            _list = new List<Distinction>();
+        }
 
-        private Distinctions(int capacity) => _list = new List<Distinction>(capacity);
+        private Distinctions(int capacity)
+        {
+            _list = new List<Distinction>(capacity);
+        }
 
-        private Distinctions(IEnumerable<Distinction> collection) => _list = new List<Distinction>(collection);
+        private Distinctions(IEnumerable<Distinction> collection)
+        {
+            _list = new List<Distinction>(collection);
+        }
 
         public Distinction this[int i]
         {
@@ -23,24 +32,46 @@ namespace ObjectsComparator.Comparator.RepresentationDistinction
             set => _list.Add(value);
         }
 
-        public IEnumerator<Distinction> GetEnumerator() => _list.GetEnumerator();
+        public IEnumerator<Distinction> GetEnumerator()
+        {
+            return _list.GetEnumerator();
+        }
 
-        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
 
-        public static Distinctions None() => new Distinctions(0);
+        public static Distinctions None()
+        {
+            return new Distinctions(0);
+        }
 
-        public static Distinctions Create() => new Distinctions();
+        public static Distinctions Create()
+        {
+            return new Distinctions();
+        }
 
-        public static Distinctions Create(string name, object expectedValue, object actuallyValue) =>
-            new Distinctions(new[] {new Distinction(name, expectedValue, actuallyValue)});
+        public static Distinctions Create(string name, object expectedValue, object actuallyValue)
+        {
+            return Create(new Distinction(name, expectedValue, actuallyValue));
+        }
 
-        public static Distinctions Create(IEnumerable<Distinction> collection) => new Distinctions(collection);
+        public static Distinctions Create(IEnumerable<Distinction> collection)
+        {
+            return new Distinctions(collection);
+        }
 
-        public static Distinctions Create(Distinction collection) => new Distinctions(new[] {collection});
+        public static Distinctions Create(Distinction distinction)
+        {
+            return new Distinctions(1) {distinction};
+        }
 
-        public static ForDistinctionsBuilder<T> CreateFor<T>(string name, object expectedValue,
-            object actuallyValue) =>
-            new ForDistinctionsBuilder<T>(name, expectedValue, actuallyValue);
+        public static ForDistinctionsBuilder<T> CreateFor<T>(string name, T expectedValue,
+            T actuallyValue)
+        {
+            return new ForDistinctionsBuilder<T>(name, expectedValue, actuallyValue);
+        }
 
         public Distinctions Add(Distinction input)
         {
@@ -48,11 +79,20 @@ namespace ObjectsComparator.Comparator.RepresentationDistinction
             return this;
         }
 
-        public bool IsEmpty() => _list.Count == 0;
+        public bool IsEmpty()
+        {
+            return _list.Count == 0;
+        }
 
-        public bool IsNotEmpty() => _list.Count > 0;
+        public bool IsNotEmpty()
+        {
+            return _list.Count > 0;
+        }
 
-        public int Count() => _list.Count;
+        public int Count()
+        {
+            return _list.Count;
+        }
 
         public Distinctions AddRange(IEnumerable<Distinction> collection)
         {

@@ -4,6 +4,7 @@ using System.Linq;
 using FluentAssertions;
 using NUnit.Framework;
 using ObjectsComparator.Comparator;
+using ObjectsComparator.Comparator.Helpers;
 using ObjectsComparator.Comparator.RepresentationDistinction;
 using ObjectsComparator.Comparator.Strategies.StrategiesForCertainProperties;
 using ObjectsComparator.Tests.TestModels;
@@ -163,10 +164,10 @@ namespace ObjectsComparator.Tests
             var skip = new[] {"Vehicle", "Name", "Courses[1].Name"};
             var result = expected.GetDistinctions(actual,
                 str => str.Set(x => x.Courses[0].Duration, (act, exp) => act > TimeSpan.FromHours(3),
-                    new Display {Expected = "Expected that Duration should be more that 3 hours"}), skip);
+                    x => x.SetExpectedInformation("Expected that Duration should be more that 3 hours")), skip);
             var expectedDistinctionsCollection = Distinctions.Create(new Distinction("Courses[0].Duration",
                 "Expected that Duration should be more that 3 hours",
-                "04:00:00"));
+                "04:00:00", "(act, exp) => (act > 03:00:00)"));
 
             CollectionAssert.AreEquivalent(result, expectedDistinctionsCollection);
         }
@@ -177,6 +178,17 @@ namespace ObjectsComparator.Tests
             var time1 = new Time("wrong", 1.5F, 3, 1.2, new List<string> {"", ""}, 4, 34);
             var resultNoDiffTime1 = _time.GetDistinctions(time1);
             resultNoDiffTime1.Should().NotBeEmpty();
+        }
+
+        [Test]
+        public void DistinctionForEqualsOverride()
+        {
+            var time1 = new StudentEq {Age = 3, Courses = new[] {new CourseE {Name = "fff"}}};
+            var time2 = new StudentEq {Age = 3, Courses = new[] {new CourseE {Name = "222"}}};
+            var resultNoDiffTime1 = time1.GetDistinctions(time2);
+            resultNoDiffTime1.Should().NotBeEmpty();
+            resultNoDiffTime1[0].Details.Should()
+                .BeEquivalentTo("Was used override 'Equals' method, objects not equals");
         }
 
         [Test]
@@ -203,6 +215,32 @@ namespace ObjectsComparator.Tests
             var diff = res.First();
             diff.ActuallyValue.Should().Be(exp.Two);
             diff.ExpectedValue.Should().Be("null");
+        }
+
+        [Test]
+        public void Enumerable()
+        {
+            var act = new ClassC
+            {
+                One = "f",
+                Two = 5,
+                ArrayThird = new[] {"sss", "ggg"},
+                InnerClass = new HashSet<string> {"ttt", "ttt2"}
+            };
+
+            var exp = new ClassC
+            {
+                One = "f",
+                Two = 5,
+                ArrayThird = new[] {"sss", "ggg"},
+                InnerClass = new HashSet<string> {"ttt1", "ttt2"}
+            };
+
+            var res = act.GetDistinctions(exp);
+            res.Should().NotBeEmpty();
+            var diff = res.First();
+            diff.ActuallyValue.Should().Be("ttt1");
+            diff.ExpectedValue.Should().Be("ttt");
         }
 
         [Test]
@@ -613,6 +651,41 @@ namespace ObjectsComparator.Tests
             };
 
             var exp = new Student
+            {
+                Name = "StudentName1",
+                Age = 1,
+                Courses = new[]
+                {
+                    new Course
+                    {
+                        Name = "CourseName1"
+                    }
+                }
+            };
+
+            var actual = act.GetDistinctions(exp, propName => propName == "Name");
+
+            var expected = Distinctions.Create(new Distinction("Courses[0].Name", "CourseName", "CourseName1"));
+            CollectionAssert.AreEquivalent(expected, actual);
+        }
+
+        [Test]
+        public void CompareInterfaceType()
+        {
+            IName act = new StudentIName
+            {
+                Name = "StudentName",
+                Age = 1,
+                Courses = new[]
+                {
+                    new Course
+                    {
+                        Name = "CourseName"
+                    }
+                }
+            };
+
+            IName exp = new StudentIName
             {
                 Name = "StudentName1",
                 Age = 1,

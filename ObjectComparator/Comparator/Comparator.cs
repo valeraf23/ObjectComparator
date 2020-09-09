@@ -2,18 +2,23 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using ObjectsComparator.Comparator.Helpers;
 using ObjectsComparator.Comparator.RepresentationDistinction;
 using ObjectsComparator.Comparator.Rules;
 using ObjectsComparator.Comparator.Rules.Implementations;
 using ObjectsComparator.Comparator.Strategies.Implementations;
 using ObjectsComparator.Comparator.Strategies.Implementations.Collections;
 using ObjectsComparator.Comparator.Strategies.Interfaces;
+using ObjectsComparator.Helpers;
 using ObjectsComparator.Helpers.Extensions;
 
 namespace ObjectsComparator.Comparator
 {
     public sealed class Comparator : ICompareObjectStrategy
     {
+        private static readonly MethodInfo CallGetDistinctions =
+            typeof(Comparator).GetTypeInfo().GetDeclaredMethod(nameof(GetDistinctions))!;
+
         public Comparator()
         {
             RuleForValuesTypes = new Rule<ICompareStructStrategy>(new CompareValueTypesStrategy());
@@ -29,7 +34,7 @@ namespace ObjectsComparator.Comparator
         public bool IsValid(Type member) => member.IsClass && member != typeof(string);
 
         public Func<string, bool> Ignore { get; set; } = p => false;
-        public IDictionary<string, ICompareValues> Strategies { get; set; } = new Dictionary<string, ICompareValues>();
+        public Dictionary<string, ICompareValues> Strategies { get; set; } = new Dictionary<string, ICompareValues>();
 
         public Distinctions Compare<T>(T expected, T actual, string propertyName)
         {
@@ -50,20 +55,28 @@ namespace ObjectsComparator.Comparator
 
                 object firstValue = null;
                 object secondValue = null;
+                Type memberType = null;
+
                 switch (mi.MemberType)
                 {
                     case MemberTypes.Field:
-                        firstValue = type.GetField(name).GetValue(expected);
-                        secondValue = type.GetField(name).GetValue(actual);
+                        var field = type.GetField(name);
+                        firstValue = field!.GetValue(expected);
+                        secondValue = field.GetValue(actual);
+                        memberType = field.FieldType;
                         break;
                     case MemberTypes.Property:
-                        firstValue = type.GetProperty(name)?.GetValue(expected);
-                        secondValue = type.GetProperty(name)?.GetValue(actual);
+                        var del = PropertyHelper.Instance(type.GetProperty(name)!);
+                        firstValue = del.GetValue(expected);
+                        secondValue = del.GetValue(actual);
+                        memberType = del.Property.PropertyType;
                         break;
                 }
 
-                var diffRes = GetDistinctions(actualPropertyPath, firstValue, secondValue);
-                if (diffRes.IsNotEmpty()) diff.AddRange(diffRes);
+                var diffRes = (Distinctions) CallGetDistinctions.MakeGenericMethod(memberType!)
+                    .Invoke(this, new[] {actualPropertyPath, firstValue, secondValue});
+
+                if (diffRes!.IsNotEmpty()) diff.AddRange(diffRes);
             }
 
             return diff;
@@ -71,25 +84,11 @@ namespace ObjectsComparator.Comparator
 
         private Distinctions GetDifference<T>(T expected, T actual, string propertyName) =>
             RuleFactory
-                .Create(RuleForCollectionTypes, RuleForReferenceTypes, RuleForValuesTypes)
+                .Create(RuleForValuesTypes, RuleForCollectionTypes, RuleForReferenceTypes)
                 .GetFor(actual.GetType())
                 .Compare(expected, actual, propertyName);
 
         public Distinctions Compare<T>(T expected, T actual) => Compare(expected, actual, null);
-
-        public Distinctions GetDistinctions(string propertyName, dynamic expected, dynamic actual)
-        {
-            if (Strategies.IsNotEmpty() && Strategies.Any(x => x.Key == propertyName))
-                return Strategies[propertyName].Compare(expected, actual, propertyName);
-
-            if (expected == null && actual != null) return Distinctions.Create(propertyName, "null", actual);
-
-            if (expected != null && actual == null) return Distinctions.Create(propertyName, expected, "null");
-
-            return expected == null
-                ? Distinctions.None()
-                : (Distinctions) GetDifference(expected, actual, propertyName);
-        }
 
         public void SetIgnore(Func<string, bool> ignoreStrategy)
         {
@@ -97,10 +96,36 @@ namespace ObjectsComparator.Comparator
             RuleForReferenceTypes.Strategies.ForEach(x => x.Ignore = ignoreStrategy);
         }
 
-        public void SetStrategies(IDictionary<string, ICompareValues> strategies)
+        public void SetStrategies(Dictionary<string, ICompareValues> strategies)
         {
             if (strategies.IsEmpty()) return;
             RuleForReferenceTypes.Strategies.ForEach(x => x.Strategies = strategies);
+        }
+
+        public Distinctions GetDistinctions<T>(string propertyName, T expected, T actual)
+        {
+            if (Strategies.IsNotEmpty() && Strategies.Any(x => x.Key == propertyName))
+                return Strategies[propertyName].Compare(expected, actual, propertyName);
+
+            if (expected == null && actual != null)
+                return Distinctions.Create(propertyName, "null", actual);
+
+            if (expected != null && actual == null)
+                return Distinctions.Create(propertyName, expected, "null");
+
+            if (expected == null)
+                return Distinctions.None();
+
+            var type = expected.GetType();
+            if (type.IsClassAndNotString() && type.IsOverridesEqualsMethod())
+            {
+                var isNotEqual = !expected.Equals(actual);
+                if (isNotEqual)
+                    return Distinctions.Create(new Distinction(propertyName, "no info", "no info",
+                        "Was used override 'Equals' method, objects not equals"));
+            }
+
+            return GetDifference(expected, actual, propertyName);
         }
     }
 }

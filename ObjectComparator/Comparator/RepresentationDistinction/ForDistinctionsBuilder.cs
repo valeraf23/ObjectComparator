@@ -8,18 +8,18 @@ namespace ObjectsComparator.Comparator.RepresentationDistinction
         private readonly T _expectedValue;
         private readonly string _name;
 
-        public ForDistinctionsBuilder(string name, object expectedValue, object actuallyValue)
+        public ForDistinctionsBuilder(string name, T expectedValue, T actuallyValue)
         {
             _name = name;
-            _expectedValue = (T) expectedValue;
-            _actuallyValue = (T) actuallyValue;
+            _expectedValue = expectedValue;
+            _actuallyValue = actuallyValue;
         }
 
         public Distinctions WhenNot(Func<T, T, bool> func)
         {
             return func(_expectedValue, _actuallyValue)
                 ? Distinctions.None()
-                : Distinctions.Create(new[] {new Distinction(_name, _expectedValue, _actuallyValue)});
+                : Distinctions.Create(new Distinction(_name, _expectedValue, _actuallyValue));
         }
     }
 }

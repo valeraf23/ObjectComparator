@@ -1,29 +1,61 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using ObjectsComparator.Comparator.RepresentationDistinction;
 
 namespace ObjectsComparator.Comparator.Strategies.Implementations.Collections
 {
     public class CollectionsCompareStrategy : BaseCollectionsCompareStrategy
     {
-        public override Distinctions Compare<T>(T expected, T actual, string propertyName)
+        private static readonly MethodInfo CompareCollectionsMethod =
+            typeof(CollectionsCompareStrategy).GetTypeInfo().GetDeclaredMethod(nameof(CompareCollections));
+
+        public override bool IsValid(Type member)
         {
-            var listA = ((IEnumerable) expected).Cast<dynamic>().ToList();
-            var listB = ((IEnumerable) actual).Cast<dynamic>().ToList();
-
-            if (listA.Count != listB.Count)
-                return Distinctions.Create(new Distinction(
-                    $"Property \"{propertyName}\": Collection has different length",
-                    $"{listA.Count}",
-                    $"{listB.Count}"));
-
-            return Enumerable.Range(0, listA.Count).Aggregate(Distinctions.Create(),
-                (dc, i) => dc.AddRange(
-                    Comparator.GetDistinctions($"{propertyName}[{i}]", listA[i], listB[i])));
+            return member.GetInterfaces().Contains(typeof(IEnumerable)) && member != typeof(string);
         }
 
-        public override bool IsValid(Type member) =>
-            member.GetInterfaces().Contains(typeof(IEnumerable)) && member != typeof(string);
+        public override Distinctions Compare<T>(T expected, T actual, string propertyName)
+        {
+            var elementType = expected.GetType();
+            var genericType = elementType.IsGenericType
+                ? elementType.GenericTypeArguments[0]
+                : elementType.GetElementType();
+            var compareCollectionsMethod = CompareCollectionsMethod.MakeGenericMethod(genericType!);
+            return CollectionHelper.GetDelegateFor(compareCollectionsMethod)(expected, actual,
+                propertyName, Comparator);
+        }
+
+        private static Distinctions CompareIListTypes<T>(IList<T> expected, IList<T> actual, string propertyName,
+            Comparator comparator)
+        {
+            var expectedCount = expected.Count;
+            var actualCount = actual.Count;
+            if (expectedCount != actualCount)
+                return DistinctionsForCollectionsWithDifferentLength(propertyName, expectedCount, actualCount);
+            var diff = Distinctions.None();
+            for (var i = 0; i < expectedCount; i++)
+                diff.AddRange(comparator.GetDistinctions($"{propertyName}[{i}]", expected[i], actual[i]));
+
+            return diff;
+        }
+
+        private static Distinctions CompareCollections<T>(IEnumerable<T> expected, IEnumerable<T> actual,
+            string propertyName, Comparator comparator)
+        {
+            var a = expected.ToList();
+            var b = actual.ToList();
+            return CompareIListTypes(a, b, propertyName, comparator);
+        }
+
+        private static Distinctions DistinctionsForCollectionsWithDifferentLength(string propertyName, int first,
+            int second)
+        {
+            return Distinctions.Create(new Distinction(
+                $"Property \"{propertyName}\": Collection has different length", $"{second}",
+                $"{first}"));
+        }
     }
 }
