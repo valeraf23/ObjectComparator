@@ -283,7 +283,7 @@ dotnet add package ObjectComparator
             var actual = new {Integer = 1, String = "Test", Nested = new byte[] {1, 2, 3}};
 	    var expected = new {Integer = 1, String = "Test", Nested = new byte[] {1, 2, 4}};
 			
-			var result = exp.DeeplyEquals(act);
+	   var result = exp.DeeplyEquals(act);
 			
 	/*
 		Path: "AnonymousType<Int32, String, Byte[]>.Nested[2]":
