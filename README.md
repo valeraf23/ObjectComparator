@@ -219,7 +219,8 @@ dotnet add package ObjectComparator
     /*
      	Objects are deeply equal
     */
-	
+    
+```	
 	## DeeplyEquals if type(not primities and not Anonymous Type) has Overridden Equals method
 
 ```csharp
@@ -235,16 +236,16 @@ dotnet add package ObjectComparator
 		Actually Value :ObjectsComparator.Tests.SomeTest
 		Details : Was used override 'Equals()'
 	*/
-	
+```	
 		## DeeplyEquals if type has Overridden Equality  method
-		
+```csharp		
 	/*	
 		Path: "SomeTest":
 		Expected Value :ObjectsComparator.Tests.SomeTest
 		Actually Value :ObjectsComparator.Tests.SomeTest
 		Details : == (Equality Operator)
 	*/
-	
+```	
 	## Display distinctions for Dictionary type
 	
 		var firstDictionary = new Dictionary<string, string>
@@ -267,9 +268,9 @@ dotnet add package ObjectComparator
 		Expected Value :Value
 		Actually Value :AnotherValue
 	*/	 
-			 
+```			 
 		## Display distinctions for Anonymous type
-
+```csharp
             var actual = new {Integer = 1, String = "Test", Nested = new byte[] {1, 2, 3}};
 			var expected = new {Integer = 1, String = "Test", Nested = new byte[] {1, 2, 4}};
 			
@@ -280,6 +281,5 @@ dotnet add package ObjectComparator
 		Expected Value :3
 		Actually Value :4
 	*/
-              
-  
+                
 ```
