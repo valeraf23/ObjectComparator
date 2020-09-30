@@ -250,7 +250,8 @@ dotnet add package ObjectComparator
 		Details : == (Equality Operator)
 	*/
 ```	
-	## Display distinctions for Dictionary type
+
+## Display distinctions for Dictionary type
 	
 ```csharp
 		var firstDictionary = new Dictionary<string, string>
