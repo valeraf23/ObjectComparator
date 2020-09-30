@@ -9,11 +9,14 @@
     <Description>This library allows comparing objects and provide distinctions. What is more, this tool can set compare strategy for certain properties or fields and types</Description>
     <RepositoryUrl>https://github.com/valeraf23/ObjectComparator</RepositoryUrl>
     <PackageTags>Diff objects compare Comparator Equals classes distinctions</PackageTags>
-    <PackageReleaseNotes>improve performance</PackageReleaseNotes>
-    <Version>2.14</Version>
+    <PackageReleaseNotes>-Display distinctions for Anonymous type ; 
+-DeeplyEquals if type has Overridden Equality method;
+-DeeplyEquals if type(not primities and not Anonymous Type) has Overridden Equals method;
+-improve performance;</PackageReleaseNotes>
+    <Version>3.00</Version>
     <PackageId>ObjectComparator</PackageId>
-    <AssemblyVersion>2.14.0.0</AssemblyVersion>
-    <FileVersion>2.14.0.0</FileVersion>
+    <AssemblyVersion>3.0.0.0</AssemblyVersion>
+    <FileVersion>3.0.0.0</FileVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netcoreapp3.1|AnyCPU'">
