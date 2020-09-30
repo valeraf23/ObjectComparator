@@ -1,6 +1,6 @@
 ﻿namespace ObjectsComparator.Tests.TestModels
 {
-    internal class StudentIName: IName
+     class StudentIName: IName
     {
         public string Name { get; set; }
         public int Age { get; set; }

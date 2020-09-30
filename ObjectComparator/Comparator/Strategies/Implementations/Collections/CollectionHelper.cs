@@ -1,8 +1,8 @@
 using System;
 using System.Reflection;
 using ObjectsComparator.Comparator.RepresentationDistinction;
+using ObjectsComparator.Comparator.Rules;
 
-#nullable enable
 namespace ObjectsComparator.Comparator.Strategies.Implementations.Collections
 {
     internal class CollectionHelper
@@ -10,25 +10,28 @@ namespace ObjectsComparator.Comparator.Strategies.Implementations.Collections
         private static readonly MethodInfo CallWrapper =
             typeof(CollectionHelper).GetTypeInfo().GetDeclaredMethod(nameof(Wrapper))!;
 
-        private static Distinctions Wrapper<TTarget>(Func<TTarget, TTarget, string, Comparator, Distinctions> func,
-            object expected, object actual, string propertyName, Comparator comparator)
+        private static readonly Type RulesHandlerType = typeof(RulesHandler);
+        private static readonly Type DistinctionsType = typeof(DeepEqualityResult);
+        private static readonly Type StringType = typeof(string);
+
+        private static DeepEqualityResult Wrapper<TTarget>(Func<TTarget, TTarget, string, RulesHandler, DeepEqualityResult> func,
+            object expected, object actual, string propertyName, RulesHandler comparator)
         {
             var ex = (TTarget) expected;
             var act = (TTarget) actual;
             return func(ex, act, propertyName, comparator);
         }
 
-        public static Func<object, object, string, Comparator, Distinctions> GetDelegateFor(MethodInfo method)
+        public static Func<object, object, string, RulesHandler, DeepEqualityResult> GetDelegateFor(MethodInfo method)
         {
             var targetType = method.GetParameters()[0].ParameterType;
-            var delegateType = typeof(Func<,,,,>).MakeGenericType(targetType, targetType, typeof(string),
-                typeof(Comparator),
-                typeof(Distinctions));
+            var delegateType = typeof(Func<,,,,>).MakeGenericType(targetType, targetType, StringType, RulesHandlerType,
+                DistinctionsType);
 
             var delegateCompareIListTypes = method.CreateDelegate(delegateType);
-            return (Func<object, object, string, Comparator, Distinctions>) CallWrapper
+            return (Func<object, object, string, RulesHandler, DeepEqualityResult>) CallWrapper
                 .MakeGenericMethod(targetType).CreateDelegate(
-                    typeof(Func<object, object, string, Comparator, Distinctions>),
+                    typeof(Func<object, object, string, RulesHandler, DeepEqualityResult>),
                     delegateCompareIListTypes);
         }
     }

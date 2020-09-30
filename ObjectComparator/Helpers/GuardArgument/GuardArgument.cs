@@ -14,7 +14,7 @@ namespace ObjectsComparator.Helpers.GuardArgument
             if (value == null) throw new ArgumentNullException(argument);
         }
 
-        public static void ArgumentOutOfCondition<T>(T value, Func<T, bool> condition, string argument)
+        public static void ArgumentOutOfCondition<T>(T value, Func<T, bool> condition, string argument) where T : notnull
         {
             if (!condition(value)) throw new ArgumentOutOfRangeException(value.ToString(), argument);
         }

@@ -4,20 +4,22 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using ObjectsComparator.Comparator.RepresentationDistinction;
+using ObjectsComparator.Comparator.Rules;
 
 namespace ObjectsComparator.Comparator.Strategies.Implementations.Collections
 {
     public class CollectionsCompareStrategy : BaseCollectionsCompareStrategy
     {
         private static readonly MethodInfo CompareCollectionsMethod =
-            typeof(CollectionsCompareStrategy).GetTypeInfo().GetDeclaredMethod(nameof(CompareCollections));
+            typeof(CollectionsCompareStrategy).GetTypeInfo().GetDeclaredMethod(nameof(CompareCollections))!;
 
-        public override bool IsValid(Type member)
+        public CollectionsCompareStrategy(Comparator comparator) : base(comparator)
         {
-            return member.GetInterfaces().Contains(typeof(IEnumerable)) && member != typeof(string);
         }
 
-        public override Distinctions Compare<T>(T expected, T actual, string propertyName)
+        public override bool IsValid(Type member) => member.GetInterfaces().Contains(typeof(IEnumerable)) && member != typeof(string);
+
+        public override DeepEqualityResult Compare<T>(T expected, T actual, string propertyName)
         {
             var elementType = expected.GetType();
             var genericType = elementType.IsGenericType
@@ -25,37 +27,31 @@ namespace ObjectsComparator.Comparator.Strategies.Implementations.Collections
                 : elementType.GetElementType();
             var compareCollectionsMethod = CompareCollectionsMethod.MakeGenericMethod(genericType!);
             return CollectionHelper.GetDelegateFor(compareCollectionsMethod)(expected, actual,
-                propertyName, Comparator);
+                propertyName, RulesHandler);
         }
 
-        private static Distinctions CompareIListTypes<T>(IList<T> expected, IList<T> actual, string propertyName,
-            Comparator comparator)
+        private static DeepEqualityResult CompareIListTypes<T>(IList<T> expected, IList<T> actual, string propertyName,
+            RulesHandler rulesHandler)
         {
             var expectedCount = expected.Count;
             var actualCount = actual.Count;
             if (expectedCount != actualCount)
                 return DistinctionsForCollectionsWithDifferentLength(propertyName, expectedCount, actualCount);
-            var diff = Distinctions.None();
+            var diff = DeepEqualityResult.None();
             for (var i = 0; i < expectedCount; i++)
-                diff.AddRange(comparator.GetDistinctions($"{propertyName}[{i}]", expected[i], actual[i]));
+                diff.AddRange(rulesHandler.GetFor(typeof(T)).Compare(expected[i], actual[i], $"{propertyName}[{i}]"));
 
             return diff;
         }
 
-        private static Distinctions CompareCollections<T>(IEnumerable<T> expected, IEnumerable<T> actual,
-            string propertyName, Comparator comparator)
+        private static DeepEqualityResult CompareCollections<T>(IEnumerable<T> expected, IEnumerable<T> actual, string propertyName, RulesHandler rulesHandler)
         {
-            var a = expected.ToList();
-            var b = actual.ToList();
-            return CompareIListTypes(a, b, propertyName, comparator);
+            var exp = expected.ToList();
+            var act = actual.ToList();
+            return CompareIListTypes(exp, act, propertyName, rulesHandler);
         }
 
-        private static Distinctions DistinctionsForCollectionsWithDifferentLength(string propertyName, int first,
-            int second)
-        {
-            return Distinctions.Create(new Distinction(
-                $"Property \"{propertyName}\": Collection has different length", $"{second}",
-                $"{first}"));
-        }
+        private static DeepEqualityResult DistinctionsForCollectionsWithDifferentLength(string propertyName, int first, int second) =>
+            DeepEqualityResult.Create(new Distinction($"Property \"{propertyName}\": Collection has different length", $"{second}", $"{first}"));
     }
 }

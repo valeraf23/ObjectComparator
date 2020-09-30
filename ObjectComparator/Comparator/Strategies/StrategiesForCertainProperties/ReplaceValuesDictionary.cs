@@ -12,6 +12,7 @@ namespace ObjectsComparator.Comparator.Strategies.StrategiesForCertainProperties
                 ["("] = "[",
                 [")"] = "]"
             };
+
             Swaps = new[] {listValues};
         }
 

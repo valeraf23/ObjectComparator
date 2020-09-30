@@ -19,7 +19,7 @@ namespace PerformanceTests
     [MemoryDiagnoser]
     public class PerformanceTests
     {
-        
+
         [Benchmark]
         public void Set_Strategy_For_Collection_Ref_Type()
         {
@@ -40,7 +40,7 @@ namespace PerformanceTests
                 InnerClass = new[] {new SomeClass {Foo = "some"}, new SomeClass {Foo = data}}
             };
 
-            act.GetDistinctions(exp, str => str.Set(x => x.InnerClass[0].Foo,
+            act.DeeplyEquals(exp, str => str.Set(x => x.InnerClass[0].Foo,
                 (s, s1) => s == data));
         }
 
@@ -63,7 +63,7 @@ namespace PerformanceTests
                 InnerClass = new HashSet<string> {"ttt1", "ttt2"}
             };
 
-            act.GetDistinctions(exp);
+            act.DeeplyEquals(exp);
 
         }
 
@@ -72,19 +72,19 @@ namespace PerformanceTests
         {
             var act = new BuildingList
             {
-               
-                Address ="dsfd",
-                ListOfAppNumbers=  new List<int>{1,2,3,4,5,6,7,8,9,10,11,12}
+
+                Address = "dsfd",
+                ListOfAppNumbers = new List<int> {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12}
             };
 
             var exp = new BuildingList
             {
 
                 Address = "dsfd",
-                ListOfAppNumbers = new List<int> { 1, 2, 3, 4, 5, 61, 7, 8, 91, 10, 11, 12 }
+                ListOfAppNumbers = new List<int> {1, 2, 3, 4, 5, 61, 7, 8, 91, 10, 11, 12}
             };
 
-            act.GetDistinctions(exp);
+            act.DeeplyEquals(exp);
 
         }
     }

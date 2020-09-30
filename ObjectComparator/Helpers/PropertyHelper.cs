@@ -7,11 +7,16 @@ namespace ObjectsComparator.Helpers
 {
     internal sealed class PropertyHelper
     {
+        private delegate TValue ByRefFunc<TDeclaringType, TValue>(ref TDeclaringType arg);
+
         private static readonly ConcurrentDictionary<string, Func<object, object>> Cache =
             new ConcurrentDictionary<string, Func<object, object>>();
 
         private static readonly MethodInfo CallPropertyGetterOpenGenericMethod =
             typeof(PropertyHelper).GetTypeInfo().GetDeclaredMethod(nameof(CallPropertyGetter))!;
+
+        private static readonly MethodInfo CallPropertyGetterByReferenceOpenGenericMethod =
+            typeof(PropertyHelper).GetTypeInfo().GetDeclaredMethod(nameof(CallPropertyGetterByReference))!;
 
         private Func<object, object>? _valueGetter;
 
@@ -32,24 +37,27 @@ namespace ObjectsComparator.Helpers
             return ValueGetter(instance);
         }
 
-        public static Func<object, object> MakeFastPropertyGetter(PropertyInfo propertyInfo)
-        {
-            return MakeFastPropertyGetter(
-                propertyInfo,
-                CallPropertyGetterOpenGenericMethod);
-        }
-
         private static Func<object, object> MakeFastPropertyGetter(
-            PropertyInfo propertyInfo,
-            MethodInfo propertyGetterWrapperMethod)
+            PropertyInfo propertyInfo)
         {
             var getMethod = propertyInfo.GetMethod!;
 
-            // Create a delegate TDeclaringType -> TValue
-            return MakeFastPropertyGetter(
-                typeof(Func<,>),
-                getMethod,
-                propertyGetterWrapperMethod);
+            if (getMethod.DeclaringType!.GetTypeInfo().IsValueType)
+            {
+                // Create a delegate (ref TDeclaringType) -> TValue
+                return MakeFastPropertyGetter(
+                    typeof(ByRefFunc<,>),
+                    getMethod,
+                    CallPropertyGetterByReferenceOpenGenericMethod);
+            }
+            else
+            {
+                // Create a delegate TDeclaringType -> TValue
+                return MakeFastPropertyGetter(
+                    typeof(Func<,>),
+                    getMethod,
+                    CallPropertyGetterOpenGenericMethod);
+            }
         }
 
         private static Func<object, object> MakeFastPropertyGetter(
@@ -85,6 +93,14 @@ namespace ObjectsComparator.Helpers
             object target)
         {
             return getter((TDeclaringType) target);
+        }
+
+        private static object? CallPropertyGetterByReference<TDeclaringType, TValue>(
+            ByRefFunc<TDeclaringType, TValue> getter,
+            object target)
+        {
+            var unboxed = (TDeclaringType) target;
+            return getter(ref unboxed);
         }
     }
 }

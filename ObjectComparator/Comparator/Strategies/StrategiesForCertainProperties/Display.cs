@@ -4,8 +4,8 @@ namespace ObjectsComparator.Comparator.Strategies.StrategiesForCertainProperties
 {
     public sealed class Display
     {
-        public string Expected { get; set; }
-        public string Actually { get; set; }
+        public string Expected { get; set; } = string.Empty;
+        public string Actually { get; set; } = string.Empty;
 
         public Distinction GetDistinction<T>(T expected, T actual, string propertyName, string lambdaExpression)
         {
@@ -14,10 +14,7 @@ namespace ObjectsComparator.Comparator.Strategies.StrategiesForCertainProperties
             return new Distinction(propertyName, expectedValue, actuallyValue, lambdaExpression);
         }
 
-        private static string ReplaceNull(object value)
-        {
-            return value == null ? "null" : value.ToString();
-        }
+        private static string ReplaceNull(object? value) => value == null ? "null" : $"{value}";
 
         public Display SetExpectedInformation(string text)
         {

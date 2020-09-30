@@ -1,14 +1,58 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
+using System.Text;
 
+#nullable disable
 namespace ObjectsComparator.Helpers.Extensions
 {
-    public static class BodyExpression
+    public static class ExpressionExtension
     {
+        private static string ReplaceNull(object? value) => value == null ? "null" : $"{value}";
+
+        public static string GetLambdaString(this LambdaExpression compareFunc, object argument,
+            params object[] arguments)
+        {
+            var parametersName = compareFunc.Parameters.Select(c => c.Name).ToArray();
+
+            var argList = new List<object> {argument};
+            if (arguments.IsNotEmpty())
+            {
+                argList.AddRange(arguments);
+            }
+
+            var tLength = argList.Count;
+
+            if (argList.Count < tLength)
+            {
+                throw new Exception("Provided more arguments");
+            }
+
+            if (argList.Count > tLength)
+            {
+                throw new Exception("Was provided more arguments than need");
+            }
+
+            var bExp = Get(compareFunc).ToString();
+
+            var sb = new StringBuilder(bExp);
+            for (var i = 0; i < parametersName.Length; i++)
+            {
+                sb.Replace(parametersName[i], $"{parametersName[i]}:({ReplaceNull(argList[i])})");
+            }
+
+            return sb.ToString();
+        }
+
         public static Expression<Func<TIn, TIn, TOut>> Get<TIn, TOut>(Expression<Func<TIn, TIn, TOut>> expression)
         {
             return (Expression<Func<TIn, TIn, TOut>>) PartialEval(expression);
+        }
+
+        public static Expression Get(Expression expression)
+        {
+            return PartialEval(expression);
         }
 
         private static Expression PartialEval(Expression expression, Func<Expression, bool> fnCanBeEvaluated)
