@@ -8,7 +8,7 @@
     <PackageProjectUrl>https://github.com/valeraf23/ObjectComparator</PackageProjectUrl>
     <Description>This library allows comparing objects and provide distinctions. What is more, this tool can set compare strategy for certain properties or fields and types</Description>
     <RepositoryUrl>https://github.com/valeraf23/ObjectComparator</RepositoryUrl>
-    <PackageTags>Diff objects compare Comparator Equals classes distinctions</PackageTags>
+    <PackageTags>DeeplyEquals Diff objects compare Comparator Equals classes distinctions</PackageTags>
     <PackageReleaseNotes>-Display distinctions for Anonymous type ; 
 -DeeplyEquals if type has Overridden Equality method;
 -DeeplyEquals if type(not primities and not Anonymous Type) has Overridden Equals method;
