@@ -254,7 +254,7 @@ dotnet add package ObjectComparator
 ## Display distinctions for Dictionary type
 	
 ```csharp
-		var firstDictionary = new Dictionary<string, string>
+	var firstDictionary = new Dictionary<string, string>
             {
                 {"Key", "Value"},
                 {"AnotherKey", "Value"},
@@ -266,7 +266,7 @@ dotnet add package ObjectComparator
                 {"AnotherKey", "AnotherValue"},
             };
 			
-		var result = firstDictionary.DeeplyEquals(secondDictionary)
+	var result = firstDictionary.DeeplyEquals(secondDictionary)
 			 
 			 
 	/*	
@@ -281,9 +281,9 @@ dotnet add package ObjectComparator
 		
 ```csharp
             var actual = new {Integer = 1, String = "Test", Nested = new byte[] {1, 2, 3}};
-			var expected = new {Integer = 1, String = "Test", Nested = new byte[] {1, 2, 4}};
+	    var expected = new {Integer = 1, String = "Test", Nested = new byte[] {1, 2, 4}};
 			
-			var result = exp.DeeplyEquals(act);
+	    var result = exp.DeeplyEquals(act);
 			
 	/*
 		Path: "AnonymousType<Int32, String, Byte[]>.Nested[2]":
