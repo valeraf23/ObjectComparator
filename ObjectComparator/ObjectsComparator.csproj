@@ -13,10 +13,10 @@
 -DeeplyEquals if type has Overridden Equality method;
 -DeeplyEquals if type(not primities and not Anonymous Type) has Overridden Equals method;
 -improve performance;</PackageReleaseNotes>
-    <Version>3.00</Version>
+    <Version>3.01</Version>
     <PackageId>ObjectComparator</PackageId>
-    <AssemblyVersion>3.0.0.0</AssemblyVersion>
-    <FileVersion>3.0.0.0</FileVersion>
+    <AssemblyVersion>3.0.0.1</AssemblyVersion>
+    <FileVersion>3.0.0.1</FileVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netcoreapp3.1|AnyCPU'">
