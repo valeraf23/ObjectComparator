@@ -22,7 +22,7 @@ namespace ObjectsComparator.Helpers.Extensions
                 argList.AddRange(arguments);
             }
 
-            var tLength = argList.Count;
+            var tLength = parametersName.Length;
 
             if (argList.Count < tLength)
             {
