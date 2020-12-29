@@ -1,22 +1,19 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp3.1;netstandard2.1</TargetFrameworks>
-    <LangVersion>8.0</LangVersion>
+    <TargetFramework>net5.0</TargetFramework>
     <Nullable>enable</Nullable>
+    <LangVersion>9.0</LangVersion>
     <Authors>Valerii_Fedorenko</Authors>
     <PackageProjectUrl>https://github.com/valeraf23/ObjectComparator</PackageProjectUrl>
     <Description>This library allows comparing objects and provide distinctions. What is more, this tool can set compare strategy for certain properties or fields and types</Description>
     <RepositoryUrl>https://github.com/valeraf23/ObjectComparator</RepositoryUrl>
     <PackageTags>DeeplyEquals Diff objects compare Comparator Equals classes distinctions</PackageTags>
-    <PackageReleaseNotes>-Display distinctions for Anonymous type ; 
--DeeplyEquals if type has Overridden Equality method;
--DeeplyEquals if type(not primities and not Anonymous Type) has Overridden Equals method;
--improve performance;</PackageReleaseNotes>
-    <Version>3.01</Version>
+    <PackageReleaseNotes>Net5</PackageReleaseNotes>
+    <Version>3.02</Version>
     <PackageId>ObjectComparator</PackageId>
-    <AssemblyVersion>3.0.0.1</AssemblyVersion>
-    <FileVersion>3.0.0.1</FileVersion>
+    <AssemblyVersion>3.0.0.2</AssemblyVersion>
+    <FileVersion>3.0.0.2</FileVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netcoreapp3.1|AnyCPU'">

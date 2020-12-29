@@ -1,9 +1,9 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using ObjectsComparator.Comparator.RepresentationDistinction;
 using ObjectsComparator.Comparator.Strategies.Interfaces;
 using ObjectsComparator.Helpers.Extensions;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace ObjectsComparator.Comparator.Rules
 {

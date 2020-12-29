@@ -1,7 +1,7 @@
-﻿using System;
-using ObjectsComparator.Comparator.Rules.Interfaces;
+﻿using ObjectsComparator.Comparator.Rules.Interfaces;
 using ObjectsComparator.Comparator.Strategies.Interfaces;
 using ObjectsComparator.Helpers.GuardArgument;
+using System;
 
 namespace ObjectsComparator.Comparator.Rules.Implementations
 {

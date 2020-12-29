@@ -13,7 +13,7 @@ namespace ObjectsComparator.Comparator.Strategies.StrategiesForCertainProperties
                 [")"] = "]"
             };
 
-            Swaps = new[] {listValues};
+            Swaps = new[] { listValues };
         }
 
         private static readonly IList<IDictionary<string, string>> Swaps;

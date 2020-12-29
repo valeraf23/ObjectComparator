@@ -11,20 +11,11 @@ namespace ObjectsComparator.Comparator.RepresentationDistinction
     {
         private readonly List<Distinction> _list;
 
-        private DeepEqualityResult()
-        {
-            _list = new List<Distinction>();
-        }
+        private DeepEqualityResult() => _list = new List<Distinction>();
 
-        private DeepEqualityResult(int capacity) : this()
-        {
-            _list = new List<Distinction>(capacity);
-        }
+        private DeepEqualityResult(int capacity) : this() => _list = new List<Distinction>(capacity);
 
-        private DeepEqualityResult(IEnumerable<Distinction> collection)
-        {
-            _list = new List<Distinction>(collection);
-        }
+        private DeepEqualityResult(IEnumerable<Distinction> collection) => _list = new List<Distinction>(collection);
 
         public Distinction this[int i]
         {
@@ -36,25 +27,25 @@ namespace ObjectsComparator.Comparator.RepresentationDistinction
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-        public static DeepEqualityResult None() => new DeepEqualityResult(0);
+        public static DeepEqualityResult None() => new(0);
 
-        public static DeepEqualityResult Create() => new DeepEqualityResult();
+        public static DeepEqualityResult Create() => new();
 
         public static DeepEqualityResult Create(string name, object expectedValue, object actuallyValue) =>
             Create(new Distinction(name, expectedValue, actuallyValue));
 
         public static DeepEqualityResult Create(IEnumerable<Distinction> collection) =>
-            new DeepEqualityResult(collection);
+            new(collection);
 
-        public static DeepEqualityResult Create(Distinction distinction) => new DeepEqualityResult(1) {distinction};
+        public static DeepEqualityResult Create(Distinction distinction) => new(1) { distinction };
 
         public static ForDistinctionsBuilder<T> CreateFor<T>(string name, T expectedValue,
             T actuallyValue) where T : notnull =>
-            new ForDistinctionsBuilder<T>(name, expectedValue, actuallyValue);
+            new(name, expectedValue, actuallyValue);
 
         public static ForDistinctionsBuilder<T> CreateFor<T>(string name, T expectedValue,
             T actuallyValue, string details) where T : notnull =>
-            new ForDistinctionsBuilder<T>(name, expectedValue, actuallyValue, details);
+            new(name, expectedValue, actuallyValue, details);
 
         public DeepEqualityResult Add(Distinction input)
         {

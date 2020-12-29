@@ -9,8 +9,7 @@ namespace ObjectsComparator.Helpers
     {
         private delegate TValue ByRefFunc<TDeclaringType, TValue>(ref TDeclaringType arg);
 
-        private static readonly ConcurrentDictionary<string, Func<object, object>> Cache =
-            new ConcurrentDictionary<string, Func<object, object>>();
+        private static readonly ConcurrentDictionary<string, Func<object, object>> Cache = new();
 
         private static readonly MethodInfo CallPropertyGetterOpenGenericMethod =
             typeof(PropertyHelper).GetTypeInfo().GetDeclaredMethod(nameof(CallPropertyGetter))!;
@@ -32,10 +31,7 @@ namespace ObjectsComparator.Helpers
 
         public Func<object, object> ValueGetter => _valueGetter ??= MakeFastPropertyGetter(Property);
 
-        public object GetValue(object instance)
-        {
-            return ValueGetter(instance);
-        }
+        public object GetValue(object instance) => ValueGetter(instance);
 
         private static Func<object, object> MakeFastPropertyGetter(
             PropertyInfo propertyInfo)
@@ -50,14 +46,12 @@ namespace ObjectsComparator.Helpers
                     getMethod,
                     CallPropertyGetterByReferenceOpenGenericMethod);
             }
-            else
-            {
-                // Create a delegate TDeclaringType -> TValue
-                return MakeFastPropertyGetter(
-                    typeof(Func<,>),
-                    getMethod,
-                    CallPropertyGetterOpenGenericMethod);
-            }
+
+            // Create a delegate TDeclaringType -> TValue
+            return MakeFastPropertyGetter(
+                typeof(Func<,>),
+                getMethod,
+                CallPropertyGetterOpenGenericMethod);
         }
 
         private static Func<object, object> MakeFastPropertyGetter(
@@ -79,27 +73,21 @@ namespace ObjectsComparator.Helpers
                     typeof(Func<object, object>),
                     propertyGetterDelegate);
 
-                return (Func<object, object>) accessorDelegate;
+                return (Func<object, object>)accessorDelegate;
             }, propertyGetMethod);
         }
 
-        public static PropertyHelper Instance(PropertyInfo property)
-        {
-            return new PropertyHelper(property);
-        }
+        public static PropertyHelper Instance(PropertyInfo property) => new PropertyHelper(property);
 
         private static object? CallPropertyGetter<TDeclaringType, TValue>(
             Func<TDeclaringType, TValue> getter,
-            object target)
-        {
-            return getter((TDeclaringType) target);
-        }
+            object target) => getter((TDeclaringType)target);
 
         private static object? CallPropertyGetterByReference<TDeclaringType, TValue>(
             ByRefFunc<TDeclaringType, TValue> getter,
             object target)
         {
-            var unboxed = (TDeclaringType) target;
+            var unboxed = (TDeclaringType)target;
             return getter(ref unboxed);
         }
     }

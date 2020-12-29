@@ -1,5 +1,5 @@
-﻿using System;
-using ObjectsComparator.Helpers.GuardArgument;
+﻿using ObjectsComparator.Helpers.GuardArgument;
+using System;
 
 namespace ObjectsComparator.Comparator.RepresentationDistinction
 {
@@ -38,11 +38,11 @@ namespace ObjectsComparator.Comparator.RepresentationDistinction
 
         public override int GetHashCode() => HashCode.Combine(Path, Details);
 
-        public static bool operator == (Distinction? a, Distinction? b) =>
+        public static bool operator ==(Distinction? a, Distinction? b) =>
             a is null && b is null ||
             a?.Equals(b) == true;
 
-        public static bool operator != (Distinction a, Distinction b) =>
+        public static bool operator !=(Distinction a, Distinction b) =>
             !(a == b);
     }
 }

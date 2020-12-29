@@ -1,23 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using FluentAssertions;
+﻿using FluentAssertions;
 using NUnit.Framework;
 using ObjectsComparator.Comparator.Helpers;
 using ObjectsComparator.Comparator.RepresentationDistinction;
 using ObjectsComparator.Comparator.Strategies.StrategiesForCertainProperties;
 using ObjectsComparator.Tests.TestModels;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace ObjectsComparator.Tests
 {
     [TestFixture]
     public class CompareObjectsTests
     {
-        private readonly Time _time = new Time("2016", 1.5F, 3, 1.2, new List<string> {"", ""}, 4, 34);
+        private readonly Time _time = new("2016", 1.5F, 3, 1.2, new List<string> { "", "" }, 4, 34);
 
-        private readonly DigitalClock _dDigitalClock = new DigitalClock(true, new[] {1, 2},
-            new Calendar(3, new Time("2016", 1.5F, 3, 1.2, new List<string> {"", ""}, 4, 34)), "2015", 1.2F, 11, 1.12,
-            new List<string> {"df", "asd"}, 1, 9);
+        private readonly DigitalClock _dDigitalClock = new(true, new[] { 1, 2 },
+            new Calendar(3, new Time("2016", 1.5F, 3, 1.2, new List<string> { "", "" }, 4, 34)), "2015", 1.2F, 11, 1.12,
+            new List<string> { "df", "asd" }, 1, 9);
 
         [Test]
         public void DictionaryVerifications()
@@ -26,9 +26,9 @@ namespace ObjectsComparator.Tests
             {
                 Books = new Dictionary<string, Book>
                 {
-                    ["hobbit"] = new Book {Pages = 1000, Text = "hobbit Text"},
-                    ["murder in orient express"] = new Book {Pages = 500, Text = "murder in orient express Text"},
-                    ["Shantaram"] = new Book {Pages = 500, Text = "Shantaram Text"}
+                    ["hobbit"] = new() { Pages = 1000, Text = "hobbit Text" },
+                    ["murder in orient express"] = new() { Pages = 500, Text = "murder in orient express Text" },
+                    ["Shantaram"] = new() { Pages = 500, Text = "Shantaram Text" }
                 }
             };
 
@@ -36,9 +36,9 @@ namespace ObjectsComparator.Tests
             {
                 Books = new Dictionary<string, Book>
                 {
-                    ["hobbit"] = new Book {Pages = 1, Text = "hobbit Text"},
-                    ["murder in orient express"] = new Book {Pages = 500, Text = "murder in orient express Text1"},
-                    ["Shantaram"] = new Book {Pages = 500, Text = "Shantaram Text"}
+                    ["hobbit"] = new() { Pages = 1, Text = "hobbit Text" },
+                    ["murder in orient express"] = new() { Pages = 500, Text = "murder in orient express Text1" },
+                    ["Shantaram"] = new() { Pages = 500, Text = "Shantaram Text" }
                 }
             };
 
@@ -50,6 +50,7 @@ namespace ObjectsComparator.Tests
                     "Library.Books[murder in orient express].Text", "murder in orient express Text",
                     "murder in orient express Text1")
             });
+
             CollectionAssert.AreEquivalent(result, expectedDistinctionsCollection);
         }
 
@@ -102,7 +103,7 @@ namespace ObjectsComparator.Tests
                 }
             };
 
-            var skip = new[] {"Vehicle", "Name", "Courses[1].Name"};
+            var skip = new[] { "Vehicle", "Name", "Courses[1].Name" };
             var result = expected.DeeplyEquals(actual,
                 str => str.Set(x => x.Courses[0].Duration, (act, exp) => act > TimeSpan.FromHours(3),
                     x => x.SetExpectedInformation("Expected that Duration should be more that 3 hours")), skip);
@@ -165,7 +166,7 @@ namespace ObjectsComparator.Tests
                 }
             };
 
-            var skip = new[] {"Vehicle", "Name", "Courses[1].Name"};
+            var skip = new[] { "Vehicle", "Name", "Courses[1].Name" };
 
             var result = expected.DeeplyEquals(actual,
                 str => str.Set(x => x.Courses[0].Duration, (act, exp) => act > TimeSpan.FromHours(3),
@@ -240,7 +241,7 @@ namespace ObjectsComparator.Tests
         [Test]
         public void DistinctionExist()
         {
-            var time1 = new Time("wrong", 1.5F, 3, 1.2, new List<string> {"", ""}, 4, 34);
+            var time1 = new Time("wrong", 1.5F, 3, 1.2, new List<string> { "", "" }, 4, 34);
             var resultNoDiffTime1 = _time.DeeplyEquals(time1);
             resultNoDiffTime1.Should().NotBeEmpty();
         }
@@ -248,8 +249,8 @@ namespace ObjectsComparator.Tests
         [Test]
         public void DistinctionForEqualsOverride()
         {
-            var time1 = new StudentEq {Age = 3, Courses = new[] {new CourseE {Name = "fff"}}};
-            var time2 = new StudentEq {Age = 3, Courses = new[] {new CourseE {Name = "222"}}};
+            var time1 = new StudentEq { Age = 3, Courses = new[] { new CourseE { Name = "fff" } } };
+            var time2 = new StudentEq { Age = 3, Courses = new[] { new CourseE { Name = "222" } } };
             var resultNoDiffTime1 = time1.DeeplyEquals(time2);
             resultNoDiffTime1.Should().NotBeEmpty();
             resultNoDiffTime1[0].Details.Should()
@@ -263,20 +264,20 @@ namespace ObjectsComparator.Tests
             {
                 One = "f",
                 Two = null,
-                ArrayThird = new[] {"sss", "ggg"},
-                InnerClass = new[] {new SomeClass {Foo = "ttt"}, new SomeClass {Foo = "ttt2"}}
+                ArrayThird = new[] { "sss", "ggg" },
+                InnerClass = new[] { new SomeClass { Foo = "ttt" }, new SomeClass { Foo = "ttt2" } }
             };
 
             var exp = new ClassA
             {
                 One = "f",
                 Two = 5,
-                ArrayThird = new[] {"sss", "ggg"},
-                InnerClass = new[] {new SomeClass {Foo = "ttt"}, new SomeClass {Foo = "ttt2"}}
+                ArrayThird = new[] { "sss", "ggg" },
+                InnerClass = new[] { new SomeClass { Foo = "ttt" }, new SomeClass { Foo = "ttt2" } }
             };
 
             var res = act.DeeplyEquals(exp);
-            ((bool) res).Should().BeFalse();
+            ((bool)res).Should().BeFalse();
             var diff = res.First();
             diff.ActuallyValue.Should().Be(exp.Two);
             diff.ExpectedValue.Should().Be("null");
@@ -289,16 +290,16 @@ namespace ObjectsComparator.Tests
             {
                 One = "f",
                 Two = 5,
-                ArrayThird = new[] {"sss", "ggg"},
-                InnerClass = new HashSet<string> {"ttt", "ttt2"}
+                ArrayThird = new[] { "sss", "ggg" },
+                InnerClass = new HashSet<string> { "ttt", "ttt2" }
             };
 
             var exp = new ClassC
             {
                 One = "f",
                 Two = 5,
-                ArrayThird = new[] {"sss", "ggg"},
-                InnerClass = new HashSet<string> {"ttt1", "ttt2"}
+                ArrayThird = new[] { "sss", "ggg" },
+                InnerClass = new HashSet<string> { "ttt1", "ttt2" }
             };
 
             var res = act.DeeplyEquals(exp);
@@ -315,16 +316,16 @@ namespace ObjectsComparator.Tests
             {
                 One = "f",
                 Two = null,
-                ArrayThird = new[] {"sss", "ggg"},
-                InnerClass = new[] {new SomeClass {Foo = "ttt"}, new SomeClass {Foo = "ttt2"}}
+                ArrayThird = new[] { "sss", "ggg" },
+                InnerClass = new[] { new SomeClass { Foo = "ttt" }, new SomeClass { Foo = "ttt2" } }
             };
 
             var exp = new ClassA
             {
                 One = "f",
                 Two = 5,
-                ArrayThird = new[] {"sss", "ggg"},
-                InnerClass = new[] {new SomeClass {Foo = "ttt"}, new SomeClass {Foo = "tt"}}
+                ArrayThird = new[] { "sss", "ggg" },
+                InnerClass = new[] { new SomeClass { Foo = "ttt" }, new SomeClass { Foo = "tt" } }
             };
 
             var res = act.DeeplyEquals(exp);
@@ -342,7 +343,7 @@ namespace ObjectsComparator.Tests
         [Test]
         public void IsObjectsEqualTest()
         {
-            var time1 = new Time("2016", 1.5F, 3, 1.2, new List<string> {"", ""}, 4, 34);
+            var time1 = new Time("2016", 1.5F, 3, 1.2, new List<string> { "", "" }, 4, 34);
             bool resultNoDiffTime1 = _time.DeeplyEquals(time1);
             resultNoDiffTime1.Should().BeTrue();
         }
@@ -350,10 +351,10 @@ namespace ObjectsComparator.Tests
         [Test]
         public void IsObjectsEqualTest_AllDigitalClock()
         {
-            var d1DigitalClock = new DigitalClock(true, new[] {1, 2},
-                new Calendar(3, new Time("2016", 1.5F, 3, 1.2, new List<string> {"", ""}, 4, 34)), "2015", 1.2F, 11,
+            var d1DigitalClock = new DigitalClock(true, new[] { 1, 2 },
+                new Calendar(3, new Time("2016", 1.5F, 3, 1.2, new List<string> { "", "" }, 4, 34)), "2015", 1.2F, 11,
                 1.12,
-                new List<string> {"df", "asd"}, 1, 9);
+                new List<string> { "df", "asd" }, 1, 9);
             var resultNoDiffClock = _dDigitalClock.DeeplyEquals(d1DigitalClock);
             resultNoDiffClock.Should().BeEmpty();
         }
@@ -361,7 +362,7 @@ namespace ObjectsComparator.Tests
         [Test]
         public void IsObjectsEqualTestWhenIgnore()
         {
-            var time1 = new Time("wrong", 1.5F, 3, 1.2, new List<string> {"", ""}, 4, 34);
+            var time1 = new Time("wrong", 1.5F, 3, 1.2, new List<string> { "", "" }, 4, 34);
             var resultNoDiffTime1 = _time.DeeplyEquals(time1, "PropYear");
             resultNoDiffTime1.Should().BeEmpty();
         }
@@ -369,10 +370,10 @@ namespace ObjectsComparator.Tests
         [Test]
         public void IsObjectsEqualTestWhenIgnoreInnerObject()
         {
-            var d2DigitalClock = new DigitalClock(true, new[] {1, 2},
-                new Calendar(3, new Time("wrong", 1.5F, 3, 1.2, new List<string> {"", ""}, 4, 34)), "2015", 1.2F, 11,
+            var d2DigitalClock = new DigitalClock(true, new[] { 1, 2 },
+                new Calendar(3, new Time("wrong", 1.5F, 3, 1.2, new List<string> { "", "" }, 4, 34)), "2015", 1.2F, 11,
                 1.12,
-                new List<string> {"df", "asd"}, 1, 9);
+                new List<string> { "df", "asd" }, 1, 9);
             var resultNoDiffTime1 =
                 _dDigitalClock.DeeplyEquals(d2DigitalClock, "PropCalendar.PropTimePanel.PropYear");
             resultNoDiffTime1.Should().BeEmpty();
@@ -382,10 +383,10 @@ namespace ObjectsComparator.Tests
         public void IsObjectsEqualTestWhenSetStrategyInnerObject()
         {
             const int page = 4;
-            var d2DigitalClock = new DigitalClock(true, new[] {1, 2},
-                new Calendar(4, new Time("2016", 1.5F, 3, 1.2, new List<string> {"", ""}, 4, 34)), "2015", 1.2F, 11,
+            var d2DigitalClock = new DigitalClock(true, new[] { 1, 2 },
+                new Calendar(4, new Time("2016", 1.5F, 3, 1.2, new List<string> { "", "" }, 4, 34)), "2015", 1.2F, 11,
                 1.12,
-                new List<string> {"df", "asd"}, 1, 9);
+                new List<string> { "df", "asd" }, 1, 9);
             var str = new Strategies<DigitalClock>().Set(x => x.PropCalendar.Page,
                 (s, s1) => s1 == page);
             var resultNoDiffTime1 = _dDigitalClock.DeeplyEquals(d2DigitalClock, str);
@@ -395,7 +396,7 @@ namespace ObjectsComparator.Tests
         [Test]
         public void IsObjectsEqualTestWhenSeveralIgnore()
         {
-            var time1 = new Time("wrong", 1.5F, 77, 1.2, new List<string> {"", ""}, 4, 34);
+            var time1 = new Time("wrong", 1.5F, 77, 1.2, new List<string> { "", "" }, 4, 34);
             var resultNoDiffTime1 = _time.DeeplyEquals(time1, "PropYear", "Day");
             resultNoDiffTime1.Should().BeEmpty();
         }
@@ -404,10 +405,10 @@ namespace ObjectsComparator.Tests
         public void IsObjectsFallTest_DigitalClock_ArrayDiff()
         {
             const int act = 11;
-            var d3DigitalClock = new DigitalClock(true, new[] {act, 2},
-                new Calendar(3, new Time("2016", 1.5F, 3, 1.2, new List<string> {"", ""}, 4, 34)), "2015", 1.2F, 11,
+            var d3DigitalClock = new DigitalClock(true, new[] { act, 2 },
+                new Calendar(3, new Time("2016", 1.5F, 3, 1.2, new List<string> { "", "" }, 4, 34)), "2015", 1.2F, 11,
                 1.12,
-                new List<string> {"df", "asd"}, 1, 9);
+                new List<string> { "df", "asd" }, 1, 9);
             var resultArrayDiffClock = _dDigitalClock.DeeplyEquals(d3DigitalClock);
             resultArrayDiffClock.Should().NotBeEmpty();
             var diff = resultArrayDiffClock.First();
@@ -420,10 +421,10 @@ namespace ObjectsComparator.Tests
         public void IsObjectsFallTest_DigitalClock_BoolDiff()
         {
             const bool act = false;
-            var d2DigitalClock = new DigitalClock(act, new[] {1, 2},
-                new Calendar(3, new Time("2016", 1.5F, 3, 1.2, new List<string> {"", ""}, 4, 34)), "2015", 1.2F, 11,
+            var d2DigitalClock = new DigitalClock(act, new[] { 1, 2 },
+                new Calendar(3, new Time("2016", 1.5F, 3, 1.2, new List<string> { "", "" }, 4, 34)), "2015", 1.2F, 11,
                 1.12,
-                new List<string> {"df", "asd"}, 1, 9);
+                new List<string> { "df", "asd" }, 1, 9);
             var resultBoolDiffClock = _dDigitalClock.DeeplyEquals(d2DigitalClock);
             resultBoolDiffClock.Should().NotBeEmpty();
             var diff = resultBoolDiffClock.First();
@@ -435,7 +436,7 @@ namespace ObjectsComparator.Tests
         public void IsObjectsFallTest_Time_FloatDiff()
         {
             const float actual = 2.5F;
-            var time3 = new Time("2016", actual, 3, 1.2, new List<string> {"", ""}, 4, 34);
+            var time3 = new Time("2016", actual, 3, 1.2, new List<string> { "", "" }, 4, 34);
             var resultFloatDiffTime1 = _time.DeeplyEquals(time3);
             resultFloatDiffTime1.Should().NotBeEmpty();
             var diff = resultFloatDiffTime1.First();
@@ -447,7 +448,7 @@ namespace ObjectsComparator.Tests
         public void IsObjectsFallTest_Time_ListDiffTime()
         {
             const string actual = "ddd";
-            var time6 = new Time("2016", 1.5F, 3, 1.2, new List<string> {"ddd", ""}, 4, 34);
+            var time6 = new Time("2016", 1.5F, 3, 1.2, new List<string> { "ddd", "" }, 4, 34);
             var resultCollectionDiffTime = _time.DeeplyEquals(time6);
             resultCollectionDiffTime.Should().NotBeEmpty();
             var diff = resultCollectionDiffTime.First();
@@ -459,7 +460,7 @@ namespace ObjectsComparator.Tests
         public void IsObjectsFallTest_Time_ShortDiffTime()
         {
             const short actual = 1;
-            var time4 = new Time("2016", 1.5F, actual, 1.2, new List<string> {"", ""}, 4, 34);
+            var time4 = new Time("2016", 1.5F, actual, 1.2, new List<string> { "", "" }, 4, 34);
             var resultShortDiffTime = _time.DeeplyEquals(time4);
             resultShortDiffTime.Should().NotBeEmpty();
             var diff = resultShortDiffTime.First();
@@ -471,7 +472,7 @@ namespace ObjectsComparator.Tests
         public void IsObjectsFallTest_Time_StringDiff()
         {
             const string actual = "2015";
-            var time2 = new Time(actual, 1.5F, 3, 1.2, new List<string> {"", ""}, 4, 34);
+            var time2 = new Time(actual, 1.5F, 3, 1.2, new List<string> { "", "" }, 4, 34);
             var resultStringDiffTime1 = _time.DeeplyEquals(time2);
             resultStringDiffTime1.Should().NotBeEmpty();
             var diff = resultStringDiffTime1.First();
@@ -483,10 +484,10 @@ namespace ObjectsComparator.Tests
         [Test]
         public void ProperlyNamePropertiesForInnerObjects()
         {
-            var d2DigitalClock = new DigitalClock(true, new[] {1, 2},
-                new Calendar(3, new Time("wrong", 1.5F, 3, 1.2, new List<string> {"", ""}, 4, 34)), "2015", 1.2F, 11,
+            var d2DigitalClock = new DigitalClock(true, new[] { 1, 2 },
+                new Calendar(3, new Time("wrong", 1.5F, 3, 1.2, new List<string> { "", "" }, 4, 34)), "2015", 1.2F, 11,
                 1.12,
-                new List<string> {"df", "asd"}, 1, 9);
+                new List<string> { "df", "asd" }, 1, 9);
             var resultNoDiffTime1 = _dDigitalClock.DeeplyEquals(d2DigitalClock);
             resultNoDiffTime1.Should().NotBeEmpty().And.ContainSingle(x =>
                 x.Path ==
@@ -501,16 +502,16 @@ namespace ObjectsComparator.Tests
             {
                 One = "f",
                 Two = 5,
-                ArrayThird = new[] {"sss", "ggg"},
-                InnerClass = new[] {new SomeClass {Foo = data}, new SomeClass {Foo = data}}
+                ArrayThird = new[] { "sss", "ggg" },
+                InnerClass = new[] { new SomeClass { Foo = data }, new SomeClass { Foo = data } }
             };
 
             var exp = new ClassA
             {
                 One = "f",
                 Two = 5,
-                ArrayThird = new[] {"sss", "ggg"},
-                InnerClass = new[] {new SomeClass {Foo = "some"}, new SomeClass {Foo = data}}
+                ArrayThird = new[] { "sss", "ggg" },
+                InnerClass = new[] { new SomeClass { Foo = "some" }, new SomeClass { Foo = data } }
             };
 
             var res = act.DeeplyEquals(exp, str => str.Set(x => x.InnerClass[0].Foo,
@@ -526,16 +527,16 @@ namespace ObjectsComparator.Tests
             {
                 One = "f",
                 Two = 5,
-                ArrayThird = new[] {"sss", "ggg"},
-                InnerClass = new[] {new SomeClass {Foo = data}, new SomeClass {Foo = data}}
+                ArrayThird = new[] { "sss", "ggg" },
+                InnerClass = new[] { new SomeClass { Foo = data }, new SomeClass { Foo = data } }
             };
 
             var exp = new ClassA
             {
                 One = "f",
                 Two = 5,
-                ArrayThird = new[] {"error", "error1"},
-                InnerClass = new[] {new SomeClass {Foo = "some"}, new SomeClass {Foo = "someFail"}}
+                ArrayThird = new[] { "error", "error1" },
+                InnerClass = new[] { new SomeClass { Foo = "some" }, new SomeClass { Foo = "someFail" } }
             };
 
             var res = act.DeeplyEquals(exp, str => str.Set(x => x.InnerClass[0].Foo,
@@ -558,16 +559,16 @@ namespace ObjectsComparator.Tests
             {
                 One = "f",
                 Two = 5,
-                ArrayThird = new[] {"sss", "ggg"},
-                InnerClass = new[] {new SomeClass {Foo = "some"}, new SomeClass {Foo = "some2"}}
+                ArrayThird = new[] { "sss", "ggg" },
+                InnerClass = new[] { new SomeClass { Foo = "some" }, new SomeClass { Foo = "some2" } }
             };
 
             var exp = new ClassA
             {
                 One = "f",
                 Two = 77,
-                ArrayThird = new[] {"sss", "ggg"},
-                InnerClass = new[] {new SomeClass {Foo = "some"}, new SomeClass {Foo = "some2"}}
+                ArrayThird = new[] { "sss", "ggg" },
+                InnerClass = new[] { new SomeClass { Foo = "some" }, new SomeClass { Foo = "some2" } }
             };
 
             var res = act.DeeplyEquals(exp, st => st.Set(x => x.Two,
@@ -581,13 +582,13 @@ namespace ObjectsComparator.Tests
             var act = new Building
             {
                 Address = "NY, First Street",
-                ListOfAppNumbers = new[] {32, 25, 14, 89}
+                ListOfAppNumbers = new[] { 32, 25, 14, 89 }
             };
 
             var exp = new Building
             {
                 Address = "NY, First Street",
-                ListOfAppNumbers = new[] {555, 25, 14, 89}
+                ListOfAppNumbers = new[] { 555, 25, 14, 89 }
             };
 
             const int expNumber = 32;
@@ -605,13 +606,13 @@ namespace ObjectsComparator.Tests
             var act = new BuildingList
             {
                 Address = "NY, First Street",
-                ListOfAppNumbers = new[] {32, 25, 14, 89}
+                ListOfAppNumbers = new[] { 32, 25, 14, 89 }
             };
 
             var exp = new BuildingList
             {
                 Address = "NY, First Street",
-                ListOfAppNumbers = new[] {555, 25, 14, 89}
+                ListOfAppNumbers = new[] { 555, 25, 14, 89 }
             };
 
             const int expNumber = 32;
@@ -629,15 +630,15 @@ namespace ObjectsComparator.Tests
             var act = new ClassB
             {
                 One = "f",
-                Two = new SomeClass {Foo = "no"},
-                Third = new SomeClass {Foo = "yes"}
+                Two = new SomeClass { Foo = "no" },
+                Third = new SomeClass { Foo = "yes" }
             };
 
             var exp = new ClassB
             {
                 One = "f",
-                Two = new SomeClass {Foo = "no"},
-                Third = new SomeClass {Foo = "no"}
+                Two = new SomeClass { Foo = "no" },
+                Third = new SomeClass { Foo = "no" }
             };
 
             var res = act.DeeplyEquals(exp, str => str.Set(x => x.Third,
@@ -651,15 +652,15 @@ namespace ObjectsComparator.Tests
             var act = new ClassB
             {
                 One = "f",
-                Two = new SomeClass {Foo = "no"},
+                Two = new SomeClass { Foo = "no" },
                 Third = null
             };
 
             var exp = new ClassB
             {
                 One = "f",
-                Two = new SomeClass {Foo = "no"},
-                Third = new SomeClass {Foo = "yes"}
+                Two = new SomeClass { Foo = "no" },
+                Third = new SomeClass { Foo = "yes" }
             };
 
             var res = act.DeeplyEquals(exp, str => str.Set(x => x.Third,
@@ -859,12 +860,9 @@ namespace ObjectsComparator.Tests
         }
 
         [Test]
-        public void Anonymous_Types()
-        {
-            new {Integer = 1, String = "Test", Nested = new byte[] {1, 2, 3}}
-                .DeeplyEquals(new {Integer = 1, String = "Test", Nested = new byte[] {1, 2, 4}}).Any().Should()
+        public void Anonymous_Types() => new { Integer = 1, String = "Test", Nested = new byte[] { 1, 2, 3 } }
+                .DeeplyEquals(new { Integer = 1, String = "Test", Nested = new byte[] { 1, 2, 4 } }).Any().Should()
                 .BeTrue();
-        }
 
         [Test]
         public void AreDeeplyEqualShouldReportCorrectlyWithDictionaries()
