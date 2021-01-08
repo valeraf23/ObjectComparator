@@ -10,10 +10,10 @@
     <RepositoryUrl>https://github.com/valeraf23/ObjectComparator</RepositoryUrl>
     <PackageTags>DeeplyEquals Diff objects compare Comparator Equals classes distinctions</PackageTags>
     <PackageReleaseNotes>Net5</PackageReleaseNotes>
-    <Version>3.03</Version>
+    <Version>3.04</Version>
     <PackageId>ObjectComparator</PackageId>
-    <AssemblyVersion>3.0.0.3</AssemblyVersion>
-    <FileVersion>3.0.0.3</FileVersion>
+    <AssemblyVersion>3.0.0.4</AssemblyVersion>
+    <FileVersion>3.0.0.4</FileVersion>
     <PackageIcon>Logo.png</PackageIcon>
   </PropertyGroup>
 
