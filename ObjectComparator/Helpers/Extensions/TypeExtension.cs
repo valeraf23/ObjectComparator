@@ -9,7 +9,7 @@ namespace ObjectsComparator.Helpers.Extensions
 {
     public static class TypeExtension
     {
-        private static readonly ConcurrentDictionary<Type, string> TypeNames = new ConcurrentDictionary<Type, string>();
+        private static readonly ConcurrentDictionary<Type, string> TypeNames = new();
 
         public static bool IsPrimitiveOrString(this Type type) =>
             type.IsPrimitive || type == typeof(string) || type.IsEnum;
