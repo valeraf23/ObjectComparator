@@ -12,7 +12,7 @@
     <PackageReleaseNotes>support netstandard2.1</PackageReleaseNotes>
     <Version>3.05</Version>
     <PackageId>ObjectComparator</PackageId>
-    <AssemblyVersion>3.0.0.4</AssemblyVersion>
+    <AssemblyVersion>3.0.0.5</AssemblyVersion>
     <FileVersion>3.0.0.5</FileVersion>
     <PackageIcon>Logo.png</PackageIcon>
   </PropertyGroup>
