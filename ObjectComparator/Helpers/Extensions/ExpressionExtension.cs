@@ -9,7 +9,7 @@ namespace ObjectsComparator.Helpers.Extensions
 {
     public static class ExpressionExtension
     {
-        private static string ReplaceNull(object? value) => value == null ? "null" : $"{value}";
+        private static string ReplaceNull(object value) => value is null ? "null" : $"{value}";
 
         public static string GetLambdaString(this LambdaExpression compareFunc, object argument,
             params object[] arguments)
@@ -86,7 +86,7 @@ namespace ObjectsComparator.Helpers.Extensions
 
             public override Expression Visit(Expression exp)
             {
-                if (exp == null) return null;
+                if (exp is null) return null;
 
                 return _candidates.Contains(exp) ? Evaluate(exp) : base.Visit(exp);
             }
@@ -121,7 +121,7 @@ namespace ObjectsComparator.Helpers.Extensions
 
             public override Expression Visit(Expression expression)
             {
-                if (expression == null) return null;
+                if (expression is null) return null;
                 var saveCannotBeEvaluated = _cannotBeEvaluated;
 
                 _cannotBeEvaluated = false;

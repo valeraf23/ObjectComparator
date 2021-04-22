@@ -16,9 +16,6 @@ namespace ObjectsComparator.Helpers.Extensions
 
         public static string ToFriendlyTypeName(this Type type)
         {
-            if (type == null)
-                return "null";
-
             return TypeNames
                 .GetOrAdd(type, _ =>
                 {
@@ -69,7 +66,7 @@ namespace ObjectsComparator.Helpers.Extensions
         public static bool IsOverridesEqualsMethod(this Type type)
         {
             var equalsMethod = type.GetMethods().FirstOrDefault(m => m.Name == "Equals" && m.DeclaringType == type);
-            if (equalsMethod != null) return equalsMethod.DeclaringType != typeof(object) && !IsAnonymousType(type);
+            if (equalsMethod is not null) return equalsMethod.DeclaringType != typeof(object) && !IsAnonymousType(type);
 
             return false;
         }

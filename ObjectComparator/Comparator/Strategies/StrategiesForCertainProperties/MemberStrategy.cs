@@ -30,7 +30,7 @@ namespace ObjectsComparator.Comparator.Strategies.StrategiesForCertainProperties
         private Func<T1, T1, bool> CastParameters<T1>(string propertyName)
         {
             var key = $"{propertyName}:{_compareFunc}";
-            return (Func<T1, T1, bool>)Cache.GetOrAdd(key, (k) =>
+            return (Func<T1, T1, bool>)Cache.GetOrAdd(key, _ =>
            {
                var castParameterExpressions = _compareFunc.Parameters.Select(p => Expression.Parameter(p.Type, p.Name)).ToList();
                var invocationExpression = Expression.Invoke(_compareFunc, castParameterExpressions);

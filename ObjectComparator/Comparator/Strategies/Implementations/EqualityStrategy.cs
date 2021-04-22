@@ -19,14 +19,14 @@ namespace ObjectsComparator.Comparator.Strategies.Implementations
         {
             var member = expected.GetType();
             Cache.TryGetValue(member, out var del);
-            bool EqualsOperatorResult(T exp, T act) => (bool) del.Invoke(null, new[] {exp, (object) act})!;
+            bool EqualsOperatorResult(T exp, T act) => (bool) del?.Invoke(null, new[] {exp, (object) act})!;
             return DeepEqualityResult.CreateFor(propertyName, expected, actual, Details).WhenNot(EqualsOperatorResult);
         }
 
         public bool IsValid(Type member)
         {
             var equalsOperator = member.GetMethods().FirstOrDefault(m => m.Name == OpEquality);
-            var res = equalsOperator != null;
+            var res = equalsOperator is not null;
             if (res)
             {
                 Cache.TryAdd(member, equalsOperator!);

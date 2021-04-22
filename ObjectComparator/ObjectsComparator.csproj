@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFrameworks>net5.0;netstandard2.1</TargetFrameworks>
     <Nullable>enable</Nullable>
     <LangVersion>9.0</LangVersion>
     <Authors>Valerii_Fedorenko</Authors>
@@ -9,11 +9,11 @@
     <Description>This library allows comparing objects and provide distinctions. What is more, this tool can set compare strategy for certain properties or fields and types</Description>
     <RepositoryUrl>https://github.com/valeraf23/ObjectComparator</RepositoryUrl>
     <PackageTags>DeeplyEquals Diff objects compare Comparator Equals classes distinctions</PackageTags>
-    <PackageReleaseNotes>Net5</PackageReleaseNotes>
-    <Version>3.04</Version>
+    <PackageReleaseNotes>support netstandard2.1</PackageReleaseNotes>
+    <Version>3.05</Version>
     <PackageId>ObjectComparator</PackageId>
     <AssemblyVersion>3.0.0.4</AssemblyVersion>
-    <FileVersion>3.0.0.4</FileVersion>
+    <FileVersion>3.0.0.5</FileVersion>
     <PackageIcon>Logo.png</PackageIcon>
   </PropertyGroup>
 

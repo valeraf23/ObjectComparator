@@ -59,8 +59,9 @@ namespace ObjectsComparator.Helpers
             MethodInfo propertyGetMethod,
             MethodInfo openGenericWrapperMethod)
         {
+            if (openGenericDelegateType is null) throw new ArgumentNullException(nameof(openGenericDelegateType));
             var name = $"{propertyGetMethod.ReflectedType!.FullName}_{propertyGetMethod.Name}";
-            return Cache.GetOrAdd(name, (key, property) =>
+            return Cache.GetOrAdd(name, (_, _) =>
             {
                 var typeInput = propertyGetMethod.DeclaringType!;
                 var typeOutput = propertyGetMethod.ReturnType;

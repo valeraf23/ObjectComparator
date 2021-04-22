@@ -24,7 +24,7 @@ namespace ObjectsComparator.Comparator.RepresentationDistinction
         public object? ActuallyValue { get; }
 
         public bool Equals(Distinction? other) =>
-            other != null &&
+            other is not null &&
             (ReferenceEquals(this, other) ||
              Path.Equals(other.Path) && Details.Equals(other.Details));
 

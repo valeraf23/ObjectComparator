@@ -30,13 +30,13 @@ namespace ObjectsComparator.Comparator.Rules
             if (_strategies.IsNotEmpty() && _strategies.Any(x => x.Key == propertyName))
                 return _strategies[propertyName].Compare(expected, actual, propertyName);
 
-            if (expected == null && actual != null)
+            if (expected is null && actual is not null)
                 return DeepEqualityResult.Create(propertyName, "null", actual);
 
-            if (expected != null && actual == null)
+            if (expected is not null && actual is null)
                 return DeepEqualityResult.Create(propertyName, expected, "null");
 
-            if (expected == null)
+            if (expected is null)
                 return DeepEqualityResult.None();
 
             return _ignore(propertyName) ? DeepEqualityResult.None() : _rule.Compare(expected, actual, propertyName);
