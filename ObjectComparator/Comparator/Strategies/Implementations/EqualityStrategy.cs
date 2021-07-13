@@ -9,8 +9,7 @@ namespace ObjectsComparator.Comparator.Strategies.Implementations
 {
     public sealed class EqualityStrategy : IEqualityStrategy
     {
-        private static readonly ConcurrentDictionary<Type, MethodInfo> Cache =
-            new ConcurrentDictionary<Type, MethodInfo>();
+        private static readonly ConcurrentDictionary<Type, MethodInfo> Cache = new();
 
         private const string Details = "== (Equality Operator)";
         private const string OpEquality = "op_Equality";

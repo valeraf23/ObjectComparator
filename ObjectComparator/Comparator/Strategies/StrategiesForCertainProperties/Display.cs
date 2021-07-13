@@ -14,7 +14,7 @@ namespace ObjectsComparator.Comparator.Strategies.StrategiesForCertainProperties
             return new Distinction(propertyName, expectedValue, actuallyValue, lambdaExpression);
         }
 
-        private static string ReplaceNull(object? value) => value == null ? "null" : $"{value}";
+        private static string ReplaceNull(object? value) => value is null ? "null" : $"{value}";
 
         public Display SetExpectedInformation(string text)
         {

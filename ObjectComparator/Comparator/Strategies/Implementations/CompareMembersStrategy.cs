@@ -28,7 +28,7 @@ namespace ObjectsComparator.Comparator.Strategies.Implementations
             var type = expected.GetType();
 
             foreach (var mi in type.GetMembers(BindingFlags.Public | BindingFlags.Instance).Where(x =>
-                x.MemberType == MemberTypes.Property || x.MemberType == MemberTypes.Field))
+                x.MemberType is MemberTypes.Property or MemberTypes.Field))
             {
                 var name = mi.Name;
                 var actualPropertyPath = string.IsNullOrEmpty(propertyName)?  mi.Name: $"{propertyName}.{mi.Name}";

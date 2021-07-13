@@ -7,7 +7,7 @@ namespace ObjectsComparator.Helpers
 {
     internal sealed class PropertyHelper
     {
-        private delegate TValue ByRefFunc<TDeclaringType, TValue>(ref TDeclaringType arg);
+        private delegate TValue ByRefFunc<TDeclaringType, out TValue>(ref TDeclaringType arg);
 
         private static readonly ConcurrentDictionary<string, Func<object, object>> Cache = new();
 
@@ -78,7 +78,7 @@ namespace ObjectsComparator.Helpers
             }, propertyGetMethod);
         }
 
-        public static PropertyHelper Instance(PropertyInfo property) => new PropertyHelper(property);
+        public static PropertyHelper Instance(PropertyInfo property) => new(property);
 
         private static object? CallPropertyGetter<TDeclaringType, TValue>(
             Func<TDeclaringType, TValue> getter,

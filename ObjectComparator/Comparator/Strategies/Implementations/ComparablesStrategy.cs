@@ -28,7 +28,7 @@ namespace ObjectsComparator.Comparator.Strategies.Implementations
         private static bool ForNullable<T>(T expected, T actual) where T : notnull
         {
             var compareToMethod = expected.GetType().GetMethods().FirstOrDefault(Predicate);
-            if (compareToMethod == null)
+            if (compareToMethod is null)
                 throw new Exception("Something has gone wrong when trying to find realization IComparable<>");
 
             var compareToResult = (int) compareToMethod.Invoke(expected, new[] {(object) actual})!;
