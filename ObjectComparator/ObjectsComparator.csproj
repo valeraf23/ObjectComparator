@@ -17,7 +17,6 @@
     <PackageIcon>Logo.png</PackageIcon>
     <Copyright>Copyright (c) VF 2022</Copyright>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-    <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netcoreapp3.1|AnyCPU'">
