@@ -53,7 +53,7 @@ namespace ObjectsComparator.Comparator.RepresentationDistinction
             return this;
         }
 
-        public bool IsEmpty() => _list.Any() == false;
+        public bool IsEmpty() => _list.Count == 0;
 
         public bool IsNotEmpty() => !IsEmpty();
 
@@ -67,7 +67,7 @@ namespace ObjectsComparator.Comparator.RepresentationDistinction
 
         public override string ToString()
         {
-            if (!_list.Any()) return "Objects are deeply equal";
+            if (IsEmpty()) return "Objects are deeply equal";
 
 
             return _list.Aggregate(new StringBuilder(),
