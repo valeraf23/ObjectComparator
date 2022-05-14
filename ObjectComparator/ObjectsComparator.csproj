@@ -1,20 +1,23 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net5.0;netstandard2.1</TargetFrameworks>
+    <TargetFrameworks>net6.0;netstandard2.1</TargetFrameworks>
     <Nullable>enable</Nullable>
-    <LangVersion>9.0</LangVersion>
+    <LangVersion>10.0</LangVersion>
     <Authors>Valerii_Fedorenko</Authors>
     <PackageProjectUrl>https://github.com/valeraf23/ObjectComparator</PackageProjectUrl>
     <Description>This library allows comparing objects and provide distinctions. What is more, this tool can set compare strategy for certain properties or fields and types</Description>
     <RepositoryUrl>https://github.com/valeraf23/ObjectComparator</RepositoryUrl>
     <PackageTags>DeeplyEquals Diff objects compare Comparator Equals classes distinctions</PackageTags>
-    <PackageReleaseNotes>support netstandard2.1</PackageReleaseNotes>
-    <Version>3.05</Version>
+    <PackageReleaseNotes>support NET6</PackageReleaseNotes>
+    <Version>3.0.0.6</Version>
     <PackageId>ObjectComparator</PackageId>
-    <AssemblyVersion>3.0.0.5</AssemblyVersion>
-    <FileVersion>3.0.0.5</FileVersion>
+    <AssemblyVersion>3.0.0.6</AssemblyVersion>
+    <FileVersion>3.0.0.6</FileVersion>
     <PackageIcon>Logo.png</PackageIcon>
+    <Copyright>Copyright (c) VF 2022</Copyright>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netcoreapp3.1|AnyCPU'">
@@ -31,6 +34,10 @@
       <PackagePath></PackagePath>
     </None>
     <None Include="..\.editorconfig" Link=".editorconfig" />
+    <None Include="..\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
   </ItemGroup>
 
   <ItemGroup>

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Concurrent;
 using System.Linq;
 using System.Reflection;
@@ -17,12 +16,7 @@ namespace ObjectsComparator.Helpers.Extensions
         public static string ToFriendlyTypeName(this Type type)
         {
             return TypeNames
-                .GetOrAdd(type, _ =>
-                {
-                    var useShortName = IsPrimitiveOrString(type) || IsAnonymousType(type) ||
-                                       type.GetInterfaces().Contains(typeof(IEnumerable));
-                    return GetFriendlyTypeName(type, false);
-                });
+                .GetOrAdd(type, _ => GetFriendlyTypeName(type, false));
         }
 
         private static string GetFriendlyTypeName(Type type, bool useFullName)

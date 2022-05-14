@@ -39,7 +39,8 @@ namespace ObjectsComparator.Helpers.Extensions
             var sb = new StringBuilder(bExp);
             for (var i = 0; i < parametersName.Length; i++)
             {
-                sb.Replace(parametersName[i], $"{parametersName[i]}:({ReplaceNull(argList[i])})");
+                ref var parameterName = ref parametersName[i];
+                sb.Replace(parameterName!, $"{parameterName}:({ReplaceNull(argList[i])})");
             }
 
             return sb.ToString();

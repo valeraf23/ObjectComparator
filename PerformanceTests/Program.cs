@@ -1,15 +1,14 @@
-﻿using System.Collections.Generic;
-using BenchmarkDotNet.Attributes;
+﻿using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Running;
-using ObjectsComparator.Comparator;
 using ObjectsComparator.Comparator.Helpers;
 using ObjectsComparator.Tests.TestModels;
+using System.Collections.Generic;
 
 namespace PerformanceTests
 {
-    class Program
+    internal class Program
     {
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             BenchmarkRunner.Run<PerformanceTests>();
         }
@@ -28,16 +27,16 @@ namespace PerformanceTests
             {
                 One = "f",
                 Two = 5,
-                ArrayThird = new[] {"sss", "ggg"},
-                InnerClass = new[] {new SomeClass {Foo = data}, new SomeClass {Foo = data}}
+                ArrayThird = new[] { "sss", "ggg" },
+                InnerClass = new[] { new SomeClass { Foo = data }, new SomeClass { Foo = data } }
             };
 
             var exp = new ClassA
             {
                 One = "f",
                 Two = 5,
-                ArrayThird = new[] {"sss", "ggg"},
-                InnerClass = new[] {new SomeClass {Foo = "some"}, new SomeClass {Foo = data}}
+                ArrayThird = new[] { "sss", "ggg" },
+                InnerClass = new[] { new SomeClass { Foo = "some" }, new SomeClass { Foo = data } }
             };
 
             act.DeeplyEquals(exp, str => str.Set(x => x.InnerClass[0].Foo,
@@ -51,16 +50,16 @@ namespace PerformanceTests
             {
                 One = "f",
                 Two = 5,
-                ArrayThird = new[] {"sss", "ggg"},
-                InnerClass = new HashSet<string> {"ttt", "ttt2"}
+                ArrayThird = new[] { "sss", "ggg" },
+                InnerClass = new HashSet<string> { "ttt", "ttt2" }
             };
 
             var exp = new ClassC
             {
                 One = "f",
                 Two = 5,
-                ArrayThird = new[] {"sss", "ggg"},
-                InnerClass = new HashSet<string> {"ttt1", "ttt2"}
+                ArrayThird = new[] { "sss", "ggg" },
+                InnerClass = new HashSet<string> { "ttt1", "ttt2" }
             };
 
             act.DeeplyEquals(exp);
@@ -74,14 +73,14 @@ namespace PerformanceTests
             {
 
                 Address = "dsfd",
-                ListOfAppNumbers = new List<int> {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12}
+                ListOfAppNumbers = new List<int> { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 }
             };
 
             var exp = new BuildingList
             {
 
                 Address = "dsfd",
-                ListOfAppNumbers = new List<int> {1, 2, 3, 4, 5, 61, 7, 8, 91, 10, 11, 12}
+                ListOfAppNumbers = new List<int> { 1, 2, 3, 4, 5, 61, 7, 8, 91, 10, 11, 12 }
             };
 
             act.DeeplyEquals(exp);

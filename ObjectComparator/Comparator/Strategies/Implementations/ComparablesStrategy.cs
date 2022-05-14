@@ -21,7 +21,7 @@ namespace ObjectsComparator.Comparator.Strategies.Implementations
         public DeepEqualityResult Compare<T>(T expected, T actual, string propertyName) where T : notnull =>
             DeepEqualityResult.CreateFor(propertyName, expected, actual, Details).WhenNot(IsEqual);
 
-        private static bool IsEqual<T>(T expected, T actual) where T : notnull =>
+        private bool IsEqual<T>(T expected, T actual) where T : notnull =>
             expected is IComparable<T> compareToMethod && compareToMethod.CompareTo(actual) == 0
             || ForNullable(expected, actual);
 

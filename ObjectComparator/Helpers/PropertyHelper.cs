@@ -61,21 +61,22 @@ namespace ObjectsComparator.Helpers
         {
             if (openGenericDelegateType is null) throw new ArgumentNullException(nameof(openGenericDelegateType));
             var name = $"{propertyGetMethod.ReflectedType!.FullName}_{propertyGetMethod.Name}";
-            return Cache.GetOrAdd(name, (_, _) =>
+            return Cache.GetOrAdd(name, static (_, mti) =>
             {
-                var typeInput = propertyGetMethod.DeclaringType!;
-                var typeOutput = propertyGetMethod.ReturnType;
+                var (type, pgm, openGenWrapMethod) = mti;
+                var typeInput = pgm.DeclaringType!;
+                var typeOutput = pgm.ReturnType;
 
-                var delegateType = openGenericDelegateType.MakeGenericType(typeInput, typeOutput);
-                var propertyGetterDelegate = propertyGetMethod.CreateDelegate(delegateType);
+                var delegateType = type.MakeGenericType(typeInput, typeOutput);
+                var propertyGetterDelegate = pgm.CreateDelegate(delegateType);
 
-                var wrapperDelegateMethod = openGenericWrapperMethod.MakeGenericMethod(typeInput, typeOutput);
+                var wrapperDelegateMethod = openGenWrapMethod.MakeGenericMethod(typeInput, typeOutput);
                 var accessorDelegate = wrapperDelegateMethod.CreateDelegate(
                     typeof(Func<object, object>),
                     propertyGetterDelegate);
 
                 return (Func<object, object>)accessorDelegate;
-            }, propertyGetMethod);
+            }, (openGenericDelegateType, propertyGetMethod, openGenericWrapperMethod));
         }
 
         public static PropertyHelper Instance(PropertyInfo property) => new(property);

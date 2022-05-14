@@ -53,10 +53,10 @@ namespace ObjectsComparator.Comparator.Strategies.Implementations
                         break;
                 }
 
-                var diffRes = (DeepEqualityResult) CallGetDistinctions.MakeGenericMethod(memberType!)
+                var diffRes = (DeepEqualityResult) CallGetDistinctions.MakeGenericMethod(memberType)
                     .Invoke(this, new[] {actualPropertyPath, firstValue, secondValue})!;
 
-                if (diffRes!.IsNotEmpty()) diff.AddRange(diffRes);
+                if (diffRes.IsNotEmpty()) diff.AddRange(diffRes);
             }
 
             return diff;
