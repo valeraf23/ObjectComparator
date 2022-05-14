@@ -38,7 +38,7 @@ namespace ObjectsComparator.Comparator.Helpers
 
         private static DeepEqualityResult DeeplyEquals<T>(T expected, T actual, Comparator compareObject) => compareObject.Compare(expected, actual);
 
-        private static IEnumerable<string> ConvertToFullPath(IEnumerable<string> ignore, string typeName)
+        private static List<string> ConvertToFullPath(IEnumerable<string> ignore, string typeName)
         {
             var enumerable = ignore.ToList();
             var ignoreFullPath = new List<string>(enumerable.Count);

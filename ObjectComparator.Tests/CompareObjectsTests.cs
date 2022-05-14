@@ -234,8 +234,8 @@ namespace ObjectsComparator.Tests
 
             result.Should()
                 .BeEquivalentTo(
-                    new Distinction("StudentNew.Courses[0].Duration", "03:00:00",
-                        "04:00:00", "== (Equality Operator)"));
+                    new[]{new Distinction("StudentNew.Courses[0].Duration", "03:00:00",
+                        "04:00:00", "== (Equality Operator)")});
         }
 
         [Test]
