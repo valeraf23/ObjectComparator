@@ -8,38 +8,44 @@ using ObjectsComparator.Comparator.Strategies.Implementations.Collections;
 using ObjectsComparator.Comparator.Strategies.Interfaces;
 using ObjectsComparator.Helpers.Extensions;
 
-namespace ObjectsComparator.Comparator
+namespace ObjectsComparator.Comparator;
+
+public sealed class Comparator
 {
-    public sealed class Comparator
+    public readonly RulesHandler RulesHandler;
+
+    public Comparator(Dictionary<string, ICustomCompareValues> customStrategies, Func<string, bool> ignoreStrategy)
     {
-        public readonly RulesHandler RulesHandler;
+        RulesHandler = new RulesHandler(new[]
+            {
+                Rule.CreateFor(new ComparePrimitiveTypesStrategy()),
+                Rule.CreateFor(new EqualityStrategy()),
+                Rule.CreateFor(new OverridesEqualsStrategy()),
+                Rule.CreateFor(new ComparablesStrategy()),
+                Rule.CreateFor<ICollectionsCompareStrategy>(new CollectionsCompareStrategy(this),
+                    new DictionaryCompareStrategy(this)),
+                Rule.CreateFor(new CompareMembersStrategy(this))
+            },
+            customStrategies,
+            ignoreStrategy);
+    }
 
-        public Comparator(Dictionary<string, ICustomCompareValues> customStrategies, Func<string, bool> ignoreStrategy)
+    public DeepEqualityResult Compare<T>(T expected, T actual)
+    {
+        var type = expected?.GetType() ?? typeof(T);
+        var actualType = actual?.GetType() ?? typeof(T);
+        var typeName = type.ToFriendlyTypeName();
+        if (type != actualType)
         {
-            RulesHandler = new RulesHandler(new[]
-                {
-                    Rule.CreateFor(new ComparePrimitiveTypesStrategy()),
-                    Rule.CreateFor(new EqualityStrategy()),
-                    Rule.CreateFor(new OverridesEqualsStrategy()),
-                    Rule.CreateFor(new ComparablesStrategy()),
-                    Rule.CreateFor<ICollectionsCompareStrategy>(new CollectionsCompareStrategy(this),
-                        new DictionaryCompareStrategy(this)),
-                    Rule.CreateFor(new CompareMembersStrategy(this))
-                },
-                customStrategies,
-                ignoreStrategy);
+            const string message = "Types are different";
+            return DeepEqualityResult.Create(new Distinction(message, typeName, actualType.ToFriendlyTypeName()));
         }
 
-        public DeepEqualityResult Compare<T>(T expected, T actual)
-        {
-            var type = typeof(T);
-            var typeName = type.ToFriendlyTypeName();
-            if (expected != null && actual == null || expected == null && actual != null)
-                return DeepEqualityResult.Create(new Distinction(typeName, expected, actual));
+        if (expected != null && actual == null || expected == null && actual != null)
+            return DeepEqualityResult.Create(new Distinction(typeName, expected, actual));
 
-            return RulesHandler
-                .GetFor(type)
-                .Compare(expected, actual, typeName);
-        }
+        return RulesHandler
+            .GetFor(type)
+            .Compare(expected, actual, typeName);
     }
 }

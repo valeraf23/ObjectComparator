@@ -18,7 +18,8 @@ namespace ObjectsComparator.Comparator.Strategies.Implementations
         {
             var member = expected.GetType();
             Cache.TryGetValue(member, out var del);
-            bool EqualsOperatorResult(T exp, T act) => (bool) del?.Invoke(null, new[] {exp, (object) act})!;
+            bool EqualsOperatorResult(T exp, T act) => (bool?)del?.Invoke(null, new[] {exp, (object) act}) ?? false;
+
             return DeepEqualityResult.CreateFor(propertyName, expected, actual, Details).WhenNot(EqualsOperatorResult);
         }
 

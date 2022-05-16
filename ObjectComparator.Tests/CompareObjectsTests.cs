@@ -766,10 +766,10 @@ namespace ObjectsComparator.Tests
                 }
             };
 
-            var actual = act.DeeplyEquals(exp, propName => propName == "IName.Name");
+            var actual = act.DeeplyEquals(exp, propName => propName == "StudentIName.Name");
 
             var expected =
-                DeepEqualityResult.Create(new Distinction("IName.Courses[0].Name", "CourseName", "CourseName1"));
+                DeepEqualityResult.Create(new Distinction("StudentIName.Courses[0].Name", "CourseName", "CourseName1"));
             CollectionAssert.AreEquivalent(expected, actual);
         }
 
