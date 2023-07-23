@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using ObjectsComparator.Comparator.RepresentationDistinction;
 
@@ -14,8 +15,8 @@ namespace ObjectsComparator.Comparator.Strategies.Implementations.Collections
         {
         }
 
-        public DeepEqualityResult CompareDictionary<TKey, TValue>(Dictionary<TKey, TValue> expected,
-            Dictionary<TKey, TValue> actual, string propertyName) where TKey : notnull
+        public DeepEqualityResult CompareDictionary<TKey, TValue>(IDictionary<TKey, TValue> expected,
+            IDictionary<TKey, TValue> actual, string propertyName) where TKey : notnull
         {
             if (expected.Count != actual.Count)
                 return DeepEqualityResult.Create("Dictionary has different length", expected.Count, actual.Count);
@@ -36,12 +37,24 @@ namespace ObjectsComparator.Comparator.Strategies.Implementations.Collections
 
         public override DeepEqualityResult Compare<T>(T expected, T actual, string propertyName)
         {
-            var genericArguments = expected.GetType().GetGenericArguments();
+            var genericArguments = GetGenericArguments(typeof(T));
             return (DeepEqualityResult) CompareMethod.MakeGenericMethod(genericArguments)
                 .Invoke(this, new[] {(object) expected, actual, propertyName})!;
         }
 
-        public override bool IsValid(Type member) =>
-            member.IsGenericType && member.GetGenericTypeDefinition() == typeof(Dictionary<,>);
+        private static Type[] GetGenericArguments(Type type)
+        {
+            return type.GetInterfaces().Prepend(type)
+                .Where(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IDictionary<,>))
+                .Select(i => i.GetGenericArguments()).First();
+        }
+
+        public override bool IsValid(Type member)
+        {
+            return member.GetInterfaces().Prepend(member)
+                .Where(i => i.IsGenericType)
+                .Select(i => i.GetGenericTypeDefinition())
+                .Contains(typeof(IDictionary<,>));
+        }
     }
 }
