@@ -883,5 +883,52 @@ namespace ObjectsComparator.Tests
                 .Be(new Distinction("Dictionary<String, String>[AnotherKey]", "Value", "AnotherValue"));
         }
 
+        [Test]
+        public void CompareIDictionaryProperty()
+        {
+            var exp = new Library2
+            {
+                Books = new Dictionary<string, Book>
+                {
+                    ["hobbit"] = new() { Pages = 1000, Text = "hobbit Text" },
+                }
+            };
+
+            var act = new Library2
+            {
+                Books = new Dictionary<string, Book>
+                {
+                    ["hobbit"] = new() { Pages = 1, Text = "hobbit Text" },
+                }
+            };
+
+            var result = exp.DeeplyEquals(act);
+            var expectedDistinctionsCollection = DeepEqualityResult.Create(new[]
+            {
+                new Distinction("Library2.Books[hobbit].Pages", 1000, 1),
+            });
+
+            CollectionAssert.AreEquivalent(result, expectedDistinctionsCollection);
+        }
+
+        [Test]
+        public void CompareIDictionaryImplementation()
+        {
+            var firstDictionary = new StringDictionary
+            {
+                {"Key", "Value"},
+                {"AnotherKey", "Value"},
+            };
+
+            var secondDictionary = new StringDictionary
+            {
+                {"Key", "Value"},
+                {"AnotherKey", "AnotherValue"},
+            };
+
+            firstDictionary.DeeplyEquals(secondDictionary)[0].Should()
+                .Be(new Distinction("StringDictionary[AnotherKey]", "Value", "AnotherValue"));
+        }
+
     }
 }
