@@ -37,8 +37,8 @@ public sealed class Comparator
         var typeName = type.ToFriendlyTypeName();
         if (type != actualType)
         {
-            const string message = "Types are different";
-            return DeepEqualityResult.Create(new Distinction(message, typeName, actualType.ToFriendlyTypeName()));
+            type = typeof(T);
+            typeName = type.ToFriendlyTypeName();
         }
 
         if (expected != null && actual == null || expected == null && actual != null)

@@ -930,5 +930,44 @@ namespace ObjectsComparator.Tests
                 .Be(new Distinction("StringDictionary[AnotherKey]", "Value", "AnotherValue"));
         }
 
+        [Test]
+        public void CompareIEnumerableProperty()
+        {
+            var act = new BuildingEnumerable
+            {
+                Address = "NY, First Street",
+                ListOfAppNumbers = new[] { 32, 25, 14, 89 }
+            };
+
+            var exp = new BuildingEnumerable
+            {
+                Address = "NY, First Street",
+                ListOfAppNumbers = new[] { 555, 25, 14, 89 }
+            };
+
+            exp.DeeplyEquals(act)[0].Should()
+                .Be(new Distinction("BuildingEnumerable.ListOfAppNumbers[0]", 555, 32));
+        }
+
+        [Test]
+        public void CompareIEnumerableImplementation()
+        {
+            var act = new StringList() { "A", "B" };
+            var exp = new StringList() { "B", "C" };
+
+            exp.DeeplyEquals(act)[0].Should()
+                .Be(new Distinction("StringList[0]", "B", "A"));
+        }
+
+        [Test]
+        public void CompareDifferentIEnumerableTypes()
+        {
+            var numbers = new[] { 1, 2, 3 };
+            var act = numbers.Skip(1);
+            var exp = numbers;
+
+            exp.DeeplyEquals(act)[0].Should()
+                .Be(new Distinction("Property \"IEnumerable<Int32>\": Collection has different length", 2, 3));
+        }
     }
 }
