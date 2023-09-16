@@ -8,6 +8,7 @@ ObjectComparator is a high-performance .NET library crafted meticulously for dee
 - **Custom Rules:** Define bespoke comparison criteria for distinct properties or fields, ensuring you have full control over the comparison process.
 - **High Performance:** Despite the comprehensive nature of its comparisons, ObjectComparator stands out due to its blazing speed.
 
+
 [![NuGet.org](https://img.shields.io/nuget/v/ObjectComparator.svg?style=flat-square&label=NuGet.org)](https://www.nuget.org/packages/ObjectComparator/)  
 ![Nuget](https://img.shields.io/nuget/dt/ObjectComparator)  
 [![Build status](https://ci.appveyor.com/api/projects/status/1i6lq6mft1jy94vx/branch/master?svg=true)](https://ci.appveyor.com/project/valeraf23/objectcomparator/branch/master)  
@@ -15,13 +16,13 @@ ObjectComparator is a high-performance .NET library crafted meticulously for dee
 
 ## Table of Contents
 
-- [Installation](#installation)
-- [Examples](#examples)
-  - [Basic Comparison](#basic-comparison)
-  - [Custom Strategies for Comparison](#custom-strategies-for-comparison)
-  - [Ignoring Specific Properties or Fields](#ignoring-specific-properties-or-fields)
-  - [Display Distinctions](#display-distinctions)
-  ... [Add more subsections as needed] ...
+- [Display Distinctions with Custom Strategy](#display-distinctions-with-custom-strategy)
+- [Comparison for Dictionary Types](#comparison-for-dictionary-types)
+- [Ignore Strategy](#ignore-strategy)
+- [DeeplyEquals if type (not primitives and not Anonymous Type) has Overridden Equals method](#deeplyequals-if-type-not-primitives-and-not-anonymous-type-has-overridden-equals-method)
+- [DeeplyEquals if type has Overridden Equality method](#deeplyequals-if-type-has-overridden-equality-method)
+- [Display distinctions for Dictionary type](#display-distinctions-for-dictionary-type)
+- [Comparison for Anonymous Types](#comparison-for-anonymous-types)
 
 ## Installation
 
