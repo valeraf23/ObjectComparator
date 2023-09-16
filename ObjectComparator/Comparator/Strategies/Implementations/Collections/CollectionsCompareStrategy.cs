@@ -13,21 +13,31 @@ namespace ObjectsComparator.Comparator.Strategies.Implementations.Collections
         private static readonly MethodInfo CompareCollectionsMethod =
             typeof(CollectionsCompareStrategy).GetTypeInfo().GetDeclaredMethod(nameof(CompareCollections))!;
 
+        private static readonly Type ListType = typeof(IEnumerable<>);
+
         public CollectionsCompareStrategy(Comparator comparator) : base(comparator)
         {
         }
 
-        public override bool IsValid(Type member) => member.GetInterfaces().Contains(typeof(IEnumerable)) && member != typeof(string);
+        public override bool IsValid(Type member)
+        {
+            return member.GetInterfaces().Prepend(member).Any(interfaceType =>
+                interfaceType.IsGenericType && interfaceType.GetGenericTypeDefinition() == ListType);
+        }
 
         public override DeepEqualityResult Compare<T>(T expected, T actual, string propertyName)
         {
-            var elementType = expected.GetType();
-            var genericType = elementType.IsGenericType
-                ? elementType.GenericTypeArguments[0]
-                : elementType.GetElementType();
+            var genericType = GetGenericArgument(typeof(T));
             var compareCollectionsMethod = CompareCollectionsMethod.MakeGenericMethod(genericType!);
             return CollectionHelper.GetDelegateFor(compareCollectionsMethod)(expected, actual,
                 propertyName, RulesHandler);
+        }
+
+        private static Type GetGenericArgument(Type type)
+        {
+            return type.GetInterfaces().Prepend(type)
+                .Where(i => i.IsGenericType && i.GetGenericTypeDefinition() == ListType)
+                .Select(i => i.GetGenericArguments()[0]).First();
         }
 
         private static DeepEqualityResult CompareIListTypes<T>(IList<T> expected, IList<T> actual, string propertyName,
