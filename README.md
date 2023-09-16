@@ -20,9 +20,9 @@ ObjectComparator is a .NET library designed to offer deep comparisons between ob
 ## Installation
 
 ### NuGet Package Manager Console
-```
+```bash
 Install-Package ObjectComparator
-```
+
 #### Install with .NET CLI
 ```
 dotnet add package ObjectComparator
