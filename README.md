@@ -1,6 +1,12 @@
-# ObjectComparator
+# ObjectComparator: Deep Dive into Object Comparisons
 
-ObjectComparator is a .NET library designed to offer deep comparisons between objects, highlighting the exact differences. Moreover, it empowers developers to set custom comparison rules for specific properties or fields.
+ObjectComparator is a high-performance .NET library crafted meticulously for deep comparisons between objects. Beyond just pointing out the disparities, it delves into the depths of objects, reflecting even the minutest differences. Furthermore, it arms developers with the capability to prescribe custom comparison rules tailored for specific properties or fields.
+
+
+## Key Features
+Deep Comparisons: Unravel every detail and identify even the slightest differences between complex objects.
+Custom Rules: Define bespoke comparison criteria for distinct properties or fields, ensuring you have full control over the comparison process.
+High Performance: Despite the comprehensive nature of its comparisons, ObjectComparator stands out due to its blazing speed.
 
 [![NuGet.org](https://img.shields.io/nuget/v/ObjectComparator.svg?style=flat-square&label=NuGet.org)](https://www.nuget.org/packages/ObjectComparator/)  
 ![Nuget](https://img.shields.io/nuget/dt/ObjectComparator)  
