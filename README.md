@@ -1,14 +1,25 @@
 # ObjectComparator
 
-**This tool allows comparing objects furthermore provide distinctions. What is more, this tool can set compare rule for certain properties or fields.**
+ObjectComparator is a .NET library designed to offer deep comparisons between objects, highlighting the exact differences. Moreover, it empowers developers to set custom comparison rules for specific properties or fields.
 
-[![NuGet.org](https://img.shields.io/nuget/v/ObjectComparator.svg?style=flat-square&label=NuGet.org)](https://www.nuget.org/packages/ObjectComparator/)
-![Nuget](https://img.shields.io/nuget/dt/ObjectComparator)
-[![Build status](https://ci.appveyor.com/api/projects/status/1i6lq6mft1jy94vx/branch/master?svg=true)](https://ci.appveyor.com/project/valeraf23/objectcomparator/branch/master)
+[![NuGet.org](https://img.shields.io/nuget/v/ObjectComparator.svg?style=flat-square&label=NuGet.org)](https://www.nuget.org/packages/ObjectComparator/)  
+![Nuget](https://img.shields.io/nuget/dt/ObjectComparator)  
+[![Build status](https://ci.appveyor.com/api/projects/status/1i6lq6mft1jy94vx/branch/master?svg=true)](https://ci.appveyor.com/project/valeraf23/objectcomparator/branch/master)  
 [![.NET Actions Status](https://github.com/valeraf23/ObjectComparator/workflows/.NET/badge.svg)](https://github.com/valeraf23/ObjectComparator/actions)
+
+## Table of Contents
+
+- [Installation](#installation)
+- [Examples](#examples)
+  - [Basic Comparison](#basic-comparison)
+  - [Custom Strategies for Comparison](#custom-strategies-for-comparison)
+  - [Ignoring Specific Properties or Fields](#ignoring-specific-properties-or-fields)
+  - [Display Distinctions](#display-distinctions)
+  ... [Add more subsections as needed] ...
+
 ## Installation
 
-#### Install with NuGet Package Manager Console
+### NuGet Package Manager Console
 ```
 Install-Package ObjectComparator
 ```
