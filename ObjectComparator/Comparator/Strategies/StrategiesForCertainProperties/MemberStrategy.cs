@@ -2,16 +2,13 @@
 using ObjectsComparator.Comparator.Strategies.Interfaces;
 using ObjectsComparator.Helpers.Extensions;
 using System;
-using System.Collections.Concurrent;
 using System.Linq;
 using System.Linq.Expressions;
 
 namespace ObjectsComparator.Comparator.Strategies.StrategiesForCertainProperties
 {
-    public class MemberStrategy<T> : ICustomCompareValues
+    public class MemberStrategy<T> : MemberStrategyBase, ICustomCompareValues
     {
-        private static readonly ConcurrentDictionary<string, Delegate> Cache = new();
-
         private readonly Display _display;
         private readonly Expression<Func<T, T, bool>> _compareFunc;
 
