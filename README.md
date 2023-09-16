@@ -22,13 +22,18 @@ ObjectComparator is a .NET library designed to offer deep comparisons between ob
 ### NuGet Package Manager Console
 ```bash
 Install-Package ObjectComparator
+```
 
 #### Install with .NET CLI
 ```
 dotnet add package ObjectComparator
 ```
 
-## Example:
+## Examples
+
+### Basic Comparison
+
+Compare two `Student` objects and identify the differences.
 
 ```csharp
          var actual = new Student
@@ -98,7 +103,10 @@ dotnet add package ObjectComparator
 	*/
 	    
 ```
-   ## Set strategies for certain properties/fields
+
+  ### Custom Strategies for Comparison
+  
+  Define specific strategies for comparing properties.
    
 ```csharp
          var result = actual.DeeplyEquals(expected,
@@ -118,7 +126,9 @@ dotnet add package ObjectComparator
     
   ```
 
-## Set Ignore list for properties/fields
+### Ignoring Specific Properties or Fields
+
+   Omit certain properties or fields from the comparison.
 
 ```csharp
 
@@ -131,8 +141,10 @@ dotnet add package ObjectComparator
     
 ```
 
-## Display distinctions for properties/fields which have the custom strategy
+### Display Distinctions with Custom Strategy
 
+   Provide specific strategies and display the differences.
+   
 ```csharp
 
      var result = actual.DeeplyEquals(expected,
@@ -160,7 +172,9 @@ dotnet add package ObjectComparator
   
 ```
 
-## Display distinctions for Dictionary type
+### Comparison for Dictionary Types
+
+Identify differences between two dictionary objects.
 
 ```csharp
 
@@ -198,7 +212,9 @@ dotnet add package ObjectComparator
   
 ```
 
-## Set ignore Strategy
+### Ignore Strategy
+
+Apply a strategy to ignore certain comparisons based on conditions.
 
 ```csharp
 
@@ -235,7 +251,7 @@ dotnet add package ObjectComparator
     
 ```	
 
-## DeeplyEquals if type(not primities and not Anonymous Type) has Overridden Equals method
+### DeeplyEquals if type(not primities and not Anonymous Type) has Overridden Equals method
 
 ```csharp
 
@@ -253,7 +269,7 @@ dotnet add package ObjectComparator
 	
 ```	
 
-## DeeplyEquals if type has Overridden Equality  method
+### DeeplyEquals if type has Overridden Equality  method
 
 ```csharp		
 	/*	
@@ -264,7 +280,7 @@ dotnet add package ObjectComparator
 	*/
 ```	
 
-## Display distinctions for Dictionary type
+### Display distinctions for Dictionary type
 	
 ```csharp
 	var firstDictionary = new Dictionary<string, string>
@@ -288,9 +304,11 @@ dotnet add package ObjectComparator
 		Actually Value :AnotherValue
 	*/
 	
-```		
+```				
 
-## Display distinctions for Anonymous type
+### Comparison for Anonymous Types
+
+Detect differences when dealing with anonymous types.
 		
 ```csharp
             var actual = new {Integer = 1, String = "Test", Nested = new byte[] {1, 2, 3}};
