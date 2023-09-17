@@ -26,7 +26,7 @@ namespace ObjectsComparator.Comparator.Strategies.Implementations.Collections
 
         public override DeepEqualityResult Compare<T>(T expected, T actual, string propertyName)
         {
-            var genericType = GetGenericArgument(typeof(T));
+            var genericType = GetGenericArgument(expected?.GetType() ?? typeof(T));
             var compareCollectionsMethod = CompareCollectionsMethod.MakeGenericMethod(genericType);
             return CollectionHelper.GetDelegateFor(compareCollectionsMethod)(expected, actual,
                 propertyName, RulesHandler);

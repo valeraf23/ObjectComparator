@@ -969,5 +969,34 @@ namespace ObjectsComparator.Tests
             exp.DeeplyEquals(act)[0].Should()
                 .Be(new Distinction("Property \"IEnumerable<Int32>\": Collection has different length", 2, 3));
         }
+
+        [Test]
+        public void CompareIEnumerableImplementationAsObject()
+        {
+            object act = new StringList() { "A", "B" };
+            object exp = new StringList() { "B", "C" };
+
+            exp.DeeplyEquals(act)[0].Should()
+                .Be(new Distinction("StringList[0]", "B", "A"));
+        }
+
+        [Test]
+        public void CompareIDictionaryImplementationAsObject()
+        {
+            object firstDictionary = new StringDictionary
+            {
+                {"Key", "Value"},
+                {"AnotherKey", "Value"},
+            };
+
+            object secondDictionary = new StringDictionary
+            {
+                {"Key", "Value"},
+                {"AnotherKey", "AnotherValue"},
+            };
+
+            firstDictionary.DeeplyEquals(secondDictionary)[0].Should()
+                .Be(new Distinction("StringDictionary[AnotherKey]", "Value", "AnotherValue"));
+        }
     }
 }
