@@ -39,7 +39,7 @@ public class DictionaryCompareStrategy : BaseCollectionsCompareStrategy
 
     public override DeepEqualityResult Compare<T>(T expected, T actual, string propertyName)
     {
-        var genericArguments = GetGenericArguments(typeof(T));
+        var genericArguments = GetGenericArguments(expected?.GetType() ?? typeof(T));
         return (DeepEqualityResult)CompareMethod.MakeGenericMethod(genericArguments)
             .Invoke(this, new[] { (object)expected, actual, propertyName })!;
     }
