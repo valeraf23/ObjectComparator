@@ -61,6 +61,6 @@ namespace ObjectsComparator.Comparator.Strategies.Implementations.Collections
         }
 
         private static DeepEqualityResult DistinctionsForCollectionsWithDifferentLength(string propertyName, int first, int second) =>
-            DeepEqualityResult.Create(new Distinction($"Property \"{propertyName}\": Collection has different length", $"{second}", $"{first}"));
+            DeepEqualityResult.Create(new Distinction($"Property \"{propertyName}\": Collection has different length", first, second));
     }
 }

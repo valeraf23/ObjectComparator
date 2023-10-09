@@ -234,8 +234,8 @@ namespace ObjectsComparator.Tests
 
             result.Should()
                 .BeEquivalentTo(
-                    new[]{new Distinction("StudentNew.Courses[0].Duration", "03:00:00",
-                        "04:00:00", "== (Equality Operator)")});
+                    new[]{new Distinction("StudentNew.Courses[0].Duration", TimeSpan.FromHours(3),
+                        TimeSpan.FromHours(4), "== (Equality Operator)")});
         }
 
         [Test]
@@ -279,7 +279,7 @@ namespace ObjectsComparator.Tests
             var res = act.DeeplyEquals(exp);
             ((bool)res).Should().BeFalse();
             var diff = res.First();
-            diff.ActuallyValue.Should().Be(exp.Two);
+            diff.ActualValue.Should().Be(exp.Two);
             diff.ExpectedValue.Should().Be("null");
         }
 
@@ -305,7 +305,7 @@ namespace ObjectsComparator.Tests
             var res = act.DeeplyEquals(exp);
             res.Should().NotBeEmpty();
             var diff = res.First();
-            diff.ActuallyValue.Should().Be("ttt1");
+            diff.ActualValue.Should().Be("ttt1");
             diff.ExpectedValue.Should().Be("ttt");
         }
 
@@ -332,11 +332,11 @@ namespace ObjectsComparator.Tests
             res.Count().Should().Be(2);
             var diff = res.First();
             diff.Path.Should().Be($"{nameof(ClassA)}.{nameof(act.Two)}");
-            diff.ActuallyValue.Should().Be(exp.Two);
+            diff.ActualValue.Should().Be(exp.Two);
             diff.ExpectedValue.Should().Be("null");
             var diff1 = res[1];
             diff1.Path.Should().Be($"{nameof(ClassA)}.{nameof(act.InnerClass) + "[1]" + ".Foo"}");
-            diff1.ActuallyValue.Should().Be(exp.InnerClass[1].Foo);
+            diff1.ActualValue.Should().Be(exp.InnerClass[1].Foo);
             diff1.ExpectedValue.Should().Be(act.InnerClass[1].Foo);
         }
 
@@ -413,7 +413,7 @@ namespace ObjectsComparator.Tests
             resultArrayDiffClock.Should().NotBeEmpty();
             var diff = resultArrayDiffClock.First();
             diff.Path.Should().BeEquivalentTo($"{nameof(DigitalClock)}.{nameof(d3DigitalClock.NumberMonth)}[0]");
-            diff.ActuallyValue.Should().Be(act);
+            diff.ActualValue.Should().Be(act);
             diff.ExpectedValue.Should().Be(_dDigitalClock.NumberMonth[0]);
         }
 
@@ -428,7 +428,7 @@ namespace ObjectsComparator.Tests
             var resultBoolDiffClock = _dDigitalClock.DeeplyEquals(d2DigitalClock);
             resultBoolDiffClock.Should().NotBeEmpty();
             var diff = resultBoolDiffClock.First();
-            diff.ActuallyValue.Should().Be(act);
+            diff.ActualValue.Should().Be(act);
             diff.ExpectedValue.Should().Be(_dDigitalClock.ClickTimer);
         }
 
@@ -440,7 +440,7 @@ namespace ObjectsComparator.Tests
             var resultFloatDiffTime1 = _time.DeeplyEquals(time3);
             resultFloatDiffTime1.Should().NotBeEmpty();
             var diff = resultFloatDiffTime1.First();
-            diff.ActuallyValue.Should().Be(actual);
+            diff.ActualValue.Should().Be(actual);
             diff.ExpectedValue.Should().Be(_time.Seconds);
         }
 
@@ -452,7 +452,7 @@ namespace ObjectsComparator.Tests
             var resultCollectionDiffTime = _time.DeeplyEquals(time6);
             resultCollectionDiffTime.Should().NotBeEmpty();
             var diff = resultCollectionDiffTime.First();
-            diff.ActuallyValue.Should().Be(actual);
+            diff.ActualValue.Should().Be(actual);
             diff.ExpectedValue.Should().Be(_time.Week[0]);
         }
 
@@ -464,7 +464,7 @@ namespace ObjectsComparator.Tests
             var resultShortDiffTime = _time.DeeplyEquals(time4);
             resultShortDiffTime.Should().NotBeEmpty();
             var diff = resultShortDiffTime.First();
-            diff.ActuallyValue.Should().Be(actual);
+            diff.ActualValue.Should().Be(actual);
             diff.ExpectedValue.Should().Be(_time.Day);
         }
 
@@ -477,7 +477,7 @@ namespace ObjectsComparator.Tests
             resultStringDiffTime1.Should().NotBeEmpty();
             var diff = resultStringDiffTime1.First();
             diff.Path.Should().BeEquivalentTo($"{nameof(Time)}.{nameof(time2.PropYear)}");
-            diff.ActuallyValue.Should().Be(actual);
+            diff.ActualValue.Should().Be(actual);
             diff.ExpectedValue.Should().Be(_time.PropYear);
         }
 
@@ -965,9 +965,9 @@ namespace ObjectsComparator.Tests
             var numbers = new[] { 1, 2, 3 };
             var act = numbers.Skip(1);
             var exp = numbers;
-
+           var t = exp.DeeplyEquals(act);
             exp.DeeplyEquals(act)[0].Should()
-                .Be(new Distinction("Property \"IEnumerable<Int32>\": Collection has different length", 2, 3));
+                .Be(new Distinction("Property \"IEnumerable<Int32>\": Collection has different length", 3, 2));
         }
 
         [Test]
