@@ -21,9 +21,14 @@ public class DictionaryCompareStrategy : BaseCollectionsCompareStrategy
         IDictionary<TKey, TValue> actual, string propertyName) where TKey : notnull
     {
         if (expected.Count != actual.Count)
-            return DeepEqualityResult.Create("Dictionary has different length", expected.Count, actual.Count);
+        {
+            const string basePath = "'Dictionary has different length'";
+            var path = string.IsNullOrEmpty(propertyName) ? basePath :propertyName + ": " + basePath;
+            return DeepEqualityResult.Create(path, expected.Count, actual.Count);
+        }
+
         var diff = DeepEqualityResult.Create();
-        foreach (var (key, value) in expected)
+        foreach (var (key, value) in expected) 
         {
             if (!actual.TryGetValue(key, out var secondValue))
                 diff.Add(new Distinction(key.ToString()!, "Should be", "Does not exist"));

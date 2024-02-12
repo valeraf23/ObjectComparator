@@ -55,6 +55,38 @@ namespace ObjectsComparator.Tests
         }
 
         [Test]
+        public void DictionaryVerifications_Different_length()
+        {
+            var exp = new Library
+            {
+                Books = new Dictionary<string, Book>
+                {
+                    ["hobbit"] = new() { Pages = 1000, Text = "hobbit Text" },
+                    ["murder in orient express"] = new() { Pages = 500, Text = "murder in orient express Text" },
+                    ["Shantaram"] = new() { Pages = 500, Text = "Shantaram Text" }
+                }
+            };
+
+            var act = new Library
+            {
+                Books = new Dictionary<string, Book>
+                {
+                    ["hobbit"] = new() { Pages = 1, Text = "hobbit Text" },
+
+                }
+            };
+
+            var result = exp.DeeplyEquals(act);
+            var expectedDistinctionsCollection = DeepEqualityResult.Create(new[]
+            {
+                new Distinction("Library.Books: 'Dictionary has different length'"
+                    , 3, 1)
+            });
+
+            CollectionAssert.AreEquivalent(result, expectedDistinctionsCollection);
+        }
+
+        [Test]
         public void DisplayCustomErrorMsg()
         {
             var actual = new Student
