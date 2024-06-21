@@ -1,4 +1,6 @@
-# ObjectComparator: Deep Dive into Object Comparisons
+# ObjectComparator
+
+## Overview
 
 ObjectComparator is a high-performance .NET library crafted meticulously for deep comparisons between objects. Beyond just pointing out the disparities, it delves into the depths of objects, reflecting even the minutest differences. Furthermore, it arms developers with the capability to prescribe custom comparison rules tailored for specific properties or fields.
 
@@ -15,14 +17,19 @@ ObjectComparator is a high-performance .NET library crafted meticulously for dee
 [![.NET Actions Status](https://github.com/valeraf23/ObjectComparator/workflows/.NET/badge.svg)](https://github.com/valeraf23/ObjectComparator/actions)
 
 ## Table of Contents
-
+- [Overview](#overview)
+- [Key Features](#key-features)
+- [Installation](#installation)
+- [Usage](#usage)
 - [Display Distinctions with Custom Strategy](#display-distinctions-with-custom-strategy)
-- [Comparison for Dictionary Types](#comparison-for-dictionary-types)
-- [Ignore Strategy](#ignore-strategy)
-- [DeeplyEquals if type (not primitives and not Anonymous Type) has Overridden Equals method](#deeplyequals-if-type-not-primitives-and-not-anonymous-type-has-overridden-equals-method)
-- [DeeplyEquals if type has Overridden Equality method](#deeplyequals-if-type-has-overridden-equality-method)
-- [Display distinctions for Dictionary type](#display-distinctions-for-dictionary-type)
-- [Comparison for Anonymous Types](#comparison-for-anonymous-types)
+  - [Comparison for Dictionary Types](#comparison-for-dictionary-types)
+  - [Ignore Strategy](#ignore-strategy)
+  - [DeeplyEquals if type (not primitives and not Anonymous Type) has Overridden Equals method](#deeplyequals-if-type-not-primitives-and-not-anonymous-type-has-overridden-equals-method)
+  - [DeeplyEquals if type has Overridden Equality method](#deeplyequals-if-type-has-overridden-equality-method)
+  - [Display distinctions for Dictionary type](#display-distinctions-for-dictionary-type)
+  - [Comparison for Anonymous Types](#comparison-for-anonymous-types)
+- [Contributing](#contributing)
+- [License](#license)
 
 ## Installation
 
@@ -36,7 +43,7 @@ Install-Package ObjectComparator
 dotnet add package ObjectComparator
 ```
 
-## Examples
+## Usage
 
 ### Basic Comparison
 
