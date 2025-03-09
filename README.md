@@ -208,20 +208,26 @@ Identify differences between two dictionary objects.
                 {
                     ["hobbit"] = new Book {Pages = 1, Text = "hobbit Text"},
                     ["murder in orient express"] = new Book {Pages = 500, Text = "murder in orient express Text1"},
-                    ["Shantaram"] = new Book {Pages = 500, Text = "Shantaram Text"}
+                    ["Shantaram"] = new Book {Pages = 500, Text = "Shantaram Text"},
+		    ["Shantaram1"] = new() { Pages = 500, Text = "Shantaram Text" }
                 }
             };
 
             var result = expected.DeeplyEquals(actual);
 	    
     /*
+		Path: "Library.Books":
+		Expected Value: 
+		Actual Value: Shantaram1
+		Details: Added
+		
 		Path: "Library.Books[hobbit].Pages":
-		Expected Value :1000
-		Actually Value :1
-
+		Expected Value: 1000
+		Actual Value: 1
+		
 		Path: "Library.Books[murder in orient express].Text":
-		Expected Value :murder in orient express Text
-		Actually Value :murder in orient express Text1
+		Expected Value: murder in orient express Text
+		Actual Value: murder in orient express Text1
    */
   
 ```
