@@ -65,6 +65,12 @@ namespace ObjectsComparator.Helpers.Extensions
             return false;
         }
 
+        public static bool IsToStringOverridden(this Type type)
+        {
+            var toStringMethod = type.GetMethod(nameof(ToString), Type.EmptyTypes);
+            return toStringMethod != null && toStringMethod.DeclaringType != typeof(object);
+        }
+
         public static bool IsClassAndNotString(this Type type) => !type.IsPrimitive && type != typeof(string) && !type.IsEnum;
     }
 }
