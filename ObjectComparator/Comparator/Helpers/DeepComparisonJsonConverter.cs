@@ -7,279 +7,155 @@ namespace ObjectsComparator.Comparator.Helpers;
 
 internal static class DeepComparisonJsonConverter
 {
-    public static string ToJson(
-        this DeepEqualityResult distinctions)
+    public static string ToJson(this DeepEqualityResult distinctions)
     {
         var result = new Dictionary<string, object>();
 
         foreach (var distinction in distinctions)
         {
             var segments = ParsePath(distinction.Path);
-            AddToResult(result, segments, 0, distinction);
+            AddToResult(result, segments, distinction);
         }
 
         return JsonConvert.SerializeObject(result, Formatting.Indented);
     }
 
-    private static void AddToResult(IDictionary<string, object> current, List<PathSegment> segments, int index, Distinction distinction)
+    private static void AddToResult(IDictionary<string, object> rootNode, List<PathSegment> segments,
+        Distinction distinction)
     {
-        while (true)
+        var parentNode = rootNode;
+
+        for (var i = 0; i < segments.Count; i++)
         {
-            var segment = segments[index];
-            var isFinalSegment = index == segments.Count - 1;
+            var segment = segments[i];
+            var isFinalSegment = i == segments.Count - 1;
+            var key = GetSegmentKey(segment);
 
             if (isFinalSegment)
             {
-                switch (segment.IsArray)
-                {
-                    case false when !segment.IsDictionary:
-                    {
-                        var newValue = new Distinctions { Before = distinction.ExpectedValue, After = distinction.ActualValue, Details = distinction.Details };
-
-                        if (!current.TryAdd(segment.Name, newValue))
-                        {
-                            var value = current[segment.Name];
-                            if (value is List<Distinctions> list)
-                                list.Add(newValue);
-                            else
-                                current[segment.Name] = new List<Distinctions> { (Distinctions)value, newValue };
-                        }
-
-                        break;
-                    }
-                    case true:
-                    {
-                        var list = EnsureListNode(current, segment.Name);
-                        EnsureListSize(list, segment.Index.Value);
-
-                        if (list[segment.Index.Value] is Dictionary<string, object> dict)
-                        {
-                            AddDistinctionToSelf(dict, distinction);
-                        }
-                        else
-                        {
-                            var newDict = new Dictionary<string, object> { ["_self"] = new List<Distinctions> { new() { Before = distinction.ExpectedValue, After = distinction.ActualValue, Details = distinction.Details } } };
-                            list[segment.Index.Value] = newDict;
-                        }
-
-                        break;
-                    }
-                    default:
-                    {
-                        if (segment.IsDictionary)
-                        {
-                            var dict = EnsureDictionaryNode(current, segment.Name);
-                            if (dict.TryGetValue(segment.Key, out var existing) && existing is Dictionary<string, object> childDict)
-                            {
-                                AddDistinctionToSelf(childDict, distinction);
-                            }
-                            else
-                            {
-                                var newDict = new Dictionary<string, object> { ["_self"] = new List<Distinctions> { new() { Before = distinction.ExpectedValue, After = distinction.ActualValue, Details = distinction.Details } } };
-                                dict[segment.Key] = newDict;
-                            }
-                        }
-
-                        break;
-                    }
-                }
-            }
-            else
-            {
-                IDictionary<string, object>? nextDict = null;
-
-                if (segment.IsArray)
-                {
-                    var list = EnsureListNode(current, segment.Name);
-                    EnsureListSize(list, segment.Index.Value);
-                    list[segment.Index.Value] ??= new Dictionary<string, object>();
-                    nextDict = list[segment.Index.Value] as Dictionary<string, object>;
-                }
-                else if (segment.IsDictionary)
-                {
-                    var dict = EnsureDictionaryNode(current, segment.Name);
-                    if (!dict.TryGetValue(segment.Key, out var child) || child == null)
-                    {
-                        child = new Dictionary<string, object>();
-                        dict[segment.Key] = child;
-                    }
-
-                    nextDict = child as Dictionary<string, object>;
-                }
-                else
-                {
-                    if (!current.ContainsKey(segment.Name) || current[segment.Name] is Distinctions) current[segment.Name] = new Dictionary<string, object>();
-                    nextDict = current[segment.Name] as Dictionary<string, object>;
-                }
-
-                current = nextDict;
-                index = index + 1;
-                continue;
+                HandleFinalSegment(parentNode, segment, key, distinction);
+                return;
             }
 
-            break;
+            parentNode = GetOrCreateChildDictionary(parentNode, segment, key);
         }
     }
 
-    private static void AddDistinctionToSelf(Dictionary<string, object> node, Distinction distinction)
+    private static string GetSegmentKey(PathSegment segment)
     {
-        if (!node.TryGetValue("_self", out var existing) || existing == null)
-        {
-            node["_self"] = new List<Distinctions>
-            {
-                new()
-                {
-                    Before = distinction.ExpectedValue,
-                    After = distinction.ActualValue,
-                    Details = distinction.Details
-                }
-            };
-            return;
-        }
+        return segment.IsDictionary ? segment.Key! :
+            segment.IsArray ? segment.Index!.ToString() :
+            segment.Name;
+    }
 
-        if (existing is Distinctions single)
+    private static void HandleFinalSegment(IDictionary<string, object> parentNode, PathSegment segment, string key,
+        Distinction distinction)
+    {
+        if (segment.IsDictionary || segment.IsArray)
         {
-            node["_self"] = new List<Distinctions>
-            {
-                single,
-                new()
-                {
-                    Before = distinction.ExpectedValue,
-                    After = distinction.ActualValue,
-                    Details = distinction.Details
-                }
-            };
-            return;
+            var containerNode = EnsureDictionaryNode(parentNode, segment.Name);
+            AddDistinctionToSelf(containerNode, key, distinction);
         }
-
-        if (existing is List<Distinctions> list)
+        else if (distinction.Details is "Added" or "Removed")
         {
-            list.Add(new Distinctions
+            var container = EnsureDictionaryNode(parentNode, key);
+            AddDistinctionToSelf(container, "_self", distinction);
+        }
+        else
+        {
+            parentNode[key] = new Distinctions
             {
                 Before = distinction.ExpectedValue,
                 After = distinction.ActualValue,
                 Details = distinction.Details
-            });
-            return;
-        }
-
-        throw new InvalidOperationException($"'_self' is of unexpected type: {existing.GetType().Name}");
-    }
-
-    private static Dictionary<string, object> EnsureDictionaryNode(IDictionary<string, object> current, string name)
-    {
-        if (!current.TryGetValue(name, out var existing) || existing == null)
-        {
-            var newDict = new Dictionary<string, object>();
-            current[name] = newDict;
-            return newDict;
-        }
-
-        switch (existing)
-        {
-            case Dictionary<string, object> dict:
-                return dict;
-            case Distinctions dist:
-            {
-                var newDict = new Dictionary<string, object>
-                {
-                    ["_self"] = new List<Distinctions> { dist }
-                };
-                current[name] = newDict;
-                return newDict;
-            }
-            case List<Distinctions> listOfDistinctions:
-            {
-                var newDict = new Dictionary<string, object>
-                {
-                    ["_self"] = listOfDistinctions
-                };
-                current[name] = newDict;
-                return newDict;
-            }
-            default:
-                switch (existing)
-                {
-                    case List<object> list:
-                    {
-                        var newDict = new Dictionary<string, object>
-                        {
-                            ["_children"] = list
-                        };
-                        current[name] = newDict;
-                        return newDict;
-                    }
-                    default:
-                        throw new InvalidOperationException(
-                            $"Cannot convert {existing.GetType().Name} into a Dictionary<string, object> at '{name}'.");
-                }
+            };
         }
     }
 
-    private static List<object> EnsureListNode(IDictionary<string, object> current, string name)
+    private static Dictionary<string, object> GetOrCreateChildDictionary(IDictionary<string, object> parentNode,
+        PathSegment segment, string key)
     {
-        if (!current.TryGetValue(name, out var existing) || existing == null)
+        var childNodeDictionary = EnsureDictionaryNode(parentNode, segment.Name);
+
+        if (!childNodeDictionary.TryGetValue(key, out var nextNode) ||
+            nextNode is not Dictionary<string, object> dictionaryNode)
         {
-            var newList = new List<object>();
-            current[name] = newList;
-            return newList;
+            dictionaryNode = new Dictionary<string, object>();
+            childNodeDictionary[key] = dictionaryNode;
         }
 
-        switch (existing)
-        {
-            case List<object> list:
-                return list;
-            case Distinctions dist:
-            {
-                var dict = new Dictionary<string, object>
-                {
-                    ["_self"] = new List<Distinctions> { dist }
-                };
-                var newList = new List<object> { dict };
-                current[name] = newList;
-                return newList;
-            }
-            case Dictionary<string, object> existingDict:
-            {
-                var newList = new List<object> { existingDict };
-                current[name] = newList;
-                return newList;
-            }
-            default:
-                throw new InvalidOperationException(
-                    $"Cannot convert {existing.GetType().Name} into a List<object> at '{name}'.");
-        }
+        return dictionaryNode;
     }
 
-    private static void EnsureListSize(List<object?> list, int index)
+
+    private static void AddDistinctionToSelf(IDictionary<string, object> node, string key, Distinction distinction)
     {
-        while (list.Count <= index)
-            list.Add(null);
+        if (!node.TryGetValue(key, out var existing) || existing is not List<Distinctions>)
+        {
+            var list = new List<Distinctions>();
+            node[key] = list;
+        }
+
+        ((List<Distinctions>)node[key]).Add(new Distinctions
+        {
+            Before = distinction.ExpectedValue,
+            After = distinction.ActualValue,
+            Details = distinction.Details
+        });
+    }
+
+    private static Dictionary<string, object> EnsureDictionaryNode(IDictionary<string, object> parentNode, string key)
+    {
+        if (!parentNode.TryGetValue(key, out var existing) || existing is not Dictionary<string, object> dictionaryNode)
+        {
+            dictionaryNode = new Dictionary<string, object>();
+            parentNode[key] = dictionaryNode;
+        }
+
+        return dictionaryNode;
     }
 
     private static List<PathSegment> ParsePath(string path)
     {
         var segments = new List<PathSegment>();
-        var parts = path.Split('.');
+        var pathSpan = path.AsSpan();
+        var dotIndex = pathSpan.IndexOf('.');
 
-        foreach (var part in parts)
-            if (part.Contains("[") && part.Contains("]"))
-            {
-                var name = part[..part.IndexOf('[')];
-                var bracketValue = part.Substring(
-                    part.IndexOf('[') + 1,
-                    part.IndexOf(']') - part.IndexOf('[') - 1);
+        if (dotIndex >= 0)
+            pathSpan = pathSpan[(dotIndex + 1)..];
+        else
+            return segments;
+        while ((dotIndex = pathSpan.IndexOf('.')) >= 0)
+        {
+            var partSpan = pathSpan[..dotIndex];
+            pathSpan = pathSpan[(dotIndex + 1)..];
+            AddPathSegment(partSpan, segments);
+        }
 
-                segments.Add(int.TryParse(bracketValue, out var idx)
-                    ? new PathSegment(name, true, idx)
-                    : new PathSegment(name, isDictionary: true, dictKey: bracketValue));
-            }
-            else
-            {
-                segments.Add(new PathSegment(part));
-            }
+        if (!pathSpan.IsEmpty) AddPathSegment(pathSpan, segments);
 
         return segments;
+    }
+
+    private static void AddPathSegment(ReadOnlySpan<char> partSpan, List<PathSegment> segments)
+    {
+        var bracketIndex = partSpan.IndexOf('[');
+        if (bracketIndex >= 0)
+        {
+            var bracketEnd = partSpan.IndexOf(']');
+            var nameSpan = partSpan[..bracketIndex];
+            var bracketValueSpan = partSpan.Slice(bracketIndex + 1, bracketEnd - bracketIndex - 1);
+
+            if (int.TryParse(bracketValueSpan, out var index))
+                segments.Add(new PathSegment(nameSpan.ToString(), true, index));
+            else
+                segments.Add(new PathSegment(nameSpan.ToString(), isDictionary: true,
+                    dictKey: bracketValueSpan.ToString()));
+        }
+        else
+        {
+            segments.Add(new PathSegment(partSpan.ToString()));
+        }
     }
 
     private record Distinctions
