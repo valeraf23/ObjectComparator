@@ -45,7 +45,7 @@ namespace ObjectsComparator.Comparator.Strategies.Implementations.Collections
             var expectedCount = expected.Count;
             var actualCount = actual.Count;
             if (expectedCount != actualCount)
-                return DistinctionsForCollectionsWithDifferentLength(propertyName, expectedCount, actualCount);
+                return DistinctionsForCollectionsWithDifferentLength(propertyName, expected, actual);
             var diff = DeepEqualityResult.None();
             for (var i = 0; i < expectedCount; i++)
                 diff.AddRange(rulesHandler.GetFor(typeof(T)).Compare(expected[i], actual[i], $"{propertyName}[{i}]"));
@@ -53,14 +53,44 @@ namespace ObjectsComparator.Comparator.Strategies.Implementations.Collections
             return diff;
         }
 
-        private static DeepEqualityResult CompareCollections<T>(IEnumerable<T> expected, IEnumerable<T> actual, string propertyName, RulesHandler rulesHandler)
+        private static DeepEqualityResult CompareCollections<T>(IEnumerable<T> expected, IEnumerable<T> actual,
+            string propertyName, RulesHandler rulesHandler)
         {
             var exp = expected.ToList();
             var act = actual.ToList();
             return CompareIListTypes(exp, act, propertyName, rulesHandler);
         }
 
-        private static DeepEqualityResult DistinctionsForCollectionsWithDifferentLength(string propertyName, int first, int second) =>
-            DeepEqualityResult.Create(new Distinction($"Property \"{propertyName}\": Collection has different length", first, second));
+        private static DeepEqualityResult DistinctionsForCollectionsWithDifferentLength<T>(string propertyName,
+            IList<T> expected, IList<T> actual)
+        {
+            var itemType = typeof(T);
+
+            if (itemType == typeof(string) || itemType.IsPrimitive)
+            {
+                var expectedList = expected.ToList();
+                var actualList = actual.ToList();
+
+                var diff = DeepEqualityResult.None();
+
+                var addedItems = actualList.Except(expectedList).ToList();
+                var removedItems = expectedList.Except(actualList).ToList();
+
+                if (addedItems.Count > 0)
+                {
+                    diff.Add(new Distinction($"{propertyName}", null, string.Join(", ", addedItems), "Added"));
+                }
+
+                if (removedItems.Count > 0)
+                {
+                    diff.Add(new Distinction($"{propertyName}", string.Join(", ", removedItems), null,  "Removed"));
+                }
+
+                return diff;
+            }
+
+            return DeepEqualityResult.Create(new Distinction(
+                $"Property \"{propertyName}\": Collection has different length", expected.Count, actual.Count));
+        }
     }
 }

@@ -1,4 +1,6 @@
-# ObjectComparator: Deep Dive into Object Comparisons
+# ObjectComparator
+
+## Overview
 
 ObjectComparator is a high-performance .NET library crafted meticulously for deep comparisons between objects. Beyond just pointing out the disparities, it delves into the depths of objects, reflecting even the minutest differences. Furthermore, it arms developers with the capability to prescribe custom comparison rules tailored for specific properties or fields.
 
@@ -15,14 +17,19 @@ ObjectComparator is a high-performance .NET library crafted meticulously for dee
 [![.NET Actions Status](https://github.com/valeraf23/ObjectComparator/workflows/.NET/badge.svg)](https://github.com/valeraf23/ObjectComparator/actions)
 
 ## Table of Contents
-
+- [Overview](#overview)
+- [Key Features](#key-features)
+- [Installation](#installation)
+- [Usage](#usage)
 - [Display Distinctions with Custom Strategy](#display-distinctions-with-custom-strategy)
-- [Comparison for Dictionary Types](#comparison-for-dictionary-types)
-- [Ignore Strategy](#ignore-strategy)
-- [DeeplyEquals if type (not primitives and not Anonymous Type) has Overridden Equals method](#deeplyequals-if-type-not-primitives-and-not-anonymous-type-has-overridden-equals-method)
-- [DeeplyEquals if type has Overridden Equality method](#deeplyequals-if-type-has-overridden-equality-method)
-- [Display distinctions for Dictionary type](#display-distinctions-for-dictionary-type)
-- [Comparison for Anonymous Types](#comparison-for-anonymous-types)
+  - [Comparison for Dictionary Types](#comparison-for-dictionary-types)
+  - [Ignore Strategy](#ignore-strategy)
+  - [DeeplyEquals if type (not primitives and not Anonymous Type) has Overridden Equals method](#deeplyequals-if-type-not-primitives-and-not-anonymous-type-has-overridden-equals-method)
+  - [DeeplyEquals if type has Overridden Equality method](#deeplyequals-if-type-has-overridden-equality-method)
+  - [Display distinctions for Dictionary type](#display-distinctions-for-dictionary-type)
+  - [Comparison for Anonymous Types](#comparison-for-anonymous-types)
+- [Contributing](#contributing)
+- [License](#license)
 
 ## Installation
 
@@ -36,7 +43,7 @@ Install-Package ObjectComparator
 dotnet add package ObjectComparator
 ```
 
-## Examples
+## Usage
 
 ### Basic Comparison
 
@@ -201,20 +208,26 @@ Identify differences between two dictionary objects.
                 {
                     ["hobbit"] = new Book {Pages = 1, Text = "hobbit Text"},
                     ["murder in orient express"] = new Book {Pages = 500, Text = "murder in orient express Text1"},
-                    ["Shantaram"] = new Book {Pages = 500, Text = "Shantaram Text"}
+                    ["Shantaram"] = new Book {Pages = 500, Text = "Shantaram Text"},
+		    ["Shantaram1"] = new() { Pages = 500, Text = "Shantaram Text" }
                 }
             };
 
             var result = expected.DeeplyEquals(actual);
 	    
     /*
+		Path: "Library.Books":
+		Expected Value: 
+		Actual Value: Shantaram1
+		Details: Added
+		
 		Path: "Library.Books[hobbit].Pages":
-		Expected Value :1000
-		Actually Value :1
-
+		Expected Value: 1000
+		Actual Value: 1
+		
 		Path: "Library.Books[murder in orient express].Text":
-		Expected Value :murder in orient express Text
-		Actually Value :murder in orient express Text1
+		Expected Value: murder in orient express Text
+		Actual Value: murder in orient express Text1
    */
   
 ```
@@ -330,3 +343,11 @@ Detect differences when dealing with anonymous types.
 	*/
                 
 ```
+
+## Contributing
+
+Contributions are welcome! If you find any issues or have suggestions for improvements, please open an issue or submit a pull request on GitHub.
+
+## License
+
+This project is licensed under the Apache-2.0 License. See the [LICENSE](LICENSE) file for more details.

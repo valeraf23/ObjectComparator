@@ -38,13 +38,15 @@ namespace ObjectsComparator.Tests
                 {
                     ["hobbit"] = new() { Pages = 1, Text = "hobbit Text" },
                     ["murder in orient express"] = new() { Pages = 500, Text = "murder in orient express Text1" },
-                    ["Shantaram"] = new() { Pages = 500, Text = "Shantaram Text" }
+                    ["Shantaram"] = new() { Pages = 500, Text = "Shantaram Text" },
+                    ["Shantaram1"] = new() { Pages = 500, Text = "Shantaram Text" }
                 }
             };
 
             var result = exp.DeeplyEquals(act);
             var expectedDistinctionsCollection = DeepEqualityResult.Create(new[]
             {
+                new Distinction("Library.Books", null , "Shantaram1", "Added"),
                 new Distinction("Library.Books[hobbit].Pages", 1000, 1),
                 new Distinction(
                     "Library.Books[murder in orient express].Text", "murder in orient express Text",
@@ -57,30 +59,29 @@ namespace ObjectsComparator.Tests
         [Test]
         public void DictionaryVerifications_Different_length()
         {
-            var exp = new Library
+            var exp = new Library3
             {
-                Books = new Dictionary<string, Book>
+                Books = new Dictionary<SomeKey, Book>
                 {
-                    ["hobbit"] = new() { Pages = 1000, Text = "hobbit Text" },
-                    ["murder in orient express"] = new() { Pages = 500, Text = "murder in orient express Text" },
-                    ["Shantaram"] = new() { Pages = 500, Text = "Shantaram Text" }
+                    [new SomeKey("hobbit")] = new() { Pages = 1000, Text = "hobbit Text" },
+                    [new SomeKey("murder in orient express")] = new() { Pages = 500, Text = "murder in orient express Text" },
+                    [new SomeKey("Shantaram")] = new() { Pages = 500, Text = "Shantaram Text" }
                 }
             };
 
-            var act = new Library
+            var act = new Library3
             {
-                Books = new Dictionary<string, Book>
+                Books = new Dictionary<SomeKey, Book>
                 {
-                    ["hobbit"] = new() { Pages = 1, Text = "hobbit Text" },
-
+                    [new SomeKey("hobbit")] = new() { Pages = 1, Text = "hobbit Text" },
                 }
             };
 
             var result = exp.DeeplyEquals(act);
             var expectedDistinctionsCollection = DeepEqualityResult.Create(new[]
             {
-                new Distinction("Library.Books: 'Dictionary has different length'"
-                    , 3, 1)
+                new Distinction("Library3.Books", $"{new SomeKey("murder in orient express")}, {new SomeKey("Shantaram")}", null, "Removed"),
+                new Distinction("Library3.Books[SomeKey { Key = hobbit }].Pages", 1000, 1)
             });
 
             CollectionAssert.AreEquivalent(result, expectedDistinctionsCollection);
@@ -992,14 +993,24 @@ namespace ObjectsComparator.Tests
         }
 
         [Test]
-        public void CompareDifferentIEnumerableTypes()
+        public void DeeplyEquals_ShouldReturnJoinedCollectionValuesDifference_WhenCollectionLengthsDiffer()
         {
-            var numbers = new[] { 1, 2, 3 };
-            var act = numbers.Skip(1);
-            var exp = numbers;
-           var t = exp.DeeplyEquals(act);
-            exp.DeeplyEquals(act)[0].Should()
-                .Be(new Distinction("Property \"IEnumerable<Int32>\": Collection has different length", 3, 2));
+            var actual = new GroupPortals
+            {
+                Portals = new List<int>() { 1, 2, 3, 5 }
+            };
+
+            var expected = new GroupPortals
+            {
+                Portals = new List<int>() { 1, 2, 3, 4, 7 }
+            };
+
+            var result = expected.DeeplyEquals(actual);
+            result[0].Should()
+               .Be(new Distinction("GroupPortals.Portals", null, "5", "Added"));
+
+            result[1].Should()
+                .Be(new Distinction("GroupPortals.Portals", "4, 7", null, "Removed"));;
         }
 
         [Test]
