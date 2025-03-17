@@ -1,4 +1,5 @@
 using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using ObjectsComparator.Comparator.RepresentationDistinction;
 using System;
 using System.Collections.Generic;
@@ -17,7 +18,16 @@ internal static class DeepComparisonJsonConverter
             AddToResult(result, segments, distinction);
         }
 
-        return JsonConvert.SerializeObject(result, Formatting.Indented);
+        var settings = new JsonSerializerSettings
+        {
+            ContractResolver = new DefaultContractResolver
+            {
+                NamingStrategy = new CamelCaseNamingStrategy()
+            },
+            Formatting = Formatting.Indented
+        };
+
+        return JsonConvert.SerializeObject(result, settings);
     }
 
     private static void AddToResult(IDictionary<string, object> rootNode, List<PathSegment> segments,
