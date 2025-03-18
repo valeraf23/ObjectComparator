@@ -66,7 +66,7 @@ namespace ObjectsComparator.Comparator.Strategies.Implementations.Collections
         {
             var itemType = typeof(T);
 
-            if (itemType == typeof(string) || itemType.IsPrimitive)
+            if (itemType == typeof(string) || itemType.IsPrimitive || itemType.IsEnum)
             {
                 var expectedList = expected.ToList();
                 var actualList = actual.ToList();

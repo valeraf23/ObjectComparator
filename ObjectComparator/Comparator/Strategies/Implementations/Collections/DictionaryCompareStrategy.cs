@@ -27,7 +27,7 @@ public class DictionaryCompareStrategy : BaseCollectionsCompareStrategy
        
         var keyType = typeof(TKey);
 
-        if (keyType == typeof(string) || keyType.IsPrimitive || keyType.IsToStringOverridden())
+        if (keyType == typeof(string) || keyType.IsPrimitive || keyType.IsEnum || keyType.IsToStringOverridden())
         {
             if (addedKeys.Count > 0)
             {

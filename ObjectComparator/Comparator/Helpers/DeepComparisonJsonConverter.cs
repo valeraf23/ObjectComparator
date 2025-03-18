@@ -69,7 +69,7 @@ internal static class DeepComparisonJsonConverter
         else if (distinction.Details is "Added" or "Removed")
         {
             var container = EnsureDictionaryNode(parentNode, key);
-            AddDistinctionToSelf(container, "_self", distinction);
+            AddDistinctionToSelf(container, distinction.Details, distinction);
         }
         else
         {
