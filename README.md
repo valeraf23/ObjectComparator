@@ -22,7 +22,7 @@ ObjectComparator is a high-performance .NET library crafted meticulously for dee
 - [Installation](#installation)
 - [Usage](#usage)
 - [Display Distinctions with Custom Strategy](#display-distinctions-with-custom-strategy)
-  - [Comparison for Collection Types](comparison-for-collection-types)   
+  - [Comparison for Collection Types](#comparison-for-collection-types)   
   - [Comparison for Dictionary Types](#comparison-for-dictionary-types)
   - [Ignore Strategy](#ignore-strategy)
   - [DeeplyEquals if type (not primitives and not Anonymous Type) has Overridden Equals method](#deeplyequals-if-type-not-primitives-and-not-anonymous-type-has-overridden-equals-method)
@@ -187,7 +187,7 @@ Compare two `Student` objects and identify the differences.
   
 ```
 
-## Comparison for Collection Types  
+### Comparison for Collection Types  
 Identify differences between two list or array-based collection objects, including nested structures.
 
 ```csharp
