@@ -10,9 +10,15 @@ namespace ObjectsComparator.Tests.TestModels
         public Course[] Courses { get; set; }
     }
 
+    internal class GroupPortals1
+    {
+        public List<Course> Courses { get; set; }
+    }
+
     internal class GroupPortals
     {
         public List<int> Portals { get; set; }
+        public List<GroupPortals1> Portals1 { get; set; }
     }
 
     internal class StudentNew

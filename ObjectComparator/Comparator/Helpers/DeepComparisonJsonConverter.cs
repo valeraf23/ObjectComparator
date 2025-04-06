@@ -1,5 +1,4 @@
 using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
 using ObjectsComparator.Comparator.RepresentationDistinction;
 using System;
 using System.Collections.Generic;
@@ -18,16 +17,7 @@ internal static class DeepComparisonJsonConverter
             AddToResult(result, segments, distinction);
         }
 
-        var settings = new JsonSerializerSettings
-        {
-            ContractResolver = new DefaultContractResolver
-            {
-                NamingStrategy = new CamelCaseNamingStrategy()
-            },
-            Formatting = Formatting.Indented
-        };
-
-        return JsonConvert.SerializeObject(result, settings);
+        return JsonConvert.SerializeObject(result, SerializerSettings.Settings);
     }
 
     private static void AddToResult(IDictionary<string, object> rootNode, List<PathSegment> segments,
@@ -61,6 +51,7 @@ internal static class DeepComparisonJsonConverter
     private static void HandleFinalSegment(IDictionary<string, object> parentNode, PathSegment segment, string key,
         Distinction distinction)
     {
+
         if (segment.IsDictionary || segment.IsArray)
         {
             var containerNode = EnsureDictionaryNode(parentNode, segment.Name);
@@ -100,18 +91,12 @@ internal static class DeepComparisonJsonConverter
 
     private static void AddDistinctionToSelf(IDictionary<string, object> node, string key, Distinction distinction)
     {
-        if (!node.TryGetValue(key, out var existing) || existing is not List<Distinctions>)
-        {
-            var list = new List<Distinctions>();
-            node[key] = list;
-        }
-
-        ((List<Distinctions>)node[key]).Add(new Distinctions
+        node[key] = new Distinctions
         {
             Before = distinction.ExpectedValue,
             After = distinction.ActualValue,
             Details = distinction.Details
-        });
+        };
     }
 
     private static Dictionary<string, object> EnsureDictionaryNode(IDictionary<string, object> parentNode, string key)
@@ -133,8 +118,7 @@ internal static class DeepComparisonJsonConverter
 
         if (dotIndex >= 0)
             pathSpan = pathSpan[(dotIndex + 1)..];
-        else
-            return segments;
+
         while ((dotIndex = pathSpan.IndexOf('.')) >= 0)
         {
             var partSpan = pathSpan[..dotIndex];
