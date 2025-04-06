@@ -29,7 +29,7 @@ ObjectComparator is a high-performance .NET library crafted meticulously for dee
   - [DeeplyEquals if type has Overridden Equality method](#deeplyequals-if-type-has-overridden-equality-method)
   - [Display distinctions for Dictionary type](#display-distinctions-for-dictionary-type)
   - [Comparison for Anonymous Types](#comparison-for-anonymous-types)
-  - [Convert Comparison Result to JSON](#convert-comparison--result-to-json)
+  - [Convert Comparison Result to JSON](#convert-comparison--result-to-JSON)
 - [Contributing](#contributing)
 - [License](#license)
 
