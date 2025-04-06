@@ -29,6 +29,7 @@ ObjectComparator is a high-performance .NET library crafted meticulously for dee
   - [DeeplyEquals if type has Overridden Equality method](#deeplyequals-if-type-has-overridden-equality-method)
   - [Display distinctions for Dictionary type](#display-distinctions-for-dictionary-type)
   - [Comparison for Anonymous Types](#comparison-for-anonymous-types)
+  - [Convert Comparison Result to JSON](#convert-comparison--result-to-json)
 - [Contributing](#contributing)
 - [License](#license)
 
@@ -191,56 +192,56 @@ Compare two `Student` objects and identify the differences.
 Identify differences between two list or array-based collection objects, including nested structures.
 
 ```csharp
-var actual = new GroupPortals
-{
-    Portals = new List<int> { 1, 2, 3, 5 },
-    Portals1 = new List<GroupPortals1>
-    {
-        new GroupPortals1
-        {
-            Courses = new List<Course>
-            {
-                new Course { Name = "test" }
-            }
-        }
-    }
-};
-
-var expected = new GroupPortals
-{
-    Portals = new List<int> { 1, 2, 3, 4, 7, 0 },
-    Portals1 = new List<GroupPortals1>
-    {
-        new GroupPortals1
-        {
-            Courses = new List<Course>
-            {
-                new Course { Name = "test1" }
-            }
-        }
-    }
-};
-
-var result = expected.DeeplyEquals(actual);
+	var actual = new GroupPortals
+	{
+	    Portals = new List<int> { 1, 2, 3, 5 },
+	    Portals1 = new List<GroupPortals1>
+	    {
+	        new GroupPortals1
+	        {
+	            Courses = new List<Course>
+	            {
+	                new Course { Name = "test" }
+	            }
+	        }
+	    }
+	};
+	
+	var expected = new GroupPortals
+	{
+	    Portals = new List<int> { 1, 2, 3, 4, 7, 0 },
+	    Portals1 = new List<GroupPortals1>
+	    {
+	        new GroupPortals1
+	        {
+	            Courses = new List<Course>
+	            {
+	                new Course { Name = "test1" }
+	            }
+	        }
+	    }
+	};
+	
+	var result = expected.DeeplyEquals(actual);
 
     /*
-	Path: "GroupPortals.Portals[3]":
-	Expected Value: 4  
-	Actual Value: 5
-	
-	Path: "GroupPortals.Portals[4]":
-	Expected Value: 7  
-	Actual Value:   
-	Details: Removed
-	
-	Path: "GroupPortals.Portals[5]":
-	Expected Value: 0  
-	Actual Value:   
-	Details: Removed
-	
-	Path: "GroupPortals.Portals1[0].Courses[0].Name":
-	Expected Value: test1  
-	Actual Value: test
+		Path: "GroupPortals.Portals[3]":
+		Expected Value: 4  
+		Actual Value: 5
+		
+		Path: "GroupPortals.Portals[4]":
+		Expected Value: 7  
+		Actual Value:   
+		Details: Removed
+		
+		Path: "GroupPortals.Portals[5]":
+		Expected Value: 0  
+		Actual Value:   
+		Details: Removed
+		
+		Path: "GroupPortals.Portals1[0].Courses[0].Name":
+		Expected Value: test1  
+		Actual Value: test
 
    */
 
@@ -400,6 +401,65 @@ Detect differences when dealing with anonymous types.
 		Path: "AnonymousType<Int32, String, Byte[]>.Nested[2]":
 		Expected Value :3
 		Actually Value :4
+	*/
+                
+```
+
+### Convert Comparison Result to JSON
+
+You can serialize the result of object comparison (DeepEqualityResult) into a structured JSON format, suitable for logging, UI display, or audits.
+		
+```csharp
+	var distinctions = DeepEqualityResult.Create(new[]
+	{
+	    new Distinction("Snapshot.Rules[2].Expression", "Amount > 100", "Amount > 200"),
+	    new Distinction("Snapshot.Rules[6].Name", "OldName", "NewName"),
+	    new Distinction("Snapshot.Portals", null, 91, "Added"),
+	    new Distinction("Snapshot.Portals", null, 101, "Added"),
+	    new Distinction("Snapshot.Portals", 1000, null, "Removed"),
+	    new Distinction("Snapshot.Portals[0].Title", "Main Portal", "Main Portal v2"),
+	});
+	
+	var json = DeepEqualsExtension.ToJson(distinctions);
+			
+	/*
+		{
+		  "Rules": {
+		    "2": {
+		      "Expression": {
+		        "before": "Amount > 100",
+		        "after": "Amount > 200",
+		        "details": ""
+		      }
+		    },
+		    "6": {
+		      "Name": {
+		        "before": "OldName",
+		        "after": "NewName",
+		        "details": ""
+		      }
+		    }
+		  },
+		  "Portals": {
+		    "Added": {
+		      "before": null,
+		      "after": 101,
+		      "details": "Added"
+		    },
+		    "Removed": {
+		      "before": 1000,
+		      "after": null,
+		      "details": "Removed"
+		    },
+		    "0": {
+		      "Title": {
+		        "before": "Main Portal",
+		        "after": "Main Portal v2",
+		        "details": ""
+		      }
+		    }
+		  }
+		}
 	*/
                 
 ```
