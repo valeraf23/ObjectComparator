@@ -1,9 +1,9 @@
+using ObjectsComparator.Comparator.RepresentationDistinction;
+using ObjectsComparator.Helpers.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using ObjectsComparator.Comparator.RepresentationDistinction;
-using ObjectsComparator.Helpers.Extensions;
 
 namespace ObjectsComparator.Comparator.Strategies.Implementations.Collections;
 
@@ -22,12 +22,16 @@ public class DictionaryCompareStrategy : BaseCollectionsCompareStrategy
         IDictionary<TKey, TValue> actual, string propertyName) where TKey : notnull
     {
         var diff = DeepEqualityResult.None();
-        var addedKeys = actual.Keys.Except(expected.Keys).ToList();
-        var removedKeys = expected.Keys.Except(actual.Keys).ToList();
-       
+
+        var expectedKeys = expected.Keys.ToHashSet();
+        var actualKeys = actual.Keys.ToHashSet();
+
+        var addedKeys = actualKeys.Except(expectedKeys).ToList();
+        var removedKeys = expectedKeys.Except(actualKeys).ToList();
+
         var keyType = typeof(TKey);
 
-        if (keyType == typeof(string) || keyType.IsPrimitive || keyType.IsToStringOverridden())
+        if (keyType == typeof(string) || keyType.IsPrimitive || keyType.IsEnum || keyType.IsToStringOverridden())
         {
             if (addedKeys.Count > 0)
             {
@@ -36,18 +40,18 @@ public class DictionaryCompareStrategy : BaseCollectionsCompareStrategy
 
             if (removedKeys.Count > 0)
             {
-                diff.Add(new Distinction($"{propertyName}", string.Join(", ", removedKeys), null,  "Removed"));
+                diff.Add(new Distinction($"{propertyName}", string.Join(", ", removedKeys), null, "Removed"));
             }
         }
         else
         {
             const string basePath = "'Dictionary has different length'";
-            diff.Add(new Distinction($"{propertyName}", expected.Count, actual.Count,  basePath));
+            diff.Add(new Distinction($"{propertyName}", expected.Count, actual.Count, basePath));
         }
 
-        var commonKeys = expected.Keys.Intersect(actual.Keys);
+        var commonKeys = expectedKeys.Intersect(actualKeys);
 
-        foreach (var key in commonKeys) 
+        foreach (var key in commonKeys)
         {
             var expectedValue = expected[key];
             var actualValue = actual[key];
