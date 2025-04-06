@@ -22,6 +22,7 @@ ObjectComparator is a high-performance .NET library crafted meticulously for dee
 - [Installation](#installation)
 - [Usage](#usage)
 - [Display Distinctions with Custom Strategy](#display-distinctions-with-custom-strategy)
+  - [Comparison for Collection Types](comparison-for-collection-types)   
   - [Comparison for Dictionary Types](#comparison-for-dictionary-types)
   - [Ignore Strategy](#ignore-strategy)
   - [DeeplyEquals if type (not primitives and not Anonymous Type) has Overridden Equals method](#deeplyequals-if-type-not-primitives-and-not-anonymous-type-has-overridden-equals-method)
@@ -184,6 +185,65 @@ Compare two `Student` objects and identify the differences.
 		Details : (act:(03:00:00), exp:(04:00:00)) => (act:(03:00:00) > 03:00:00)
    */
   
+```
+
+## Comparison for Collection Types  
+Identify differences between two list or array-based collection objects, including nested structures.
+
+```csharp
+var actual = new GroupPortals
+{
+    Portals = new List<int> { 1, 2, 3, 5 },
+    Portals1 = new List<GroupPortals1>
+    {
+        new GroupPortals1
+        {
+            Courses = new List<Course>
+            {
+                new Course { Name = "test" }
+            }
+        }
+    }
+};
+
+var expected = new GroupPortals
+{
+    Portals = new List<int> { 1, 2, 3, 4, 7, 0 },
+    Portals1 = new List<GroupPortals1>
+    {
+        new GroupPortals1
+        {
+            Courses = new List<Course>
+            {
+                new Course { Name = "test1" }
+            }
+        }
+    }
+};
+
+var result = expected.DeeplyEquals(actual);
+
+    /*
+	Path: "GroupPortals.Portals[3]":
+	Expected Value: 4  
+	Actual Value: 5
+	
+	Path: "GroupPortals.Portals[4]":
+	Expected Value: 7  
+	Actual Value:   
+	Details: Removed
+	
+	Path: "GroupPortals.Portals[5]":
+	Expected Value: 0  
+	Actual Value:   
+	Details: Removed
+	
+	Path: "GroupPortals.Portals1[0].Courses[0].Name":
+	Expected Value: test1  
+	Actual Value: test
+
+   */
+
 ```
 
 ### Comparison for Dictionary Types
