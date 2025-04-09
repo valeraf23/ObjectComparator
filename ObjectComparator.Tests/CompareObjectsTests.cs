@@ -1,4 +1,6 @@
 ﻿using FluentAssertions;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 using ObjectsComparator.Comparator.Helpers;
 using ObjectsComparator.Comparator.RepresentationDistinction;
@@ -38,13 +40,15 @@ namespace ObjectsComparator.Tests
                 {
                     ["hobbit"] = new() { Pages = 1, Text = "hobbit Text" },
                     ["murder in orient express"] = new() { Pages = 500, Text = "murder in orient express Text1" },
-                    ["Shantaram"] = new() { Pages = 500, Text = "Shantaram Text" }
+                    ["Shantaram"] = new() { Pages = 500, Text = "Shantaram Text" },
+                    ["Shantaram1"] = new() { Pages = 500, Text = "Shantaram Text" }
                 }
             };
 
             var result = exp.DeeplyEquals(act);
             var expectedDistinctionsCollection = DeepEqualityResult.Create(new[]
             {
+                new Distinction("Library.Books", null, "Shantaram1", "Added"),
                 new Distinction("Library.Books[hobbit].Pages", 1000, 1),
                 new Distinction(
                     "Library.Books[murder in orient express].Text", "murder in orient express Text",
@@ -57,30 +61,31 @@ namespace ObjectsComparator.Tests
         [Test]
         public void DictionaryVerifications_Different_length()
         {
-            var exp = new Library
+            var exp = new Library3
             {
-                Books = new Dictionary<string, Book>
+                Books = new Dictionary<SomeKey, Book>
                 {
-                    ["hobbit"] = new() { Pages = 1000, Text = "hobbit Text" },
-                    ["murder in orient express"] = new() { Pages = 500, Text = "murder in orient express Text" },
-                    ["Shantaram"] = new() { Pages = 500, Text = "Shantaram Text" }
+                    [new SomeKey("hobbit")] = new() { Pages = 1000, Text = "hobbit Text" },
+                    [new SomeKey("murder in orient express")] =
+                        new() { Pages = 500, Text = "murder in orient express Text" },
+                    [new SomeKey("Shantaram")] = new() { Pages = 500, Text = "Shantaram Text" }
                 }
             };
 
-            var act = new Library
+            var act = new Library3
             {
-                Books = new Dictionary<string, Book>
+                Books = new Dictionary<SomeKey, Book>
                 {
-                    ["hobbit"] = new() { Pages = 1, Text = "hobbit Text" },
-
+                    [new SomeKey("hobbit")] = new() { Pages = 1, Text = "hobbit Text" },
                 }
             };
 
             var result = exp.DeeplyEquals(act);
             var expectedDistinctionsCollection = DeepEqualityResult.Create(new[]
             {
-                new Distinction("Library.Books: 'Dictionary has different length'"
-                    , 3, 1)
+                new Distinction("Library3.Books",
+                    $"{new SomeKey("murder in orient express")}, {new SomeKey("Shantaram")}", null, "Removed"),
+                new Distinction("Library3.Books[SomeKey { Key = hobbit }].Pages", 1000, 1)
             });
 
             CollectionAssert.AreEquivalent(result, expectedDistinctionsCollection);
@@ -266,8 +271,11 @@ namespace ObjectsComparator.Tests
 
             result.Should()
                 .BeEquivalentTo(
-                    new[]{new Distinction("StudentNew.Courses[0].Duration", TimeSpan.FromHours(3),
-                        TimeSpan.FromHours(4), "== (Equality Operator)")});
+                    new[]
+                    {
+                        new Distinction("StudentNew.Courses[0].Duration", TimeSpan.FromHours(3),
+                            TimeSpan.FromHours(4), "== (Equality Operator)")
+                    });
         }
 
         [Test]
@@ -559,7 +567,7 @@ namespace ObjectsComparator.Tests
             {
                 One = "f",
                 Two = 5,
-                ArrayThird = new[] { "sss", "ggg" },
+                ArrayThird = new[] { "test", "test1" },
                 InnerClass = new[] { new SomeClass { Foo = data }, new SomeClass { Foo = data } }
             };
 
@@ -568,7 +576,11 @@ namespace ObjectsComparator.Tests
                 One = "f",
                 Two = 5,
                 ArrayThird = new[] { "error", "error1" },
-                InnerClass = new[] { new SomeClass { Foo = "some" }, new SomeClass { Foo = "someFail" } }
+                InnerClass = new[]
+                {
+                    new SomeClass { Foo = "some" }, new SomeClass { Foo = "someFail" },
+                    new SomeClass { Foo = "someFail1" }
+                }
             };
 
             var res = act.DeeplyEquals(exp, str => str.Set(x => x.InnerClass[0].Foo,
@@ -576,9 +588,12 @@ namespace ObjectsComparator.Tests
 
             var expected = DeepEqualityResult.Create(new[]
             {
-                new Distinction("ClassA.ArrayThird[0]", "sss", "error"),
-                new Distinction("ClassA.ArrayThird[1]", "ggg", "error1"),
-                new Distinction("ClassA.InnerClass[1].Foo", "actual", "someFail")
+                new Distinction("ClassA.ArrayThird[0]", "test", "error"),
+                new Distinction("ClassA.ArrayThird[1]", "test1", "error1"),
+                new Distinction("ClassA.InnerClass[1].Foo", "actual", "someFail"),
+                new Distinction("ClassA.InnerClass[2]", null,
+                    JsonConvert.SerializeObject(new SomeClass { Foo = "someFail1" }, SerializerSettings.Settings),
+                    "Added")
             });
 
             CollectionAssert.AreEquivalent(res, expected);
@@ -893,22 +908,22 @@ namespace ObjectsComparator.Tests
 
         [Test]
         public void Anonymous_Types() => new { Integer = 1, String = "Test", Nested = new byte[] { 1, 2, 3 } }
-                .DeeplyEquals(new { Integer = 1, String = "Test", Nested = new byte[] { 1, 2, 4 } }).Any().Should()
-                .BeTrue();
+            .DeeplyEquals(new { Integer = 1, String = "Test", Nested = new byte[] { 1, 2, 4 } }).Any().Should()
+            .BeTrue();
 
         [Test]
         public void AreDeeplyEqualShouldReportCorrectlyWithDictionaries()
         {
             var firstDictionary = new Dictionary<string, string>
             {
-                {"Key", "Value"},
-                {"AnotherKey", "Value"},
+                { "Key", "Value" },
+                { "AnotherKey", "Value" },
             };
 
             var secondDictionary = new Dictionary<string, string>
             {
-                {"Key", "Value"},
-                {"AnotherKey", "AnotherValue"},
+                { "Key", "Value" },
+                { "AnotherKey", "AnotherValue" },
             };
 
             firstDictionary.DeeplyEquals(secondDictionary)[0].Should()
@@ -948,14 +963,14 @@ namespace ObjectsComparator.Tests
         {
             var firstDictionary = new StringDictionary
             {
-                {"Key", "Value"},
-                {"AnotherKey", "Value"},
+                { "Key", "Value" },
+                { "AnotherKey", "Value" },
             };
 
             var secondDictionary = new StringDictionary
             {
-                {"Key", "Value"},
-                {"AnotherKey", "AnotherValue"},
+                { "Key", "Value" },
+                { "AnotherKey", "AnotherValue" },
             };
 
             firstDictionary.DeeplyEquals(secondDictionary)[0].Should()
@@ -992,14 +1007,57 @@ namespace ObjectsComparator.Tests
         }
 
         [Test]
-        public void CompareDifferentIEnumerableTypes()
+        public void DeeplyEquals_ShouldReturnJoinedCollectionValuesDifference_WhenCollectionLengthsDiffer()
         {
-            var numbers = new[] { 1, 2, 3 };
-            var act = numbers.Skip(1);
-            var exp = numbers;
-           var t = exp.DeeplyEquals(act);
-            exp.DeeplyEquals(act)[0].Should()
-                .Be(new Distinction("Property \"IEnumerable<Int32>\": Collection has different length", 3, 2));
+            var actual = new GroupPortals
+            {
+                Portals = new List<int>() { 1, 2, 3, 5 },
+                Portals1 = new List<GroupPortals1>()
+                {
+                    new GroupPortals1()
+                    {
+                        Courses = new List<Course>()
+                        {
+                            new Course()
+                            {
+                                Name = "test"
+                            }
+                        }
+                    }
+                }
+            };
+
+            var expected = new GroupPortals
+            {
+                Portals = new List<int>() { 1, 2, 3, 4, 7, 0 },
+                Portals1 = new List<GroupPortals1>()
+                {
+                    new GroupPortals1()
+                    {
+                        Courses = new List<Course>()
+                        {
+                            new Course()
+                            {
+                                Name = "test1"
+                            }
+                        }
+                    }
+                }
+            };
+
+            var result = expected.DeeplyEquals(actual);
+            result[0].Should()
+                .Be(new Distinction("GroupPortals.Portals[3]", 4, 5));
+
+            result[1].Should()
+                .Be(new Distinction("GroupPortals.Portals[4]", 7, null, "Removed"));
+
+            result[2].Should()
+                .Be(new Distinction("GroupPortals.Portals[5]", 0, null, "Removed"));
+
+
+            result[3].Should()
+                .Be(new Distinction("GroupPortals.Portals1[0].Courses[0].Name", "test1", "test"));
         }
 
         [Test]
@@ -1017,18 +1075,84 @@ namespace ObjectsComparator.Tests
         {
             object firstDictionary = new StringDictionary
             {
-                {"Key", "Value"},
-                {"AnotherKey", "Value"},
+                { "Key", "Value" },
+                { "AnotherKey", "Value" },
             };
 
             object secondDictionary = new StringDictionary
             {
-                {"Key", "Value"},
-                {"AnotherKey", "AnotherValue"},
+                { "Key", "Value" },
+                { "AnotherKey", "AnotherValue" },
             };
 
             firstDictionary.DeeplyEquals(secondDictionary)[0].Should()
                 .Be(new Distinction("StringDictionary[AnotherKey]", "Value", "AnotherValue"));
         }
+
+        [Test]
+        public void ToJson_ShouldSerializeDistinctionsCollectionCorrectly()
+        {
+            // Arrange
+            var distinctions = DeepEqualityResult.Create(new[]
+            {
+                new Distinction("Snapshot.Rules[2].Expression", "Amount > 100", "Amount > 200"),
+                new Distinction("Snapshot.Rules[6].Name", "OldName", "NewName"),
+                new Distinction("Snapshot.Portals", null, 91, "Added"),
+                new Distinction("Snapshot.Portals", null, 101, "Added"),
+                new Distinction("Snapshot.Portals", 1000, null, "Removed"),
+                new Distinction("Snapshot.Portals[0].Title", "Main Portal", "Main Portal v2"),
+            });
+
+            var actualJson = DeepEqualsExtension.ToJson(distinctions);
+
+            // Expected JSON
+            var expectedJson = """
+                               {
+                                 "Rules": {
+                                   "2": {
+                                     "Expression": {
+                                       "before": "Amount > 100",
+                                       "after": "Amount > 200",
+                                       "details": ""
+                                     }
+                                   },
+                                   "6": {
+                                     "Name": {
+                                       "before": "OldName",
+                                       "after": "NewName",
+                                       "details": ""
+                                     }
+                                   }
+                                 },
+                                 "Portals": {
+                                   "Added": {
+                                     "before": null,
+                                     "after": 101,
+                                     "details": "Added"
+                                   },
+                                   "Removed": {
+                                     "before": 1000,
+                                     "after": null,
+                                     "details": "Removed"
+                                   },
+                                   "0": {
+                                     "Title": {
+                                       "before": "Main Portal",
+                                       "after": "Main Portal v2",
+                                       "details": ""
+                                     }
+                                   }
+                                 }
+                               }
+                               """;
+
+            // Assert
+            var normalizedExpected = JObject.Parse(expectedJson).ToString();
+            var normalizedActual = JObject.Parse(actualJson).ToString();
+
+            Assert.AreEqual(normalizedExpected, normalizedActual);
+        }
+
+
     }
 }

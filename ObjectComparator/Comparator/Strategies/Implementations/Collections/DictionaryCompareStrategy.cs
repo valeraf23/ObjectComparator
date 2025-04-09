@@ -1,8 +1,9 @@
+using ObjectsComparator.Comparator.RepresentationDistinction;
+using ObjectsComparator.Helpers.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using ObjectsComparator.Comparator.RepresentationDistinction;
 
 namespace ObjectsComparator.Comparator.Strategies.Implementations.Collections;
 
@@ -20,21 +21,43 @@ public class DictionaryCompareStrategy : BaseCollectionsCompareStrategy
     public DeepEqualityResult CompareDictionary<TKey, TValue>(IDictionary<TKey, TValue> expected,
         IDictionary<TKey, TValue> actual, string propertyName) where TKey : notnull
     {
-        if (expected.Count != actual.Count)
+        var diff = DeepEqualityResult.None();
+
+        var expectedKeys = expected.Keys.ToHashSet();
+        var actualKeys = actual.Keys.ToHashSet();
+
+        var addedKeys = actualKeys.Except(expectedKeys).ToList();
+        var removedKeys = expectedKeys.Except(actualKeys).ToList();
+
+        var keyType = typeof(TKey);
+
+        if (keyType == typeof(string) || keyType.IsPrimitive || keyType.IsEnum || keyType.IsToStringOverridden())
+        {
+            if (addedKeys.Count > 0)
+            {
+                diff.Add(new Distinction($"{propertyName}", null, string.Join(", ", addedKeys), "Added"));
+            }
+
+            if (removedKeys.Count > 0)
+            {
+                diff.Add(new Distinction($"{propertyName}", string.Join(", ", removedKeys), null, "Removed"));
+            }
+        }
+        else
         {
             const string basePath = "'Dictionary has different length'";
-            var path = string.IsNullOrEmpty(propertyName) ? basePath :propertyName + ": " + basePath;
-            return DeepEqualityResult.Create(path, expected.Count, actual.Count);
+            diff.Add(new Distinction($"{propertyName}", expected.Count, actual.Count, basePath));
         }
 
-        var diff = DeepEqualityResult.Create();
-        foreach (var (key, value) in expected) 
+        var commonKeys = expectedKeys.Intersect(actualKeys);
+
+        foreach (var key in commonKeys)
         {
-            if (!actual.TryGetValue(key, out var secondValue))
-                diff.Add(new Distinction(key.ToString()!, "Should be", "Does not exist"));
+            var expectedValue = expected[key];
+            var actualValue = actual[key];
 
             var diffRes = RulesHandler.GetFor(typeof(TValue))
-                .Compare(value, secondValue, $"{propertyName}[{key}]");
+                .Compare(expectedValue, actualValue, $"{propertyName}[{key}]");
 
             diff.AddRange(diffRes);
         }

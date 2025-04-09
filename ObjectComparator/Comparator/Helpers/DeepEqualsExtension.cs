@@ -11,6 +11,11 @@ namespace ObjectsComparator.Comparator.Helpers
     public static class DeepEqualsExtension
     {
 
+        public static string ToJson(this DeepEqualityResult distinctions)
+        {
+            return DeepComparisonJsonConverter.ToJson(distinctions);
+        }
+
         public static DeepEqualityResult DeeplyEquals<T>(this T expected, T actual, params string[] ignore) =>
             DeeplyEquals(expected, actual, new Strategies<T>(), ignore);
 

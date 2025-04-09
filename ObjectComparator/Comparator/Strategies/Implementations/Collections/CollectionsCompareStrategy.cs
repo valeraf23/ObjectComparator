@@ -1,9 +1,12 @@
+using Newtonsoft.Json;
+using ObjectsComparator.Comparator.Helpers;
+using ObjectsComparator.Comparator.RepresentationDistinction;
+using ObjectsComparator.Comparator.Rules;
+using ObjectsComparator.Helpers.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using ObjectsComparator.Comparator.RepresentationDistinction;
-using ObjectsComparator.Comparator.Rules;
 
 namespace ObjectsComparator.Comparator.Strategies.Implementations.Collections
 {
@@ -28,8 +31,7 @@ namespace ObjectsComparator.Comparator.Strategies.Implementations.Collections
         {
             var genericType = GetGenericArgument(expected?.GetType() ?? typeof(T));
             var compareCollectionsMethod = CompareCollectionsMethod.MakeGenericMethod(genericType);
-            return CollectionHelper.GetDelegateFor(compareCollectionsMethod)(expected, actual,
-                propertyName, RulesHandler);
+            return CollectionHelper.GetDelegateFor(compareCollectionsMethod)(expected, actual, propertyName, RulesHandler);
         }
 
         private static Type GetGenericArgument(Type type)
@@ -39,28 +41,79 @@ namespace ObjectsComparator.Comparator.Strategies.Implementations.Collections
                 .Select(i => i.GetGenericArguments()[0]).First();
         }
 
-        private static DeepEqualityResult CompareIListTypes<T>(IList<T> expected, IList<T> actual, string propertyName,
+        private static object GetFormattedValue<T>(T item, bool isPrimitive, bool couldToString)
+        {
+            return isPrimitive ? item : (couldToString ? item?.ToString() : FormatValue(item));
+        }
+
+        private static void AddExtraDifferences<T>(
+            IList<T> source, 
+            int startIndex, 
+            string propertyName, 
+            string action, 
+            bool isPrimitive, 
+            bool couldToString, 
+            DeepEqualityResult diff)
+        {
+            for (var i = startIndex; i < source.Count; i++)
+            {
+                var value = GetFormattedValue(source[i], isPrimitive, couldToString);
+                if (action == "Removed")
+                {
+                    diff.Add(new Distinction($"{propertyName}[{i}]", value, null, action));
+                }
+                else if (action == "Added")
+                {
+                    diff.Add(new Distinction($"{propertyName}[{i}]", null, value, action));
+                }
+            }
+        }
+
+        private static DeepEqualityResult CompareLists<T>(
+            IList<T> expected, 
+            IList<T> actual, 
+            string propertyName, 
             RulesHandler rulesHandler)
         {
-            var expectedCount = expected.Count;
-            var actualCount = actual.Count;
-            if (expectedCount != actualCount)
-                return DistinctionsForCollectionsWithDifferentLength(propertyName, expectedCount, actualCount);
+            var type = typeof(T);
+            var isPrimitive = type == typeof(string) || type.IsPrimitive;
+            var couldToString = type.IsEnum || type.IsToStringOverridden();
             var diff = DeepEqualityResult.None();
-            for (var i = 0; i < expectedCount; i++)
-                diff.AddRange(rulesHandler.GetFor(typeof(T)).Compare(expected[i], actual[i], $"{propertyName}[{i}]"));
+            var minCount = Math.Min(expected.Count, actual.Count);
+            var handler = rulesHandler.GetFor(type);
+
+            for (var i = 0; i < minCount; i++)
+            {
+                var elementDiff = handler.Compare(expected[i], actual[i], $"{propertyName}[{i}]");
+                diff.AddRange(elementDiff);
+            }
+
+            if (expected.Count > actual.Count)
+            {
+                AddExtraDifferences(expected, actual.Count, propertyName, "Removed", isPrimitive, couldToString, diff);
+            }
+            else if (actual.Count > expected.Count)
+            {
+                AddExtraDifferences(actual, expected.Count, propertyName, "Added", isPrimitive, couldToString, diff);
+            }
 
             return diff;
         }
 
-        private static DeepEqualityResult CompareCollections<T>(IEnumerable<T> expected, IEnumerable<T> actual, string propertyName, RulesHandler rulesHandler)
+        private static string FormatValue<T>(T value)
+        {
+            return JsonConvert.SerializeObject(value, SerializerSettings.Settings);
+        }
+
+        private static DeepEqualityResult CompareCollections<T>(
+            IEnumerable<T> expected, 
+            IEnumerable<T> actual, 
+            string propertyName, 
+            RulesHandler rulesHandler)
         {
             var exp = expected.ToList();
             var act = actual.ToList();
-            return CompareIListTypes(exp, act, propertyName, rulesHandler);
+            return CompareLists(exp, act, propertyName, rulesHandler);
         }
-
-        private static DeepEqualityResult DistinctionsForCollectionsWithDifferentLength(string propertyName, int first, int second) =>
-            DeepEqualityResult.Create(new Distinction($"Property \"{propertyName}\": Collection has different length", first, second));
     }
 }

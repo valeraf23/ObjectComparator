@@ -22,8 +22,8 @@
 
         public void Add(string key, string value) => _dictionary.Add(key, value);
 
-        public ICollection<string> Keys => throw new System.NotImplementedException();
-        public ICollection<string> Values => throw new System.NotImplementedException();
+        public ICollection<string> Keys => _dictionary.Keys;
+        public ICollection<string> Values => _dictionary.Values;
         public bool IsReadOnly => throw new System.NotImplementedException();
 
         public void Add(KeyValuePair<string, string> item) => throw new System.NotImplementedException();

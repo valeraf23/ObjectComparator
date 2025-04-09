@@ -7,6 +7,11 @@ namespace ObjectsComparator.Tests.TestModels
         public Dictionary<string, Book> Books { get; set; } = new();
     }
 
+    internal class Library3
+    {
+        public Dictionary<SomeKey, Book> Books { get; set; } = new();
+    }
+
     internal class Library2
     {
         public IDictionary<string, Book> Books { get; set; } = new Dictionary<string, Book>();
