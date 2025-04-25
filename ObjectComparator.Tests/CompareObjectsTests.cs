@@ -1068,6 +1068,32 @@ namespace ObjectsComparator.Tests
 
             exp.DeeplyEquals(act)[0].Should()
                 .Be(new Distinction("StringList[0]", "B", "A"));
+        }   
+        
+        [Test]
+        public void CollectionComparisonResultComparer_Should_RespectIgnoreStrategy_BeforeNullChecks()
+        {
+            var a1 = new A
+            {
+                B = new List<B>
+                {
+                    new B
+                    {
+                        C = null
+                    }
+                }
+            };
+            var a2 = new A
+            {
+                B = new List<B>
+                {
+                    new B
+                    {
+                        C = "C"
+                    }
+                }
+            };
+            var result = a1.DeeplyEquals(a2, Ignore.IgnoreProperty);
         }
 
         [Test]
@@ -1152,7 +1178,5 @@ namespace ObjectsComparator.Tests
 
             Assert.AreEqual(normalizedExpected, normalizedActual);
         }
-
-
     }
 }

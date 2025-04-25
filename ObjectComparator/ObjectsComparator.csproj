@@ -10,7 +10,7 @@
     <RepositoryUrl>https://github.com/valeraf23/ObjectComparator</RepositoryUrl>
     <PackageTags>ObjectComparison DeepComparison CustomComparisonRules .NET Reflection Difference Disparity DetailedComparison HighPerformance EqualityCheck ObjectDiff FieldComparison PropertyComparison</PackageTags>
     <PackageReleaseNotes>Add details when dictionaty length not equalAdd details when dictionary length not equal</PackageReleaseNotes>
-    <Version>3.6.0</Version>
+    <Version>3.6.1</Version>
     <PackageId>ObjectComparator</PackageId>
     <AssemblyVersion>3.0.0.6</AssemblyVersion>
     <FileVersion>3.0.0.6</FileVersion>
