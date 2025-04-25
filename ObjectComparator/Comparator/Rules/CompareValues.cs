@@ -27,6 +27,11 @@ namespace ObjectsComparator.Comparator.Rules
             if (string.IsNullOrEmpty(propertyName))
                 throw new Exception($"{nameof(propertyName)} should not be null or empty");
 
+            if (_ignore(propertyName))
+            {
+                return DeepEqualityResult.None();
+            }
+
             if (_strategies.IsNotEmpty() && _strategies.Any(x => x.Key == propertyName))
                 return _strategies[propertyName].Compare(expected, actual, propertyName);
 
@@ -39,7 +44,7 @@ namespace ObjectsComparator.Comparator.Rules
             if (expected is null)
                 return DeepEqualityResult.None();
 
-            return _ignore(propertyName) ? DeepEqualityResult.None() : _rule.Compare(expected, actual, propertyName);
+            return _rule.Compare(expected, actual, propertyName);
         }
     }
 }
