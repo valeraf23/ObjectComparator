@@ -483,23 +483,8 @@ Prefer member-by-member comparison (property-level diffs) by skipping equality-b
 	var actual = new CourseNew3 { Name = "Math", Duration = 5 };
 	var expected = new CourseNew3 { Name = "Math", Duration = 4 };
 	
-	// Option A: using factory (if implemented)
-	// var options = ComparatorOptions.Create(StrategyType.Equality, StrategyType.OverridesEquals, StrategyType.CompareTo);
-	
-	// Option B: using the HashSet directly
-	var options = new ComparatorOptions();
-	options.StrategyTypeSkipList.UnionWith(new[]
-	{
-	    StrategyType.Equality,
-	    StrategyType.OverridesEquals,
-	    StrategyType.CompareTo
-	});
-	
-	// You can use the implicit bool conversion...
-	bool equal = expected.DeeplyEquals(actual, options);
-	equal.Should().BeFalse();
-	
-	// ...or inspect the actual differences:
+	var options = ComparatorOptions.Create(StrategyType.Equality, StrategyType.OverridesEquals, StrategyType.CompareTo);
+
 	var diffs = expected.DeeplyEquals(actual, options);
 	// diffs[0].Path == "CourseNew3.Duration"
 	// diffs[0].ExpectedValue == 4
