@@ -1202,15 +1202,15 @@ namespace ObjectsComparator.Tests
         [Test]
         public void EqualityAndCompareToSkipped_FallsBackToPrimitiveComparison_NoDetails()
         {
-            var actual = new CourseNew3 { Name = "Math", Duration = TimeSpan.FromHours(5) };
+            var actual = new CourseNew3 { Name = "Math", Duration = 5 };
+            var expected = new CourseNew3 { Name = "Math", Duration = 4 };
 
-            var expected = new CourseNew3 { Name = "Math", Duration = TimeSpan.FromHours(4) };
+            var options = ComparatorOptions.Create(StrategyType.Equality, StrategyType.OverridesEquals,
+                StrategyType.CompareTo);
 
-            var options = new ComparatorOptions();
-            options.StrategyTypeSkipList.Add(StrategyType.Equality);
-            bool result = expected.DeeplyEquals(actual, options);
+            bool equal = expected.DeeplyEquals(actual, options);
+            equal.Should().BeFalse();
 
-            result.Should().BeFalse();
         }
 
         [Test]
