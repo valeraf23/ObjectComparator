@@ -26,8 +26,8 @@ New
 • Core overload wiring options: DeeplyEquals(expected, actual, Dictionary&lt;string, ICustomCompareValues&gt; custom, Func&lt;string, bool&gt; ignoreStrategy, ComparatorOptions? options = null)</PackageReleaseNotes>
     <Version>3.6.2</Version>
     <PackageId>ObjectComparator</PackageId>
-    <AssemblyVersion>3.0.0.6</AssemblyVersion>
-    <FileVersion>3.0.0.6</FileVersion>
+    <AssemblyVersion>3.0.0.0</AssemblyVersion>
+    <FileVersion>3.6.2</FileVersion>
     <PackageIcon>icon.png</PackageIcon>
     <Copyright>Copyright (c) VF 2022</Copyright>
     <PackageReadmeFile>README.md</PackageReadmeFile>
