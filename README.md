@@ -30,7 +30,7 @@ ObjectComparator is a high-performance .NET library crafted meticulously for dee
   - [Display distinctions for Dictionary type](#display-distinctions-for-dictionary-type)
   - [Comparison for Anonymous Types](#comparison-for-anonymous-types)
   - [Convert Comparison Result to JSON](#convert-comparison-result-to-JSON)
-  - [Configuring comparison pipeline (ComparatorOptions)](#configuring-comparison-pipeline-(ComparatorOptions))
+  - [Configuring comparison pipeline (ComparatorOptions)](#configuring-comparison-pipeline-comparatoroptions)
 - [Contributing](#contributing)
 - [License](#license)
 
