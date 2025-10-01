@@ -19,12 +19,28 @@ namespace ObjectsComparator.Tests.TestModels
         public string Name { get; set; }
         public TimeSpan Duration { get; set; }
 
-        public static bool operator ==(CourseNew2 a, CourseNew2 b)
+        public static bool operator == (CourseNew2 a, CourseNew2 b)
         {
             return a?.Name == b?.Name && a?.Duration == b?.Duration;
         }
 
         public static bool operator !=(CourseNew2 a, CourseNew2 b)
+        {
+            return !(a == b);
+        }
+    }
+
+    internal class CourseNew3
+    {
+        public string Name { get; set; }
+        public TimeSpan Duration { get; set; }
+
+        public static bool operator ==(CourseNew3 a, CourseNew3 b)
+        {
+            return a?.Name == b?.Name;
+        }
+
+        public static bool operator !=(CourseNew3 a, CourseNew3 b)
         {
             return !(a == b);
         }

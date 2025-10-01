@@ -4,6 +4,7 @@ using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 using ObjectsComparator.Comparator.Helpers;
 using ObjectsComparator.Comparator.RepresentationDistinction;
+using ObjectsComparator.Comparator.Strategies;
 using ObjectsComparator.Comparator.Strategies.StrategiesForCertainProperties;
 using ObjectsComparator.Tests.TestModels;
 using System;
@@ -999,8 +1000,8 @@ namespace ObjectsComparator.Tests
         [Test]
         public void CompareIEnumerableImplementation()
         {
-            var act = new StringList() { "A", "B" };
-            var exp = new StringList() { "B", "C" };
+            var act = new StringList { "A", "B" };
+            var exp = new StringList { "B", "C" };
 
             exp.DeeplyEquals(act)[0].Should()
                 .Be(new Distinction("StringList[0]", "B", "A"));
@@ -1011,14 +1012,14 @@ namespace ObjectsComparator.Tests
         {
             var actual = new GroupPortals
             {
-                Portals = new List<int>() { 1, 2, 3, 5 },
-                Portals1 = new List<GroupPortals1>()
+                Portals = new List<int> { 1, 2, 3, 5 },
+                Portals1 = new List<GroupPortals1>
                 {
-                    new GroupPortals1()
+                    new GroupPortals1
                     {
-                        Courses = new List<Course>()
+                        Courses = new List<Course>
                         {
-                            new Course()
+                            new Course
                             {
                                 Name = "test"
                             }
@@ -1029,14 +1030,14 @@ namespace ObjectsComparator.Tests
 
             var expected = new GroupPortals
             {
-                Portals = new List<int>() { 1, 2, 3, 4, 7, 0 },
-                Portals1 = new List<GroupPortals1>()
+                Portals = new List<int> { 1, 2, 3, 4, 7, 0 },
+                Portals1 = new List<GroupPortals1>
                 {
-                    new GroupPortals1()
+                    new GroupPortals1
                     {
-                        Courses = new List<Course>()
+                        Courses = new List<Course>
                         {
-                            new Course()
+                            new Course
                             {
                                 Name = "test1"
                             }
@@ -1063,13 +1064,13 @@ namespace ObjectsComparator.Tests
         [Test]
         public void CompareIEnumerableImplementationAsObject()
         {
-            object act = new StringList() { "A", "B" };
-            object exp = new StringList() { "B", "C" };
+            object act = new StringList { "A", "B" };
+            object exp = new StringList { "B", "C" };
 
             exp.DeeplyEquals(act)[0].Should()
                 .Be(new Distinction("StringList[0]", "B", "A"));
-        }   
-        
+        }
+
         [Test]
         public void CollectionComparisonResultComparer_Should_RespectIgnoreStrategy_BeforeNullChecks()
         {
@@ -1177,6 +1178,69 @@ namespace ObjectsComparator.Tests
             var normalizedActual = JObject.Parse(actualJson).ToString();
 
             Assert.AreEqual(normalizedExpected, normalizedActual);
+        }
+
+        [Test]
+        public void MemberComparison_WhenOverridesEqualsSkipped_ShouldReportNestedPropertyDifferences()
+        {
+            var expected = new StudentEq { Age = 3, Courses = new[] { new CourseE { Name = "fff" } } };
+            var actual = new StudentEq { Age = 3, Courses = new[] { new CourseE { Name = "222" } } };
+
+            var options = new ComparatorOptions();
+            options.StrategyTypeSkipList.Add(StrategyType.OverridesEquals);
+
+            var result = expected.DeeplyEquals(actual, options);
+
+            result.Should().BeEquivalentTo(
+                new[]
+                {
+                    new Distinction("StudentEq.Courses[0].Name", "fff", "222")
+                });
+        }
+
+
+        [Test]
+        public void EqualityAndCompareToSkipped_FallsBackToPrimitiveComparison_NoDetails()
+        {
+            var actual = new CourseNew3 { Name = "Math", Duration = TimeSpan.FromHours(5) };
+
+            var expected = new CourseNew3 { Name = "Math", Duration = TimeSpan.FromHours(4) };
+
+            var options = new ComparatorOptions();
+            options.StrategyTypeSkipList.Add(StrategyType.Equality);
+            bool result = expected.DeeplyEquals(actual, options);
+
+            result.Should().BeFalse();
+        }
+
+        [Test]
+        public void DeeplyEquals_WithOptionsAndIgnoreTokens_ShouldIgnoreSpecifiedMembers()
+        {
+            var expected = new Student
+            {
+                Name = "StudentName",
+                Age = 1,
+                Courses = new[]
+                {
+                    new Course { Name = "CourseName" }
+                }
+            };
+
+            var actual = new Student
+            {
+                Name = "StudentName1",
+                Age = 1,
+                Courses = new[]
+                {
+                    new Course { Name = "CourseName1" }
+                }
+            };
+
+            var options = new ComparatorOptions();
+            // Ignore Name everywhere via tokens (converted to full path by DeepEqualsExtension)
+            var res = expected.DeeplyEquals(actual, options, "Name", "Courses[0].Name");
+
+            res.Should().BeEmpty();
         }
     }
 }

@@ -1,8 +1,10 @@
+using ObjectsComparator.Comparator.Helpers;
 using System;
 using System.Collections.Generic;
 using ObjectsComparator.Comparator.RepresentationDistinction;
 using ObjectsComparator.Comparator.Rules;
 using ObjectsComparator.Comparator.Rules.Interfaces;
+using ObjectsComparator.Comparator.Strategies;
 using ObjectsComparator.Comparator.Strategies.Implementations;
 using ObjectsComparator.Comparator.Strategies.Implementations.Collections;
 using ObjectsComparator.Comparator.Strategies.Interfaces;
@@ -14,20 +16,32 @@ public sealed class Comparator
 {
     public readonly RulesHandler RulesHandler;
 
-    public Comparator(Dictionary<string, ICustomCompareValues> customStrategies, Func<string, bool> ignoreStrategy)
+    public Comparator(Dictionary<string, ICustomCompareValues> customStrategies, Func<string, bool> ignoreStrategy, ComparatorOptions options)
     {
-        RulesHandler = new RulesHandler(new[]
-            {
-                Rule.CreateFor(new ComparePrimitiveTypesStrategy()),
-                Rule.CreateFor(new EqualityStrategy()),
-                Rule.CreateFor(new OverridesEqualsStrategy()),
-                Rule.CreateFor(new ComparablesStrategy()),
-                Rule.CreateFor<ICollectionsCompareStrategy>(new CollectionsCompareStrategy(this),
-                    new DictionaryCompareStrategy(this)),
-                Rule.CreateFor(new CompareMembersStrategy(this))
-            },
-            customStrategies,
-            ignoreStrategy);
+        var rules = new List<Rule>(6)
+        {
+            Rule.CreateFor(new ComparePrimitiveTypesStrategy())
+        };
+
+        if (options.StrategyTypeSkipList.Contains(StrategyType.Equality) == false)
+        {
+            rules.Add(Rule.CreateFor(new EqualityStrategy()));
+        }
+        if (options.StrategyTypeSkipList.Contains(StrategyType.OverridesEquals) == false)
+        {
+            rules.Add(Rule.CreateFor(new OverridesEqualsStrategy()));
+        }
+        if (options.StrategyTypeSkipList.Contains(StrategyType.CompareTo) == false)
+        {
+            rules.Add(Rule.CreateFor(new ComparablesStrategy()));
+        }
+
+        rules.Add(Rule.CreateFor<ICollectionsCompareStrategy>(new CollectionsCompareStrategy(this),
+            new DictionaryCompareStrategy(this)));
+
+        rules.Add(Rule.CreateFor(new CompareMembersStrategy(this)));
+
+        RulesHandler = new RulesHandler(rules, customStrategies, ignoreStrategy);
     }
 
     public DeepEqualityResult Compare<T>(T expected, T actual)
