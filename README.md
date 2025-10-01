@@ -30,6 +30,7 @@ ObjectComparator is a high-performance .NET library crafted meticulously for dee
   - [Display distinctions for Dictionary type](#display-distinctions-for-dictionary-type)
   - [Comparison for Anonymous Types](#comparison-for-anonymous-types)
   - [Convert Comparison Result to JSON](#convert-comparison-result-to-JSON)
+  - [Configuring comparison pipeline (ComparatorOptions)](#configuring-comparison-pipeline-comparatoroptions)
 - [Contributing](#contributing)
 - [License](#license)
 
@@ -462,6 +463,34 @@ You can serialize the result of object comparison (DeepEqualityResult) into a st
 		}
 	*/
                 
+```
+
+## Configuring comparison pipeline (ComparatorOptions)
+
+Prefer member-by-member comparison (property-level diffs) by skipping equality-based short-circuits. This is useful when types implement `==`, `Equals`, or `IComparable`, but you need detailed change tracking on each member.
+
+```
+	internal class CourseNew3
+	{
+	    public string Name { get; set; }
+	    public int Duration { get; set; }
+	
+	    public static bool operator ==(CourseNew3 a, CourseNew3 b) => a?.Name == b?.Name;
+	    public static bool operator !=(CourseNew3 a, CourseNew3 b) => !(a == b);
+	    public override bool Equals(object? obj) => obj is CourseNew3 other && this == other;
+	    public override int GetHashCode() => Name?.GetHashCode() ?? 0;
+	}
+	
+	var actual = new CourseNew3 { Name = "Math", Duration = 5 };
+	var expected = new CourseNew3 { Name = "Math", Duration = 4 };
+	
+	var options = ComparatorOptions.Create(StrategyType.Equality, StrategyType.OverridesEquals, StrategyType.CompareTo);
+
+	var diffs = expected.DeeplyEquals(actual, options);
+	// diffs[0].Path == "CourseNew3.Duration"
+	// diffs[0].ExpectedValue == 4
+	// diffs[0].ActualValue == 5
+
 ```
 
 ## Contributing
