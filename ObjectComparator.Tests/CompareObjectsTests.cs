@@ -1186,12 +1186,10 @@ namespace ObjectsComparator.Tests
             var expected = new StudentEq { Age = 3, Courses = new[] { new CourseE { Name = "fff" } } };
             var actual = new StudentEq { Age = 3, Courses = new[] { new CourseE { Name = "222" } } };
 
-            var options = new ComparatorOptions();
-            options.StrategyTypeSkipList.Add(StrategyType.OverridesEquals);
+            var options = ComparatorOptions.SkipStrategies(StrategyType.OverridesEquals);
 
             var result = expected.DeeplyEquals(actual, options);
-
-            result.Should().BeEquivalentTo(
+                        result.Should().BeEquivalentTo(
                 new[]
                 {
                     new Distinction("StudentEq.Courses[0].Name", "fff", "222")
@@ -1205,7 +1203,7 @@ namespace ObjectsComparator.Tests
             var actual = new CourseNew3 { Name = "Math", Duration = 5 };
             var expected = new CourseNew3 { Name = "Math", Duration = 4 };
 
-            var options = ComparatorOptions.Create(StrategyType.Equality, StrategyType.OverridesEquals,
+            var options = ComparatorOptions.SkipStrategies(StrategyType.Equality, StrategyType.OverridesEquals,
                 StrategyType.CompareTo);
 
             bool equal = expected.DeeplyEquals(actual, options);

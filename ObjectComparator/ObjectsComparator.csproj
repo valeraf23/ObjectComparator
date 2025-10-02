@@ -4,59 +4,44 @@
     <TargetFrameworks>net6.0;netstandard2.1</TargetFrameworks>
     <Nullable>enable</Nullable>
     <LangVersion>latest</LangVersion>
-    <Authors>Valerii_Fedorenko</Authors>
-    <PackageProjectUrl>https://github.com/valeraf23/ObjectComparator</PackageProjectUrl>
-    <Description>ObjectComparator is a high-performance .NET library crafted meticulously for deep comparisons between objects. Beyond just pointing out the disparities, it delves into the depths of objects, reflecting even the minutest differences. Furthermore, it arms developers with the capability to prescribe custom comparison rules tailored for specific properties or fields.</Description>
-    <RepositoryUrl>https://github.com/valeraf23/ObjectComparator</RepositoryUrl>
-    <PackageTags>ObjectComparison DeepComparison CustomComparisonRules .NET Reflection Difference Disparity DetailedComparison HighPerformance EqualityCheck ObjectDiff FieldComparison PropertyComparison</PackageTags>
-    <PackageReleaseNotes>Highlights
-• Configurable comparison pipeline via ComparatorOptions to prefer member-by-member diffs over equality short-circuits.
-• New DeeplyEquals overloads to pass options alongside ignore tokens or custom strategies.
-• More granular collection/dictionary diffs with Added/Removed distinctions.
-• Additional unit tests covering the new behavior.
-New
-• ComparatorOptions with StrategyTypeSkipList to skip specific strategies:
-• StrategyType.Equality
-• StrategyType.OverridesEquals
-• StrategyType.CompareTo
-• DeeplyEquals overloads:
-• DeeplyEquals(expected, actual, ComparatorOptions options, params string[] ignore)
-• DeeplyEquals(expected, actual, Strategies&lt;T&gt; custom, ComparatorOptions options, params string[] ignore)
-• DeeplyEquals(expected, actual, strategiesBuilder, ComparatorOptions options, params string[] ignore)
-• Core overload wiring options: DeeplyEquals(expected, actual, Dictionary&lt;string, ICustomCompareValues&gt; custom, Func&lt;string, bool&gt; ignoreStrategy, ComparatorOptions? options = null)</PackageReleaseNotes>
-    <Version>3.6.2</Version>
+
     <PackageId>ObjectComparator</PackageId>
-    <AssemblyVersion>3.0.0.0</AssemblyVersion>
-    <FileVersion>3.6.2</FileVersion>
+    <Version>3.6.3</Version>
+    <AssemblyVersion>3.6.0.0</AssemblyVersion>
+    <FileVersion>3.6.3.0</FileVersion>
+
+    <Authors>Valerii Fedorenko</Authors>
+    <PackageProjectUrl>https://github.com/valeraf23/ObjectComparator</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/valeraf23/ObjectComparator</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+
     <PackageIcon>icon.png</PackageIcon>
-    <Copyright>Copyright (c) VF 2022</Copyright>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
-    <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
-    <IncludeSymbols>True</IncludeSymbols>
+    <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-  </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFrameworks)|$(Platform)'=='Debug|netcoreapp3.1|AnyCPU'">
-    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
-  </PropertyGroup>
+    <Description>High-performance deep object comparison for .NET with customizable rules and strategy skipping.</Description>
+    <PackageTags>ObjectComparison;DeepComparison;Equality;Diff;Reflection</PackageTags>
 
-  <ItemGroup>
-    <Compile Remove="Comparator\Strategies\StrategiesForCertainProperties\DistinctionForStrategy.cs" />
-  </ItemGroup>
+    <PackageReleaseNotes>Added ComparatorOptions.SkipStrategies(...) factory helper.
+Comparator now respects skipped strategies (Equality, OverridesEquals, CompareTo).
+Improved null handling and type mismatch detection.
+⚠️ Breaking: ComparatorOptions.Create(...) renamed to SkipStrategies(...).</PackageReleaseNotes>
+  </PropertyGroup>
 
   <ItemGroup>
     <None Include="..\icon.png">
-      <Pack>True</Pack>
-      <PackagePath></PackagePath>
+      <Pack>true</Pack>
+      <PackagePath>\</PackagePath>
     </None>
-    <None Include="..\.editorconfig" Link=".editorconfig" />
     <None Include="..\LICENSE">
-      <Pack>True</Pack>
+      <Pack>true</Pack>
       <PackagePath>\</PackagePath>
     </None>
     <None Include="..\README.md">
-      <Pack>True</Pack>
+      <Pack>true</Pack>
       <PackagePath>\</PackagePath>
     </None>
   </ItemGroup>
@@ -64,6 +49,7 @@ New
   <ItemGroup>
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
   </ItemGroup>
 
   <ItemGroup>

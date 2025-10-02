@@ -23,15 +23,15 @@ public sealed class Comparator
             Rule.CreateFor(new ComparePrimitiveTypesStrategy())
         };
 
-        if (options.StrategyTypeSkipList.Contains(StrategyType.Equality) == false)
+        if (options.IsSkipped(StrategyType.Equality) == false)
         {
             rules.Add(Rule.CreateFor(new EqualityStrategy()));
         }
-        if (options.StrategyTypeSkipList.Contains(StrategyType.OverridesEquals) == false)
+        if (options.IsSkipped(StrategyType.OverridesEquals) == false)
         {
             rules.Add(Rule.CreateFor(new OverridesEqualsStrategy()));
         }
-        if (options.StrategyTypeSkipList.Contains(StrategyType.CompareTo) == false)
+        if (options.IsSkipped(StrategyType.CompareTo) == false)
         {
             rules.Add(Rule.CreateFor(new ComparablesStrategy()));
         }
