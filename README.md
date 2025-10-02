@@ -484,7 +484,7 @@ Prefer member-by-member comparison (property-level diffs) by skipping equality-b
 	var actual = new CourseNew3 { Name = "Math", Duration = 5 };
 	var expected = new CourseNew3 { Name = "Math", Duration = 4 };
 	
-	var options = ComparatorOptions.Create(StrategyType.Equality, StrategyType.OverridesEquals, StrategyType.CompareTo);
+	var options = ComparatorOptions.SkipStrategies(StrategyType.Equality, StrategyType.OverridesEquals, StrategyType.CompareTo);
 
 	var diffs = expected.DeeplyEquals(actual, options);
 	// diffs[0].Path == "CourseNew3.Duration"
