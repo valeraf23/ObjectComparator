@@ -11,6 +11,7 @@
     <FileVersion>3.6.3.0</FileVersion>
 
     <Authors>Valerii Fedorenko</Authors>
+    <Copyright>Copyright (c) 2022-2025 Valerii Fedorenko</Copyright>
     <PackageProjectUrl>https://github.com/valeraf23/ObjectComparator</PackageProjectUrl>
     <RepositoryUrl>https://github.com/valeraf23/ObjectComparator</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
