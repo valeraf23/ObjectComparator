@@ -6,9 +6,9 @@
     <LangVersion>latest</LangVersion>
 
     <PackageId>ObjectComparator</PackageId>
-    <Version>3.6.3</Version>
+    <Version>3.6.4</Version>
     <AssemblyVersion>3.6.0.0</AssemblyVersion>
-    <FileVersion>3.6.3.0</FileVersion>
+    <FileVersion>3.6.4.10</FileVersion>
 
     <Authors>Valerii Fedorenko</Authors>
     <Copyright>Copyright (c) 2022-2025 Valerii Fedorenko</Copyright>
@@ -49,7 +49,7 @@ Improved null handling and type mismatch detection.
 
   <ItemGroup>
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
   </ItemGroup>
 

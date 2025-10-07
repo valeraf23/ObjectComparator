@@ -9,10 +9,16 @@ namespace ObjectsComparator.Comparator.Strategies.Implementations
 {
     public sealed class ComparablesStrategy : IComparablesStrategy
     {
+        private readonly bool _structsOnly;
         private static readonly Type ObjectType = typeof(object);
         private const string MethodName = "CompareTo";
         private static readonly Type Type = typeof(IComparable<>);
-        private static readonly string Details = $"used_{MethodName}()";
+        private const string Details = $"used_{MethodName}()";
+
+        public ComparablesStrategy(bool structsOnly = false)
+        {
+            _structsOnly = structsOnly;
+        }
 
         private static bool Predicate(MethodInfo methodInfo) =>
             methodInfo.Name == MethodName
@@ -35,6 +41,15 @@ namespace ObjectsComparator.Comparator.Strategies.Implementations
             return compareToResult == 0;
         }
 
-        public bool IsValid(Type member) => member.ImplementsGenericInterface(Type);
+        public bool IsValid(Type member)
+        {
+            if (_structsOnly)
+            {
+                return member.IsClass == false && member.ImplementsGenericInterface(Type);
+            }
+
+            return member.ImplementsGenericInterface(Type);
+
+        }
     }
 }
