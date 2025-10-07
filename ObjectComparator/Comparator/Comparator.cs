@@ -27,14 +27,15 @@ public sealed class Comparator
         {
             rules.Add(Rule.CreateFor(new EqualityStrategy()));
         }
+
         if (options.IsSkipped(StrategyType.OverridesEquals) == false)
         {
             rules.Add(Rule.CreateFor(new OverridesEqualsStrategy()));
         }
-        if (options.IsSkipped(StrategyType.CompareTo) == false)
-        {
-            rules.Add(Rule.CreateFor(new ComparablesStrategy()));
-        }
+
+        rules.Add(options.IsSkipped(StrategyType.CompareTo) == false
+            ? Rule.CreateFor(new ComparablesStrategy())
+            : Rule.CreateFor(new ComparablesStrategy(true)));
 
         rules.Add(Rule.CreateFor<ICollectionsCompareStrategy>(new CollectionsCompareStrategy(this),
             new DictionaryCompareStrategy(this)));
