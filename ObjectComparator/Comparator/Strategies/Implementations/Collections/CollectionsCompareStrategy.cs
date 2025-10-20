@@ -47,7 +47,7 @@ namespace ObjectsComparator.Comparator.Strategies.Implementations.Collections
         }
 
         private static void AddExtraDifferences<T>(
-            IList<T> source, 
+            IReadOnlyList<T> source, 
             int startIndex, 
             string propertyName, 
             string action, 
@@ -70,8 +70,8 @@ namespace ObjectsComparator.Comparator.Strategies.Implementations.Collections
         }
 
         private static DeepEqualityResult CompareLists<T>(
-            IList<T> expected, 
-            IList<T> actual, 
+            IReadOnlyList<T> expected, 
+            IReadOnlyList<T> actual, 
             string propertyName, 
             RulesHandler rulesHandler)
         {
@@ -111,9 +111,31 @@ namespace ObjectsComparator.Comparator.Strategies.Implementations.Collections
             string propertyName, 
             RulesHandler rulesHandler)
         {
-            var exp = expected.ToList();
-            var act = actual.ToList();
+            var exp = EnsureReadOnlyList(expected);
+            var act = EnsureReadOnlyList(actual);
             return CompareLists(exp, act, propertyName, rulesHandler);
+        }
+
+        private static IReadOnlyList<T> EnsureReadOnlyList<T>(IEnumerable<T> source)
+        {
+            if (source is null)
+            {
+                return Array.Empty<T>();
+            }
+
+            switch (source)
+            {
+                case IReadOnlyList<T> readOnlyList:
+                    return readOnlyList;
+                case ICollection<T> collection:
+                {
+                    var array = new T[collection.Count];
+                    collection.CopyTo(array, 0);
+                    return array;
+                }
+                default:
+                    return source.ToList();
+            }
         }
     }
 }
