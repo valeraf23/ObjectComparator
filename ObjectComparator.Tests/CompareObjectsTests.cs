@@ -1302,10 +1302,7 @@ namespace ObjectsComparator.Tests
 
         private static readonly JsonSerializerSettings CamelCaseIndentedSettings = new()
         {
-            ContractResolver = new DefaultContractResolver
-            {
-                NamingStrategy = new CamelCaseNamingStrategy()
-            },
+            ContractResolver = CamelCasePropertyNamesContractResolver.Instance,
             Formatting = Formatting.Indented
         };
 
