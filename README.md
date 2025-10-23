@@ -271,7 +271,7 @@ Identify differences between two dictionary objects.
                     ["hobbit"] = new Book {Pages = 1, Text = "hobbit Text"},
                     ["murder in orient express"] = new Book {Pages = 500, Text = "murder in orient express Text1"},
                     ["Shantaram"] = new Book {Pages = 500, Text = "Shantaram Text"},
-		    ["Shantaram1"] = new() { Pages = 500, Text = "Shantaram Text" }
+		   		    ["Shantaram1"] = new() { Pages = 500, Text = "Shantaram Text" }
                 }
             };
 
