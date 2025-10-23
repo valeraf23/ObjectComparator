@@ -411,20 +411,31 @@ Detect differences when dealing with anonymous types.
 You can serialize the result of object comparison (DeepEqualityResult) into a structured JSON format, suitable for logging, UI display, or audits.
 		
 ```csharp
-	var distinctions = DeepEqualityResult.Create(new[]
-	{
-	    new Distinction("Snapshot.Rules[2].Expression", "Amount > 100", "Amount > 200"),
-	    new Distinction("Snapshot.Rules[6].Name", "OldName", "NewName"),
-	    new Distinction("Snapshot.Portals", null, 91, "Added"),
-	    new Distinction("Snapshot.Portals", null, 101, "Added"),
-	    new Distinction("Snapshot.Portals", 1000, null, "Removed"),
-	    new Distinction("Snapshot.Portals[0].Title", "Main Portal", "Main Portal v2"),
-	});
+            var distinctions = DeepEqualityResult.Create(new[]
+            {
+                new Distinction("Snapshot.Status", "Active", "Deprecated", "Different state"),
+                new Distinction("Snapshot.Rules[2].Expression", "Amount > 100", "Amount > 200"),
+                new Distinction("Snapshot.Rules[6].Name", "OldName", "NewName"),
+                new Distinction("Snapshot.Rules[3]", "Rule-3", "Rule-3 v2"),
+                new Distinction("Snapshot.Metadata[isEnabled]", true, false),
+                new Distinction("Snapshot.Metadata[range of values].Min", 10, 20),
+                new Distinction(
+                    "Snapshot.Metadata[range of values].Bounds[1].Label", "Old bound", "New bound"),
+                new Distinction("Snapshot.Portals[2]", null, 91, "Added"),
+                new Distinction("Snapshot.Portals[3]", null, 101, "Added"),
+                new Distinction("Snapshot.Portals[4]", 1000, null, "Removed"),
+                new Distinction("Snapshot.Portals[0].Title", "Main Portal", "Main Portal v2"),
+            });
 	
-	var json = DeepEqualsExtension.ToJson(distinctions);
+	      var json = DeepEqualsExtension.ToJson(distinctions);
 			
 	/*
 		{
+		  "Status": {
+		    "before": "Active",
+		    "after": "Deprecated",
+		    "details": "Different state"
+		  },
 		  "Rules": {
 		    "2": {
 		      "Expression": {
@@ -439,15 +450,48 @@ You can serialize the result of object comparison (DeepEqualityResult) into a st
 		        "after": "NewName",
 		        "details": ""
 		      }
+		    },
+		    "3": {
+		      "before": "Rule-3",
+		      "after": "Rule-3 v2",
+		      "details": ""
+		    }
+		  },
+		  "Metadata": {
+		    "isEnabled": {
+		      "before": true,
+		      "after": false,
+		      "details": ""
+		    },
+		    "range of values": {
+		      "Min": {
+		        "before": 10,
+		        "after": 20,
+		        "details": ""
+		      },
+		      "Bounds": {
+		        "1": {
+		          "Label": {
+		            "before": "Old bound",
+		            "after": "New bound",
+		            "details": ""
+		          }
+		        }
+		      }
 		    }
 		  },
 		  "Portals": {
-		    "Added": {
+		    "2": {
+		      "before": null,
+		      "after": 91,
+		      "details": "Added"
+		    },
+		    "3": {
 		      "before": null,
 		      "after": 101,
 		      "details": "Added"
 		    },
-		    "Removed": {
+		    "4": {
 		      "before": 1000,
 		      "after": null,
 		      "details": "Removed"
