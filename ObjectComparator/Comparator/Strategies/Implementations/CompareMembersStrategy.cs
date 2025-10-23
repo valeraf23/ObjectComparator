@@ -112,8 +112,11 @@ namespace ObjectsComparator.Comparator.Strategies.Implementations
         private delegate DeepEqualityResult GetDistinctionDelegate(CompareMembersStrategy strategy, string propertyName,
             object? expected, object? actual);
 
-        private sealed class MemberAccessor(string Name, Type MemberType, Func<object, object?> Getter)
+        private sealed class MemberAccessor(string name, Type memberType, Func<object, object?> getter)
         {
+            public string Name { get; } = name;
+            public Type MemberType { get; } = memberType;
+            public Func<object, object?> Getter { get; } = getter;
         }
     }
 }

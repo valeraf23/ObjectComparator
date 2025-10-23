@@ -96,11 +96,7 @@ public class DictionaryCompareStrategy : BaseCollectionsCompareStrategy
         {
             return JsonConvert.SerializeObject(key, SerializerSettings.Settings);
         }
-        catch (JsonException)
-        {
-            return key.GetHashCode().ToString();
-        }
-        catch (JsonSerializationException)
+        catch
         {
             return key.GetHashCode().ToString();
         }
