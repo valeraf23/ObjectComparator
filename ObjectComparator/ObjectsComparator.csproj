@@ -6,9 +6,9 @@
     <LangVersion>latest</LangVersion>
 
     <PackageId>ObjectComparator</PackageId>
-    <Version>3.6.4</Version>
+    <Version>3.6.5</Version>
     <AssemblyVersion>3.6.0.0</AssemblyVersion>
-    <FileVersion>3.6.4.0</FileVersion>
+    <FileVersion>3.6.5.0</FileVersion>
 
     <Authors>Valerii Fedorenko</Authors>
     <Copyright>Copyright (c) 2022-2025 Valerii Fedorenko</Copyright>
@@ -24,12 +24,9 @@
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
 
     <Description>High-performance deep object comparison for .NET with customizable rules and strategy skipping.</Description>
-    <PackageTags>ObjectComparison;DeepComparison;Equality;Diff;Reflection</PackageTags>
+    <PackageTags>ObjectComparison;DeepComparison;Equality;Diff;Reflection;Performance</PackageTags>
 
-    <PackageReleaseNotes>Added ComparatorOptions.SkipStrategies(...) factory helper.
-Comparator now respects skipped strategies (Equality, OverridesEquals, CompareTo).
-Improved null handling and type mismatch detection.
-⚠️ Breaking: ComparatorOptions.Create(...) renamed to SkipStrategies(...).</PackageReleaseNotes>
+    <PackageReleaseNotes>Performance improvements</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>
