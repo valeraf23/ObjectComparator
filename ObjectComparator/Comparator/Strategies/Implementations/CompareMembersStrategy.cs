@@ -114,9 +114,6 @@ namespace ObjectsComparator.Comparator.Strategies.Implementations
 
         private sealed class MemberAccessor(string Name, Type MemberType, Func<object, object?> Getter)
         {
-            public string Name { get; } = Name;
-            public Type MemberType { get; } = MemberType;
-            public Func<object, object?> Getter { get; } = Getter;
         }
     }
 }
