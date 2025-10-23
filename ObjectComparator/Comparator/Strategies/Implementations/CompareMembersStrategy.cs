@@ -1,25 +1,34 @@
-﻿using System;
-using System.Linq;
-using System.Reflection;
-using ObjectsComparator.Comparator.RepresentationDistinction;
+﻿using ObjectsComparator.Comparator.RepresentationDistinction;
 using ObjectsComparator.Comparator.Strategies.Interfaces;
 using ObjectsComparator.Helpers;
 using ObjectsComparator.Helpers.Extensions;
+using System;
+using System.Collections.Concurrent;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Reflection;
 
 namespace ObjectsComparator.Comparator.Strategies.Implementations
 {
     public sealed class CompareMembersStrategy : ICompareMembersStrategy
     {
-        private static readonly Type DefaultType = typeof(object);
-
-        private readonly Comparator _handler;
-
-        public CompareMembersStrategy(Comparator handler) => _handler = handler;
-
         private static readonly MethodInfo CallGetDistinctions =
             typeof(CompareMembersStrategy).GetTypeInfo().GetDeclaredMethod(nameof(GetDistinctions))!;
 
-        public bool IsValid(Type member) => member.IsClassAndNotString();
+        private static readonly ConcurrentDictionary<Type, MemberAccessor[]> CachedAccessors = new();
+        private static readonly ConcurrentDictionary<Type, GetDistinctionDelegate> CachedDistinctionDelegates = new();
+
+        private readonly Comparator _handler;
+
+        public CompareMembersStrategy(Comparator handler)
+        {
+            _handler = handler;
+        }
+
+        public bool IsValid(Type member)
+        {
+            return member.IsClassAndNotString();
+        }
 
         public DeepEqualityResult Compare<T>(T expected, T actual, string propertyName) where T : notnull
         {
@@ -27,34 +36,18 @@ namespace ObjectsComparator.Comparator.Strategies.Implementations
             var diff = DeepEqualityResult.Create();
             var type = expected.GetType();
 
-            foreach (var mi in type.GetMembers(BindingFlags.Public | BindingFlags.Instance).Where(x =>
-                x.MemberType is MemberTypes.Property or MemberTypes.Field))
+            foreach (var accessor in CachedAccessors.GetOrAdd(type, CreateAccessors))
             {
-                var name = mi.Name;
-                var actualPropertyPath = string.IsNullOrEmpty(propertyName)?  mi.Name: $"{propertyName}.{mi.Name}";
+                var actualPropertyPath = string.IsNullOrEmpty(propertyName)
+                    ? accessor.Name
+                    : $"{propertyName}.{accessor.Name}";
 
-                object? firstValue = null;
-                object? secondValue = null;
-                Type memberType = DefaultType;
+                var firstValue = accessor.Getter(expected);
+                var secondValue = accessor.Getter(actual);
 
-                switch (mi.MemberType)
-                {
-                    case MemberTypes.Field:
-                        var field = type.GetField(name);
-                        firstValue = field!.GetValue(expected);
-                        secondValue = field.GetValue(actual);
-                        memberType = field.FieldType;
-                        break;
-                    case MemberTypes.Property:
-                        var del = PropertyHelper.Instance(type.GetProperty(name)!);
-                        firstValue = del.GetValue(expected);
-                        secondValue = del.GetValue(actual);
-                        memberType = del.Property.PropertyType;
-                        break;
-                }
-
-                var diffRes = (DeepEqualityResult) CallGetDistinctions.MakeGenericMethod(memberType)
-                    .Invoke(this, new[] {actualPropertyPath, firstValue, secondValue})!;
+                var diffRes = CachedDistinctionDelegates
+                    .GetOrAdd(accessor.MemberType, CreateDistinctionDelegate)
+                    .Invoke(this, actualPropertyPath, firstValue, secondValue);
 
                 if (diffRes.IsNotEmpty()) diff.AddRange(diffRes);
             }
@@ -62,8 +55,68 @@ namespace ObjectsComparator.Comparator.Strategies.Implementations
             return diff;
         }
 
-        public DeepEqualityResult GetDistinctions<T>(string propertyName, T expected, T actual) =>
-            _handler.RulesHandler.GetFor(typeof(T))
+        private static MemberAccessor[] CreateAccessors(Type type)
+        {
+            return type.GetMembers(BindingFlags.Public | BindingFlags.Instance)
+                .Where(x => x.MemberType is MemberTypes.Property or MemberTypes.Field)
+                .Select(CreateAccessor)
+                .Where(accessor => accessor is not null)
+                .Cast<MemberAccessor>()
+                .ToArray();
+        }
+
+        private static MemberAccessor? CreateAccessor(MemberInfo member)
+        {
+            switch (member)
+            {
+                case PropertyInfo { CanRead: true } property when property.GetIndexParameters().Length == 0:
+                    var helper = PropertyHelper.Instance(property);
+                    return new MemberAccessor(member.Name, helper.Property.PropertyType, helper.GetValue);
+                case FieldInfo field:
+                    return new MemberAccessor(member.Name, field.FieldType, field.GetValue);
+                default:
+                    return null;
+            }
+        }
+
+        private static GetDistinctionDelegate CreateDistinctionDelegate(Type memberType)
+        {
+            var method = CallGetDistinctions.MakeGenericMethod(memberType);
+
+            var strategyParameter = Expression.Parameter(typeof(CompareMembersStrategy), "strategy");
+            var propertyParameter = Expression.Parameter(typeof(string), "propertyName");
+            var expectedParameter = Expression.Parameter(typeof(object), "expected");
+            var actualParameter = Expression.Parameter(typeof(object), "actual");
+
+            var call = Expression.Call(
+                strategyParameter,
+                method,
+                propertyParameter,
+                Expression.Convert(expectedParameter, memberType),
+                Expression.Convert(actualParameter, memberType));
+
+            return Expression.Lambda<GetDistinctionDelegate>(
+                call,
+                strategyParameter,
+                propertyParameter,
+                expectedParameter,
+                actualParameter).Compile();
+        }
+
+        public DeepEqualityResult GetDistinctions<T>(string propertyName, T expected, T actual)
+        {
+            return _handler.RulesHandler.GetFor(typeof(T))
                 .Compare(expected, actual, propertyName);
+        }
+
+        private delegate DeepEqualityResult GetDistinctionDelegate(CompareMembersStrategy strategy, string propertyName,
+            object? expected, object? actual);
+
+        private sealed class MemberAccessor(string name, Type memberType, Func<object, object?> getter)
+        {
+            public string Name { get; } = name;
+            public Type MemberType { get; } = memberType;
+            public Func<object, object?> Getter { get; } = getter;
+        }
     }
 }

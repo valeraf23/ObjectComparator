@@ -9,7 +9,26 @@ namespace ObjectsComparator.Tests.TestModels
         public Vehicle Vehicle { get; set; }
         public Course[] Courses { get; set; }
     }
+    internal class LibraryWithOpaqueKeys
+    {
+        public Dictionary<OpaqueKey, Book> Books { get; set; } = new();
+    }
+    internal class OpaqueKey
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
 
+        public override bool Equals(object obj)
+        {
+            if (obj is not OpaqueKey other) return false;
+            return Id == other.Id && Name == other.Name;
+        }
+
+        public override int GetHashCode()
+        {
+            return EqualityComparer<int>.Default.GetHashCode(Id) * 397 ^ (Name?.GetHashCode() ?? 0);
+        }
+    }
     internal class GroupPortals1
     {
         public List<Course> Courses { get; set; }

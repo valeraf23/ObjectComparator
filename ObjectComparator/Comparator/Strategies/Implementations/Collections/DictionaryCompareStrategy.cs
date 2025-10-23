@@ -1,3 +1,5 @@
+using Newtonsoft.Json;
+using ObjectsComparator.Comparator.Helpers;
 using ObjectsComparator.Comparator.RepresentationDistinction;
 using ObjectsComparator.Helpers.Extensions;
 using System;
@@ -45,8 +47,23 @@ public class DictionaryCompareStrategy : BaseCollectionsCompareStrategy
         }
         else
         {
-            const string basePath = "'Dictionary has different length'";
-            diff.Add(new Distinction($"{propertyName}", expected.Count, actual.Count, basePath));
+            foreach (var key in removedKeys)
+            {
+                diff.Add(new Distinction(
+                    $"{propertyName}[{FormatKey(key)}]",
+                    FormatValue(expected[key]),
+                    null,
+                    "Removed"));
+            }
+
+            foreach (var key in addedKeys)
+            {
+                diff.Add(new Distinction(
+                    $"{propertyName}[{FormatKey(key)}]",
+                    null,
+                    FormatValue(actual[key]),
+                    "Added"));
+            }
         }
 
         var commonKeys = expectedKeys.Intersect(actualKeys);
@@ -57,12 +74,48 @@ public class DictionaryCompareStrategy : BaseCollectionsCompareStrategy
             var actualValue = actual[key];
 
             var diffRes = RulesHandler.GetFor(typeof(TValue))
-                .Compare(expectedValue, actualValue, $"{propertyName}[{key}]");
+                .Compare(expectedValue, actualValue, $"{propertyName}[{FormatKey(key)}]");
 
             diff.AddRange(diffRes);
         }
 
         return diff;
+    }
+
+    private static string FormatKey<TKey>(TKey key)
+    {
+        if (key is null) return "null";
+
+        var type = key.GetType();
+        if (type == typeof(string) || type.IsPrimitive || type.IsEnum || type.IsToStringOverridden())
+        {
+            return key.ToString()!;
+        }
+
+        try
+        {
+            return JsonConvert.SerializeObject(key, SerializerSettings.Settings);
+        }
+        catch
+        {
+            return key.GetHashCode().ToString();
+        }
+    }
+
+    private static object? FormatValue<TValue>(TValue value)
+    {
+        if (value is null)
+        {
+            return null;
+        }
+
+        var type = value.GetType();
+        if (type == typeof(string) || type.IsPrimitive || type.IsEnum || type.IsToStringOverridden())
+        {
+            return value;
+        }
+
+        return JsonConvert.SerializeObject(value, SerializerSettings.Settings);
     }
 
     public override DeepEqualityResult Compare<T>(T expected, T actual, string propertyName)
