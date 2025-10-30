@@ -50,7 +50,7 @@ dotnet add package ObjectComparator
 
 ## Getting Started
 
-ObjectComparator targets modern .NET versions (netstandard2.0 and higher). Install the NuGet package and add `using ObjectComparator;` to access the extension methods. The library works seamlessly in unit tests, integration tests, and production services.
+ObjectComparator targets modern .NET versions (netstandard2.1 and higher). Install the NuGet package and add `using ObjectComparator;` to access the extension methods. The library works seamlessly in unit tests, integration tests, and production services.
 
 ```csharp
 using ObjectsComparator;
