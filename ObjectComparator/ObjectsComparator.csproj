@@ -6,9 +6,9 @@
     <LangVersion>latest</LangVersion>
 
     <PackageId>ObjectComparator</PackageId>
-    <Version>3.6.5</Version>
+    <Version>3.6.6-beta.1</Version>
     <AssemblyVersion>3.6.0.0</AssemblyVersion>
-    <FileVersion>3.6.5.0</FileVersion>
+    <FileVersion>3.6.6.0</FileVersion>
 
     <Authors>Valerii Fedorenko</Authors>
     <Copyright>Copyright (c) 2022-2025 Valerii Fedorenko</Copyright>
@@ -26,7 +26,10 @@
     <Description>High-performance deep object comparison for .NET with customizable rules and strategy skipping.</Description>
     <PackageTags>ObjectComparison;DeepComparison;Equality;Diff;Reflection;Performance</PackageTags>
 
-    <PackageReleaseNotes>Performance improvements</PackageReleaseNotes>
+    <PackageReleaseNotes>Added opt‑in support for deep comparison across different runtime types with ComparatorOptions.AllowDifferentTypes(true).
+New DeeplyEqualsIgnoreObjectTypes convenience overload for cross‑type comparisons.
+Cross‑type comparisons now work for collections and dictionaries (element/value comparisons by matching members).
+Ignore‑path handling updated to respect the selected root type when comparing different types.</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>
