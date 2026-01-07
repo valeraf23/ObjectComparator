@@ -23,6 +23,7 @@ ObjectComparator is a high-performance .NET library designed for deep comparison
   - [DeeplyEquals when Equality Operator Is Overridden](#deeplyequals-when-equality-operator-is-overridden)
   - [Display Distinctions for Dictionary Types](#display-distinctions-for-dictionary-types)
   - [Comparison for Anonymous Types](#comparison-for-anonymous-types)
+  - [Comparison for Different Types](#comparison-for-different-types)
   - [Convert Comparison Result to JSON](#convert-comparison-result-to-json)
   - [Configuring the Comparison Pipeline](#configuring-the-comparison-pipeline)
 - [Working with the Source](#working-with-the-source)
@@ -409,6 +410,35 @@ var result = exp.DeeplyEquals(act);
     Path: "AnonymousType<Int32, String, Byte[]>.Nested[2]":
     Expected Value :3
     Actually Value :4
+*/
+```
+
+### Comparison for Different Types
+
+Compare objects with different types that share the same shape or property names.
+
+```csharp
+var expected = new LegacyStudent
+{
+    Name = "Alex",
+    Age = 20
+};
+
+var actual = new Student
+{
+    Name = "Alex",
+    Age = 21
+};
+
+var result = expected.DeeplyEquals(actual, options => options.AllowDifferentTypes());
+
+// Or use the convenience overload:
+var result2 = expected.DeeplyEqualsIgnoreObjectTypes(actual);
+
+/*
+    Path: "LegacyStudent.Age":
+    Expected Value: 20
+    Actual Value: 21
 */
 ```
 
