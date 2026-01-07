@@ -168,7 +168,7 @@ public sealed class Comparator
 
     private static CompareValuesDelegate CreateCompareValuesDelegate(Type expectedType)
     {
-        var method = typeof(CompareValues).GetMethod(nameof(CompareValues))!.MakeGenericMethod(expectedType);
+        var method = typeof(CompareValues).GetMethod(nameof(Compare))!.MakeGenericMethod(expectedType);
 
         var compareValuesParameter = Expression.Parameter(typeof(CompareValues), "compareValues");
         var expectedParameter = Expression.Parameter(typeof(object), "expected");
