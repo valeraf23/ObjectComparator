@@ -4,6 +4,7 @@ using ObjectsComparator.Comparator.RepresentationDistinction;
 using ObjectsComparator.Comparator.Rules;
 using ObjectsComparator.Helpers.Extensions;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -29,7 +30,22 @@ namespace ObjectsComparator.Comparator.Strategies.Implementations.Collections
 
         public override DeepEqualityResult Compare<T>(T expected, T actual, string propertyName)
         {
-            var genericType = GetGenericArgument(expected?.GetType() ?? typeof(T));
+            var expectedType = expected?.GetType() ?? typeof(T);
+            var actualType = actual?.GetType() ?? typeof(T);
+
+            if (Comparator.Options.DifferentTypesAllowed && expectedType != actualType)
+            {
+                var expectedHasElementType = TryGetGenericArgument(expectedType, out var expectedElementType);
+                var actualHasElementType = TryGetGenericArgument(actualType, out var actualElementType);
+
+                if (expectedHasElementType == false || actualHasElementType == false
+                    || expectedElementType != actualElementType)
+                {
+                    return CompareDifferentTypes(expected, actual, propertyName);
+                }
+            }
+
+            var genericType = GetGenericArgument(expectedType);
             var compareCollectionsMethod = CompareCollectionsMethod.MakeGenericMethod(genericType);
             return CollectionHelper.GetDelegateFor(compareCollectionsMethod)(expected, actual, propertyName, RulesHandler);
         }
@@ -39,6 +55,21 @@ namespace ObjectsComparator.Comparator.Strategies.Implementations.Collections
             return type.GetInterfaces().Prepend(type)
                 .Where(i => i.IsGenericType && i.GetGenericTypeDefinition() == ListType)
                 .Select(i => i.GetGenericArguments()[0]).First();
+        }
+
+        private static bool TryGetGenericArgument(Type type, out Type genericArgument)
+        {
+            var interfaceType = type.GetInterfaces().Prepend(type)
+                .FirstOrDefault(i => i.IsGenericType && i.GetGenericTypeDefinition() == ListType);
+
+            if (interfaceType is null)
+            {
+                genericArgument = typeof(object);
+                return false;
+            }
+
+            genericArgument = interfaceType.GetGenericArguments()[0];
+            return true;
         }
 
         private static object GetFormattedValue<T>(T item, bool isPrimitive, bool couldToString)
@@ -105,6 +136,22 @@ namespace ObjectsComparator.Comparator.Strategies.Implementations.Collections
             return JsonConvert.SerializeObject(value, SerializerSettings.Settings);
         }
 
+        private static object? FormatValue(object? value)
+        {
+            if (value is null)
+            {
+                return null;
+            }
+
+            var type = value.GetType();
+            if (type == typeof(string) || type.IsPrimitive || type.IsEnum || type.IsToStringOverridden())
+            {
+                return value;
+            }
+
+            return JsonConvert.SerializeObject(value, SerializerSettings.Settings);
+        }
+
         private static DeepEqualityResult CompareCollections<T>(
             IEnumerable<T> expected, 
             IEnumerable<T> actual, 
@@ -136,6 +183,95 @@ namespace ObjectsComparator.Comparator.Strategies.Implementations.Collections
                 default:
                     return source.ToList();
             }
+        }
+
+        internal DeepEqualityResult CompareDifferentTypes(object expected, object actual, string propertyName)
+        {
+            if (expected is not IEnumerable expectedEnumerable || actual is not IEnumerable actualEnumerable)
+            {
+                return DeepEqualityResult.Create(propertyName, expected, actual);
+            }
+
+            var exp = EnsureReadOnlyList(expectedEnumerable);
+            var act = EnsureReadOnlyList(actualEnumerable);
+
+            var expectedType = expected.GetType();
+            var actualType = actual.GetType();
+
+            var expectedElementType = TryGetGenericArgument(expectedType, out var expType) ? expType : typeof(object);
+            var actualElementType = TryGetGenericArgument(actualType, out var actType) ? actType : typeof(object);
+
+            return CompareObjectLists(exp, act, propertyName, expectedElementType, actualElementType);
+        }
+
+        private DeepEqualityResult CompareObjectLists(IReadOnlyList<object?> expected, IReadOnlyList<object?> actual,
+            string propertyName, Type expectedElementType, Type actualElementType)
+        {
+            var diff = DeepEqualityResult.None();
+            var minCount = Math.Min(expected.Count, actual.Count);
+
+            for (var i = 0; i < minCount; i++)
+            {
+                var expectedValue = expected[i];
+                var actualValue = actual[i];
+
+                var expectedValueType = expectedValue?.GetType() ?? expectedElementType;
+                var actualValueType = actualValue?.GetType() ?? actualElementType;
+
+                var elementDiff = Comparator.CompareWithTypes(expectedValue, actualValue, $"{propertyName}[{i}]",
+                    expectedValueType, actualValueType);
+
+                diff.AddRange(elementDiff);
+            }
+
+            if (expected.Count > actual.Count)
+            {
+                AddExtraDifferences(expected, actual.Count, propertyName, "Removed", diff);
+            }
+            else if (actual.Count > expected.Count)
+            {
+                AddExtraDifferences(actual, expected.Count, propertyName, "Added", diff);
+            }
+
+            return diff;
+        }
+
+        private static void AddExtraDifferences(
+            IReadOnlyList<object?> source,
+            int startIndex,
+            string propertyName,
+            string action,
+            DeepEqualityResult diff)
+        {
+            for (var i = startIndex; i < source.Count; i++)
+            {
+                var value = FormatValue(source[i]);
+                if (action == "Removed")
+                {
+                    diff.Add(new Distinction($"{propertyName}[{i}]", value, null, action));
+                }
+                else if (action == "Added")
+                {
+                    diff.Add(new Distinction($"{propertyName}[{i}]", null, value, action));
+                }
+            }
+        }
+
+        private static IReadOnlyList<object?> EnsureReadOnlyList(IEnumerable source)
+        {
+            if (source is null)
+            {
+                return Array.Empty<object?>();
+            }
+
+            if (source is ICollection collection)
+            {
+                var array = new object?[collection.Count];
+                collection.CopyTo(array, 0);
+                return array;
+            }
+
+            return source.Cast<object?>().ToList();
         }
     }
 }

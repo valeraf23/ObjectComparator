@@ -8,6 +8,7 @@ namespace ObjectsComparator.Comparator.Strategies.Implementations.Collections
     public abstract class BaseCollectionsCompareStrategy : ICollectionsCompareStrategy
     {
         private readonly Comparator _comparator;
+        protected Comparator Comparator => _comparator;
         protected RulesHandler RulesHandler => _comparator.RulesHandler;
         protected BaseCollectionsCompareStrategy(Comparator comparator)
         {

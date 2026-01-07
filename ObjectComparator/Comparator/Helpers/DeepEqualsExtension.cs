@@ -20,6 +20,23 @@ namespace ObjectsComparator.Comparator.Helpers
         public static DeepEqualityResult DeeplyEquals<T>(this T expected, T actual, params string[] ignore) =>
             DeeplyEquals(expected, actual, new Strategies<T>(), ignore);
 
+        public static DeepEqualityResult DeeplyEquals<TExpected, TActual>(this TExpected expected, TActual actual,
+            Action<ComparatorOptions> optionsBuilder, params string[] ignore)
+        {
+            var options = new ComparatorOptions();
+            optionsBuilder?.Invoke(options);
+
+            var ignoreFullPath = ConvertToFullPath(ignore,
+                GetIgnoreTypeName(expected, actual, typeof(TExpected), options));
+
+            return DeeplyEquals<object?>(expected, actual, new Dictionary<string, ICustomCompareValues>(),
+                ignoreFullPath.Contains, options);
+        }
+
+        public static DeepEqualityResult DeeplyEqualsIgnoreObjectTypes<TExpected, TActual>(this TExpected expected,
+            TActual actual, params string[] ignore) =>
+            DeeplyEquals(expected, actual, options => options.AllowDifferentTypes(), ignore);
+
         public static DeepEqualityResult DeeplyEquals<T>(this T expected, T actual, Strategies<T> custom,
             params string[] ignore)
         {
@@ -50,7 +67,7 @@ namespace ObjectsComparator.Comparator.Helpers
             Func<Strategies<T>, IEnumerable<KeyValuePair<string, ICustomCompareValues>>> strategies,
             ComparatorOptions options, params string[] ignore)
         {
-            var ignoreFullPath = ConvertToFullPath(ignore, typeof(T).ToFriendlyTypeName());
+            var ignoreFullPath = ConvertToFullPath(ignore, GetIgnoreTypeName(expected, actual, typeof(T), options));
             var customStr = strategies(new Strategies<T>());
             return DeeplyEquals(expected, actual, customStr.ToDictionary(x => x.Key, x => x.Value),
                 ignoreFullPath.Contains, options);
@@ -63,7 +80,7 @@ namespace ObjectsComparator.Comparator.Helpers
         public static DeepEqualityResult DeeplyEquals<T>(this T expected, T actual, Strategies<T> custom,
             ComparatorOptions options, params string[] ignore)
         {
-            var ignoreFullPath = ConvertToFullPath(ignore, typeof(T).ToFriendlyTypeName());
+            var ignoreFullPath = ConvertToFullPath(ignore, GetIgnoreTypeName(expected, actual, typeof(T), options));
             return DeeplyEquals(expected, actual, custom.ToDictionary(x => x.Key, x => x.Value),
                 ignoreFullPath.Contains, options);
         }
@@ -98,6 +115,18 @@ namespace ObjectsComparator.Comparator.Helpers
             }
 
             return set.ToList();
+        }
+
+        private static string GetIgnoreTypeName(object? expected, object? actual, Type defaultType,
+            ComparatorOptions? options)
+        {
+            if (options?.DifferentTypesAllowed == true)
+            {
+                if (expected != null) return expected.GetType().ToFriendlyTypeName();
+                if (actual != null) return actual.GetType().ToFriendlyTypeName();
+            }
+
+            return defaultType.ToFriendlyTypeName();
         }
     }
 }

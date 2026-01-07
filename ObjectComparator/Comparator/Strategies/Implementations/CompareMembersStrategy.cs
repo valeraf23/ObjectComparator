@@ -4,6 +4,7 @@ using ObjectsComparator.Helpers;
 using ObjectsComparator.Helpers.Extensions;
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -17,6 +18,7 @@ namespace ObjectsComparator.Comparator.Strategies.Implementations
 
         private static readonly ConcurrentDictionary<Type, MemberAccessor[]> CachedAccessors = new();
         private static readonly ConcurrentDictionary<Type, GetDistinctionDelegate> CachedDistinctionDelegates = new();
+        private static readonly ConcurrentDictionary<Type, IReadOnlyDictionary<string, MemberAccessor>> CachedAccessorsByName = new();
 
         private readonly Comparator _handler;
 
@@ -35,6 +37,12 @@ namespace ObjectsComparator.Comparator.Strategies.Implementations
             if (ReferenceEquals(expected, actual)) return DeepEqualityResult.None();
             var diff = DeepEqualityResult.Create();
             var type = expected.GetType();
+            var actualType = actual.GetType();
+
+            if (_handler.Options.DifferentTypesAllowed && type != actualType)
+            {
+                return CompareDifferentTypes(expected, actual, propertyName);
+            }
 
             foreach (var accessor in CachedAccessors.GetOrAdd(type, CreateAccessors))
             {
@@ -48,6 +56,43 @@ namespace ObjectsComparator.Comparator.Strategies.Implementations
                 var diffRes = CachedDistinctionDelegates
                     .GetOrAdd(accessor.MemberType, CreateDistinctionDelegate)
                     .Invoke(this, actualPropertyPath, firstValue, secondValue);
+
+                if (diffRes.IsNotEmpty()) diff.AddRange(diffRes);
+            }
+
+            return diff;
+        }
+
+        internal DeepEqualityResult CompareDifferentTypes(object expected, object actual, string propertyName)
+        {
+            if (ReferenceEquals(expected, actual)) return DeepEqualityResult.None();
+
+            var diff = DeepEqualityResult.Create();
+            var expectedType = expected.GetType();
+            var actualType = actual.GetType();
+
+            var expectedAccessors = CachedAccessorsByName.GetOrAdd(expectedType, CreateAccessorsByName);
+            var actualAccessors = CachedAccessorsByName.GetOrAdd(actualType, CreateAccessorsByName);
+
+            foreach (var accessor in expectedAccessors)
+            {
+                if (actualAccessors.TryGetValue(accessor.Key, out var actualAccessor) == false)
+                {
+                    continue;
+                }
+
+                var actualPropertyPath = string.IsNullOrEmpty(propertyName)
+                    ? accessor.Key
+                    : $"{propertyName}.{accessor.Key}";
+
+                var expectedValue = accessor.Value.Getter(expected);
+                var actualValue = actualAccessor.Getter(actual);
+
+                var expectedValueType = accessor.Value.MemberType;
+                var actualValueType = actualValue?.GetType() ?? actualAccessor.MemberType;
+
+                var diffRes = _handler.CompareWithTypes(expectedValue, actualValue, actualPropertyPath,
+                    expectedValueType, actualValueType);
 
                 if (diffRes.IsNotEmpty()) diff.AddRange(diffRes);
             }
@@ -77,6 +122,17 @@ namespace ObjectsComparator.Comparator.Strategies.Implementations
                 default:
                     return null;
             }
+        }
+
+        private static IReadOnlyDictionary<string, MemberAccessor> CreateAccessorsByName(Type type)
+        {
+            var map = new Dictionary<string, MemberAccessor>(StringComparer.Ordinal);
+            foreach (var accessor in CreateAccessors(type))
+            {
+                if (!map.TryAdd(accessor.Name, accessor)) continue;
+            }
+
+            return map;
         }
 
         private static GetDistinctionDelegate CreateDistinctionDelegate(Type memberType)

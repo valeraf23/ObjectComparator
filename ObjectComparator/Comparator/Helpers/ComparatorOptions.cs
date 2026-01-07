@@ -7,6 +7,7 @@ namespace ObjectsComparator.Comparator.Helpers
     public sealed class ComparatorOptions
     {
         public ISet<StrategyType> SkippedStrategies { get; }
+        public bool DifferentTypesAllowed { get; private set; }
 
         public ComparatorOptions(params StrategyType[] skipList)
         {
@@ -34,6 +35,12 @@ namespace ObjectsComparator.Comparator.Helpers
                 SkippedStrategies.Add(s);
             }
 
+            return this;
+        }
+
+        public ComparatorOptions AllowDifferentTypes(bool allow = true)
+        {
+            DifferentTypesAllowed = allow;
             return this;
         }
 

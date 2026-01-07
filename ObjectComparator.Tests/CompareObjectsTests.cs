@@ -1197,6 +1197,99 @@ namespace ObjectsComparator.Tests
         }
 
         [Test]
+        public void DeeplyEquals_ShouldCompareDifferentTypes_WhenAllowed()
+        {
+            var expected = new StudentDto
+            {
+                Name = "Alex",
+                Age = 20,
+                Courses = new[]
+                {
+                    new CourseDto { Name = "Math", Credits = 3 }
+                }
+            };
+
+            var actual = new StudentEntity
+            {
+                Name = "Alex",
+                Age = 21,
+                Courses = new[]
+                {
+                    new CourseEntity { Name = "Math", Credits = 3 }
+                }
+            };
+
+            var result = expected.DeeplyEquals(actual, options => options.AllowDifferentTypes(true));
+
+            result.Should().BeEquivalentTo(new[]
+            {
+                new Distinction("StudentDto.Age", 20, 21)
+            });
+        }
+
+        [Test]
+        public void DeeplyEquals_ShouldCompareDifferentTypeCollections_WhenAllowed()
+        {
+            var expected = new[]
+            {
+                new StudentDto
+                {
+                    Name = "Alex",
+                    Age = 20,
+                    Courses = new[]
+                    {
+                        new CourseDto { Name = "Math", Credits = 3 }
+                    }
+                }
+            };
+
+            var actual = new[]
+            {
+                new StudentEntity
+                {
+                    Name = "Alex",
+                    Age = 20,
+                    Courses = new[]
+                    {
+                        new CourseEntity { Name = "Math", Credits = 3 }
+                    }
+                }
+            };
+
+            var result = expected.DeeplyEquals(actual, options => options.AllowDifferentTypes(true));
+
+            result.Should().BeEmpty();
+        }
+
+        [Test]
+        public void DeeplyEqualsIgnoreObjectTypes_ShouldCompareDifferentTypes()
+        {
+            var expected = new StudentDto
+            {
+                Name = "Alex",
+                Age = 20,
+                Courses = new[]
+                {
+                    new CourseDto { Name = "Math", Credits = 3 }
+                }
+            };
+
+            var actual = new StudentEntity
+            {
+                Name = "Alex",
+                Age = 20,
+                Courses = new[]
+                {
+                    new CourseEntity { Name = "Math", Credits = 3 }
+                }
+            };
+
+            var result = expected.DeeplyEqualsIgnoreObjectTypes(actual);
+
+            result.Should().BeEmpty();
+        }
+
+        [Test]
         public void MemberComparison_WhenOverridesEqualsSkipped_ShouldReportNestedPropertyDifferences()
         {
             var expected = new StudentEq { Age = 3, Courses = new[] { new CourseE { Name = "fff" } } };

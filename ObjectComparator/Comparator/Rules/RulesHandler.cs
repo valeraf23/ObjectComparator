@@ -27,5 +27,10 @@ namespace ObjectsComparator.Comparator.Rules
 
             return new CompareValues(rule, _strategies, _ignoreStrategy);
         }
+
+        internal bool IsIgnored(string propertyName)
+        {
+            return _ignoreStrategy(propertyName);
+        }
     }
 }
