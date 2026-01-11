@@ -1350,6 +1350,47 @@ namespace ObjectsComparator.Tests
             res.Should().BeEmpty();
         }
 
+
+        [Test]
+        public void DeeplyEquals_ShouldIgnoreCollectionMemberProperty_WhenIgnoreTokenOmitsIndex()
+        {
+            var expected = new List<ClassA>
+            {
+                new() { One = "1" },
+                new() { Two = 2 }
+            };
+
+            var actual = new List<ClassA>
+            {
+                new() { One = "2" },
+                new() { Two = 2 }
+            };
+
+            var result = expected.DeeplyEquals(actual, "One");
+
+            result.Should().BeEmpty();
+        }
+
+        [Test]
+        public void DeeplyEqualsIgnoreObjectTypes_ShouldIgnoreCollectionMember_WhenIgnoreTokenOmitsIndex()
+        {
+            var expected = new List<ClassA>
+            {
+                new() { One = "1" },
+                new() { Two = 2 }
+            };
+
+            var actual = new List<ClassB>
+            {
+                new() { One = "1" },
+                new() { Two = new SomeClass() }
+            };
+
+            var result = expected.DeeplyEqualsIgnoreObjectTypes(actual, "Two");
+
+            result.Should().BeEmpty();
+        }
+
         [Test]
         public void DictionaryVerifications_Complex_keys_produce_detailed_differences()
         {

@@ -20,6 +20,8 @@ namespace ObjectsComparator.Comparator.Strategies.Implementations
         private static readonly ConcurrentDictionary<Type, GetDistinctionDelegate> CachedDistinctionDelegates = new();
         private static readonly ConcurrentDictionary<Type, IReadOnlyDictionary<string, MemberAccessor>> CachedAccessorsByName = new();
 
+        private const string NullDisplayValue = "null";
+
         private readonly Comparator _handler;
 
         public CompareMembersStrategy(Comparator handler)
@@ -63,9 +65,14 @@ namespace ObjectsComparator.Comparator.Strategies.Implementations
             return diff;
         }
 
-        internal DeepEqualityResult CompareDifferentTypes(object expected, object actual, string propertyName)
+        internal DeepEqualityResult CompareDifferentTypes(object? expected, object? actual, string propertyName)
         {
-            if (ReferenceEquals(expected, actual)) return DeepEqualityResult.None();
+            if (ReferenceEquals(expected, actual) || expected is null && actual is null) return DeepEqualityResult.None();
+
+            if (expected is null || actual is null)
+            {
+                return DeepEqualityResult.Create(propertyName, expected ?? NullDisplayValue, actual ?? NullDisplayValue);
+            }
 
             var diff = DeepEqualityResult.Create();
             var expectedType = expected.GetType();
@@ -100,15 +107,15 @@ namespace ObjectsComparator.Comparator.Strategies.Implementations
             return diff;
         }
 
-        private static MemberAccessor[] CreateAccessors(Type type)
-        {
-            return type.GetMembers(BindingFlags.Public | BindingFlags.Instance)
-                .Where(x => x.MemberType is MemberTypes.Property or MemberTypes.Field)
-                .Select(CreateAccessor)
-                .Where(accessor => accessor is not null)
-                .Cast<MemberAccessor>()
-                .ToArray();
-        }
+            private static MemberAccessor[] CreateAccessors(Type type)
+            {
+                return type.GetMembers(BindingFlags.Public | BindingFlags.Instance)
+                    .Where(x => x.MemberType is MemberTypes.Property or MemberTypes.Field)
+                    .Select(CreateAccessor)
+                    .Where(accessor => accessor is not null)
+                    .Cast<MemberAccessor>()
+                    .ToArray();
+            }
 
         private static MemberAccessor? CreateAccessor(MemberInfo member)
         {
@@ -126,12 +133,21 @@ namespace ObjectsComparator.Comparator.Strategies.Implementations
 
         private static IReadOnlyDictionary<string, MemberAccessor> CreateAccessorsByName(Type type)
         {
-            var map = new Dictionary<string, MemberAccessor>(StringComparer.Ordinal);
-            foreach (var accessor in CreateAccessors(type))
+            var members = type.GetMembers(BindingFlags.Public | BindingFlags.Instance);
+            var map = new Dictionary<string, MemberAccessor>(members.Length, StringComparer.Ordinal);
+            
+            foreach (var member in members)
             {
-                if (!map.TryAdd(accessor.Name, accessor)) continue;
+                if (member.MemberType is not (MemberTypes.Property or MemberTypes.Field))
+                    continue;
+                    
+                var accessor = CreateAccessor(member);
+                if (accessor is not null)
+                {
+                    map.TryAdd(accessor.Name, accessor);
+                }
             }
-
+            
             return map;
         }
 

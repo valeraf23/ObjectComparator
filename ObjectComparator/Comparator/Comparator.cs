@@ -18,7 +18,6 @@ namespace ObjectsComparator.Comparator;
 public sealed class Comparator
 {
     public readonly RulesHandler RulesHandler;
-    private readonly ComparatorOptions _options;
     private readonly CompareMembersStrategy _compareMembersStrategy;
     private readonly CollectionsCompareStrategy _collectionsCompareStrategy;
     private readonly DictionaryCompareStrategy _dictionaryCompareStrategy;
@@ -27,12 +26,16 @@ public sealed class Comparator
     private static readonly Type EnumerableType = typeof(IEnumerable<>);
 
     private static readonly ConcurrentDictionary<Type, CompareValuesDelegate> CompareValuesDelegates = new();
+    private static readonly ConcurrentDictionary<Type, bool> IsDictionaryCache = new();
+    private static readonly ConcurrentDictionary<Type, bool> IsCollectionCache = new();
 
-    internal ComparatorOptions Options => _options;
+    private const string NullDisplayValue = "null";
+
+    internal ComparatorOptions Options { get; }
 
     public Comparator(Dictionary<string, ICustomCompareValues> customStrategies, Func<string, bool> ignoreStrategy, ComparatorOptions options)
     {
-        _options = options ?? new ComparatorOptions();
+        Options = options ?? new ComparatorOptions();
         _compareMembersStrategy = new CompareMembersStrategy(this);
         _collectionsCompareStrategy = new CollectionsCompareStrategy(this);
         _dictionaryCompareStrategy = new DictionaryCompareStrategy(this);
@@ -42,17 +45,17 @@ public sealed class Comparator
             Rule.CreateFor(new ComparePrimitiveTypesStrategy())
         };
 
-        if (_options.IsSkipped(StrategyType.Equality) == false)
+        if (Options.IsSkipped(StrategyType.Equality) == false)
         {
             rules.Add(Rule.CreateFor(new EqualityStrategy()));
         }
 
-        if (_options.IsSkipped(StrategyType.OverridesEquals) == false)
+        if (Options.IsSkipped(StrategyType.OverridesEquals) == false)
         {
             rules.Add(Rule.CreateFor(new OverridesEqualsStrategy()));
         }
 
-        rules.Add(_options.IsSkipped(StrategyType.CompareTo) == false
+        rules.Add(Options.IsSkipped(StrategyType.CompareTo) == false
             ? Rule.CreateFor(new ComparablesStrategy())
             : Rule.CreateFor(new ComparablesStrategy(true)));
 
@@ -72,7 +75,7 @@ public sealed class Comparator
 
         if (type != actualType)
         {
-            if (_options.DifferentTypesAllowed)
+            if (Options.DifferentTypesAllowed)
             {
                 if (expected is null && actual is not null)
                 {
@@ -98,7 +101,7 @@ public sealed class Comparator
             return DeepEqualityResult.None();
         }
 
-        if (_options.DifferentTypesAllowed && type != actualType)
+        if (Options.DifferentTypesAllowed && type != actualType)
         {
             return CompareWithTypes(expected, actual, typeName, type, actualType);
         }
@@ -111,31 +114,26 @@ public sealed class Comparator
     internal DeepEqualityResult CompareWithTypes(object? expected, object? actual, string propertyName, Type expectedType,
         Type actualType)
     {
-        if (_options.DifferentTypesAllowed && IsCompatible(expectedType, actualType, expected, actual) == false)
+        if (!Options.DifferentTypesAllowed || IsCompatible(expectedType, actualType, expected, actual))
         {
-            return CompareDifferentTypes(expected, actual, propertyName, expectedType, actualType);
+            var comparer = RulesHandler.GetFor(expectedType);
+            return CompareValues(comparer, expected, actual, propertyName, expectedType);
         }
 
-        var comparer = RulesHandler.GetFor(expectedType);
-        return CompareValues(comparer, expected, actual, propertyName, expectedType);
+        return CompareDifferentTypes(expected, actual, propertyName, expectedType, actualType);
     }
 
     private DeepEqualityResult CompareDifferentTypes(object? expected, object? actual, string propertyName, Type expectedType,
         Type actualType)
     {
-        if (RulesHandler.IsIgnored(propertyName))
-        {
-            return DeepEqualityResult.None();
-        }
-
-        if (expected is null && actual is null)
+        if (RulesHandler.IsIgnored(propertyName) || expected is null && actual is null)
         {
             return DeepEqualityResult.None();
         }
 
         if (expected is null || actual is null)
         {
-            return DeepEqualityResult.Create(propertyName, expected ?? "null", actual ?? "null");
+            return DeepEqualityResult.Create(propertyName, expected ?? NullDisplayValue, actual ?? NullDisplayValue);
         }
 
         if (expectedType.IsValueType || actualType.IsValueType
@@ -186,19 +184,18 @@ public sealed class Comparator
 
     private static bool IsDictionaryType(Type type)
     {
-        return type.GetInterfaces().Prepend(type)
-            .Any(interfaceType => interfaceType.IsGenericType && interfaceType.GetGenericTypeDefinition() == DictionaryType);
+        return IsDictionaryCache.GetOrAdd(type, static t =>
+            t.GetInterfaces().Prepend(t)
+                .Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == DictionaryType));
     }
 
     private static bool IsCollectionType(Type type)
     {
-        if (type == typeof(string))
-        {
-            return false;
-        }
-
-        return type.GetInterfaces().Prepend(type)
-            .Any(interfaceType => interfaceType.IsGenericType && interfaceType.GetGenericTypeDefinition() == EnumerableType);
+        if (type == typeof(string)) return false;
+        
+        return IsCollectionCache.GetOrAdd(type, static t =>
+            t.GetInterfaces().Prepend(t)
+                .Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == EnumerableType));
     }
 
     private static bool IsCompatible(Type expectedType, Type actualType, object? expected, object? actual)
