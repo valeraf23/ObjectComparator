@@ -18,74 +18,71 @@ namespace ObjectsComparator.Comparator.Helpers
             return DeepComparisonJsonConverter.ToJson(distinctions);
         }
 
-        extension<T>(T expected)
+        public static DeepEqualityResult DeeplyEquals<T>(this T expected, T actual, params string[] ignore) =>
+            DeeplyEquals(expected, actual, new Strategies<T>(), ignore);
+
+        public static DeepEqualityResult DeeplyEquals<T, TActual>(this T expected, TActual actual,
+            Action<ComparatorOptions> optionsBuilder, params string[] ignore)
         {
-            public DeepEqualityResult DeeplyEquals(T actual, params string[] ignore) =>
-                DeeplyEquals(expected, actual, new Strategies<T>(), ignore);
+            var options = new ComparatorOptions();
+            optionsBuilder?.Invoke(options);
 
-            public DeepEqualityResult DeeplyEquals<TActual>(TActual actual,
-                Action<ComparatorOptions> optionsBuilder, params string[] ignore)
-            {
-                var options = new ComparatorOptions();
-                optionsBuilder?.Invoke(options);
+            var ignoreStrategy = CreateIgnoreStrategy(ignore,
+                GetIgnoreTypeName(expected, actual, typeof(T), options));
 
-                var ignoreStrategy = CreateIgnoreStrategy(ignore,
-                    GetIgnoreTypeName(expected, actual, typeof(T), options));
+            return DeeplyEquals<object?>(expected, actual, new Dictionary<string, ICustomCompareValues>(),
+                ignoreStrategy, options);
+        }
 
-                return DeeplyEquals<object?>(expected, actual, new Dictionary<string, ICustomCompareValues>(),
-                    ignoreStrategy, options);
-            }
+        public static DeepEqualityResult DeeplyEqualsIgnoreObjectTypes<T, TActual>(this T expected, TActual actual, params string[] ignore) =>
+            DeeplyEquals(expected, actual, options => options.AllowDifferentTypes(), ignore);
 
-            public DeepEqualityResult DeeplyEqualsIgnoreObjectTypes<TActual>(TActual actual, params string[] ignore) =>
-                DeeplyEquals(expected, actual, options => options.AllowDifferentTypes(), ignore);
+        public static DeepEqualityResult DeeplyEquals<T>(this T expected, T actual, Strategies<T> custom,
+            params string[] ignore)
+        {
+            var ignoreStrategy = CreateIgnoreStrategy(ignore, typeof(T).ToFriendlyTypeName());
+            return DeeplyEquals(expected, actual, custom.ToDictionary(x => x.Key, x => x.Value),
+                ignoreStrategy);
+        }
 
-            public DeepEqualityResult DeeplyEquals(T actual, Strategies<T> custom,
-                params string[] ignore)
-            {
-                var ignoreStrategy = CreateIgnoreStrategy(ignore, typeof(T).ToFriendlyTypeName());
-                return DeeplyEquals(expected, actual, custom.ToDictionary(x => x.Key, x => x.Value),
-                    ignoreStrategy);
-            }
+        public static DeepEqualityResult DeeplyEquals<T>(this T expected, T actual,
+            Func<Strategies<T>, IEnumerable<KeyValuePair<string, ICustomCompareValues>>> strategies,
+            params string[] ignore)
+        {
+            var ignoreStrategy = CreateIgnoreStrategy(ignore, typeof(T).ToFriendlyTypeName());
+            var customStr = strategies(new Strategies<T>());
+            return DeeplyEquals(expected, actual, customStr.ToDictionary(x => x.Key, x => x.Value),
+                ignoreStrategy);
+        }
 
-            public DeepEqualityResult DeeplyEquals(T actual,
-                Func<Strategies<T>, IEnumerable<KeyValuePair<string, ICustomCompareValues>>> strategies,
-                params string[] ignore)
-            {
-                var ignoreStrategy = CreateIgnoreStrategy(ignore, typeof(T).ToFriendlyTypeName());
-                var customStr = strategies(new Strategies<T>());
-                return DeeplyEquals(expected, actual, customStr.ToDictionary(x => x.Key, x => x.Value),
-                    ignoreStrategy);
-            }
+        public static DeepEqualityResult
+            DeeplyEquals<T>(this T expected, T actual, Func<string, bool> ignoreStrategy) =>
+            DeeplyEquals(expected, actual, new Dictionary<string, ICustomCompareValues>(), ignoreStrategy);
 
-            public DeepEqualityResult
-                DeeplyEquals(T actual, Func<string, bool> ignoreStrategy) =>
-                DeeplyEquals(expected, actual, new Dictionary<string, ICustomCompareValues>(), ignoreStrategy);
+        public static DeepEqualityResult DeeplyEquals<T>(this T expected, T actual, Func<string, bool> ignoreStrategy,
+            ComparatorOptions options) =>
+            DeeplyEquals(expected, actual, new Dictionary<string, ICustomCompareValues>(), ignoreStrategy, options);
 
-            public DeepEqualityResult DeeplyEquals(T actual, Func<string, bool> ignoreStrategy,
-                ComparatorOptions options) =>
-                DeeplyEquals(expected, actual, new Dictionary<string, ICustomCompareValues>(), ignoreStrategy, options);
+        public static DeepEqualityResult DeeplyEquals<T>(this T expected, T actual,
+            Func<Strategies<T>, IEnumerable<KeyValuePair<string, ICustomCompareValues>>> strategies,
+            ComparatorOptions options, params string[] ignore)
+        {
+            var ignoreStrategy = CreateIgnoreStrategy(ignore, GetIgnoreTypeName(expected, actual, typeof(T), options));
+            var customStr = strategies(new Strategies<T>());
+            return DeeplyEquals(expected, actual, customStr.ToDictionary(x => x.Key, x => x.Value),
+                ignoreStrategy, options);
+        }
 
-            public DeepEqualityResult DeeplyEquals(T actual,
-                Func<Strategies<T>, IEnumerable<KeyValuePair<string, ICustomCompareValues>>> strategies,
-                ComparatorOptions options, params string[] ignore)
-            {
-                var ignoreStrategy = CreateIgnoreStrategy(ignore, GetIgnoreTypeName(expected, actual, typeof(T), options));
-                var customStr = strategies(new Strategies<T>());
-                return DeeplyEquals(expected, actual, customStr.ToDictionary(x => x.Key, x => x.Value),
-                    ignoreStrategy, options);
-            }
+        public static DeepEqualityResult DeeplyEquals<T>(this T expected, T actual, ComparatorOptions options,
+            params string[] ignore) =>
+            DeeplyEquals(expected, actual, new Strategies<T>(), options, ignore);
 
-            public DeepEqualityResult DeeplyEquals(T actual, ComparatorOptions options,
-                params string[] ignore) =>
-                DeeplyEquals(expected, actual, new Strategies<T>(), options, ignore);
-
-            public DeepEqualityResult DeeplyEquals(T actual, Strategies<T> custom,
-                ComparatorOptions options, params string[] ignore)
-            {
-                var ignoreStrategy = CreateIgnoreStrategy(ignore, GetIgnoreTypeName(expected, actual, typeof(T), options));
-                return DeeplyEquals(expected, actual, custom.ToDictionary(x => x.Key, x => x.Value),
-                    ignoreStrategy, options);
-            }
+        public static DeepEqualityResult DeeplyEquals<T>(this T expected, T actual, Strategies<T> custom,
+            ComparatorOptions options, params string[] ignore)
+        {
+            var ignoreStrategy = CreateIgnoreStrategy(ignore, GetIgnoreTypeName(expected, actual, typeof(T), options));
+            return DeeplyEquals(expected, actual, custom.ToDictionary(x => x.Key, x => x.Value),
+                ignoreStrategy, options);
         }
 
         public static DeepEqualityResult DeeplyEquals<T>(T expected, T actual,
