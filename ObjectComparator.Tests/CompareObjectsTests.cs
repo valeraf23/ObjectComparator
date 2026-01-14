@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using FluentAssertions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
@@ -1284,7 +1284,7 @@ namespace ObjectsComparator.Tests
                 }
             };
 
-            var result = expected.DeeplyEqualsIgnoreObjectTypes(actual);
+            var result = expected.DeeplyEquals(actual, options => options.AllowDifferentTypes());
 
             result.Should().BeEmpty();
         }
@@ -1386,7 +1386,7 @@ namespace ObjectsComparator.Tests
                 new() { Two = new SomeClass() }
             };
 
-            var result = expected.DeeplyEqualsIgnoreObjectTypes(actual, "Two");
+            var result = expected.DeeplyEquals(actual, options => options.AllowDifferentTypes(), "Two");
 
             result.Should().BeEmpty();
         }
