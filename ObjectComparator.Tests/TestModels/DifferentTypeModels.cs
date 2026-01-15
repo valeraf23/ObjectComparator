@@ -25,4 +25,21 @@ namespace ObjectsComparator.Tests.TestModels
         public string Name { get; set; }
         public int Credits { get; set; }
     }
+
+    // Models for testing combined strategies + options + ignore with different types
+    internal class VehicleDto
+    {
+        public int Id { get; set; }
+        public string Model { get; set; }
+        public string Description { get; set; }
+        public string InternalCode { get; set; }
+    }
+
+    internal class VehicleEntity
+    {
+        public int Id { get; set; }
+        public string Model { get; set; }
+        public string Description { get; set; }
+        public string InternalCode { get; set; }
+    }
 }

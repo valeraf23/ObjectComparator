@@ -1392,6 +1392,109 @@ namespace ObjectsComparator.Tests
         }
 
         [Test]
+        public void DeeplyEquals_DifferentTypes_WithStrategiesOptionsAndIgnore_ShouldWork()
+        {
+            // Arrange: DTO has empty string, Entity has null - should be treated as equal via custom strategy
+            var expected = new VehicleDto
+            {
+                Id = 1,
+                Model = "",
+                Description = "Test",
+                InternalCode = "ABC"
+            };
+
+            var actual = new VehicleEntity
+            {
+                Id = 1,
+                Model = null,
+                Description = "Test",
+                InternalCode = "XYZ" 
+            };
+
+            // Act: Combine all three features:
+            // 1. Different types (AllowDifferentTypes)
+            // 2. Custom strategy (treat null and empty as equal for Model)
+            // 3. Ignore property (InternalCode)
+            var result = expected.DeeplyEquals(actual,
+                strategy => strategy
+                    .Set(x => x.Model, (exp, act) =>
+                        (string.IsNullOrEmpty(exp) && string.IsNullOrEmpty(act)) || exp == act),
+                options => options.AllowDifferentTypes(),
+                "InternalCode");
+
+            // Assert
+            result.Should().BeEmpty();
+        }
+
+        [Test]
+        public void DeeplyEquals_DifferentTypes_WithStrategiesOptionsAndIgnore_ShouldReportDifferences()
+        {
+            // Arrange: Description differs and is NOT ignored
+            var expected = new VehicleDto
+            {
+                Id = 1,
+                Model = "",
+                Description = "Expected Description",
+                InternalCode = "ABC"
+            };
+
+            var actual = new VehicleEntity
+            {
+                Id = 1,
+                Model = null,
+                Description = "Actual Description",
+                InternalCode = "XYZ"
+            };
+
+            // Act
+            var result = expected.DeeplyEquals(actual,
+                strategy => strategy
+                    .Set(x => x.Model, (exp, act) =>
+                        (string.IsNullOrEmpty(exp) && string.IsNullOrEmpty(act)) || exp == act),
+                options => options.AllowDifferentTypes(),
+                "InternalCode");
+
+            // Assert: Should report Description difference only
+            result.Should().HaveCount(1);
+            result.First().Path.Should().EndWith("Description");
+            result.First().ExpectedValue.Should().Be("Expected Description");
+            result.First().ActualValue.Should().Be("Actual Description");
+        }
+
+        [Test]
+        public void DeeplyEquals_DifferentTypes_WithMultipleStrategies_ShouldApplyAll()
+        {
+            // Arrange
+            var expected = new VehicleDto
+            {
+                Id = 1,
+                Model = "",
+                Description = null,
+                InternalCode = "CODE"
+            };
+
+            var actual = new VehicleEntity
+            {
+                Id = 1,
+                Model = null,
+                Description = "",
+                InternalCode = "CODE"
+            };
+
+            // Act: Apply custom strategy to both Model and Description
+            var result = expected.DeeplyEquals(actual,
+                strategy => strategy
+                    .Set(x => x.Model, (exp, act) =>
+                        (string.IsNullOrEmpty(exp) && string.IsNullOrEmpty(act)) || exp == act)
+                    .Set(x => x.Description, (exp, act) =>
+                        (string.IsNullOrEmpty(exp) && string.IsNullOrEmpty(act)) || exp == act),
+                options => options.AllowDifferentTypes());
+
+            // Assert
+            result.Should().BeEmpty();
+        }
+
+        [Test]
         public void DictionaryVerifications_Complex_keys_produce_detailed_differences()
         {
             var sharedKey = new OpaqueKey { Id = 1, Name = "shared" };

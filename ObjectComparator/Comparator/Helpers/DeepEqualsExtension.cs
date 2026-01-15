@@ -40,12 +40,16 @@ namespace ObjectsComparator.Comparator.Helpers
         /// var result = expected.DeeplyEquals(actual, "Id", "CreatedDate");
         /// </code>
         /// </example>
-        public static DeepEqualityResult DeeplyEquals<T>(this T expected, T actual, params string[] ignore) =>
-            DeeplyEquals(expected, actual, new Strategies<T>(), new ComparatorOptions(), ignore);
+        public static DeepEqualityResult DeeplyEquals<T>(this T expected, T actual, params string[] ignore)
+        {
+            var ignoreStrategy = CreateIgnoreStrategy(ignore, typeof(T).ToFriendlyTypeName());
+            return DeeplyEquals(expected, actual, new Dictionary<string, ICustomCompareValues>(),
+                ignoreStrategy, new ComparatorOptions());
+        }
 
         #endregion
 
-        #region Comparisons with Options
+        #region Comparisons with Options (Same and Different Types)
 
         /// <summary>
         /// Performs a deep equality comparison with configurable options.
@@ -89,8 +93,12 @@ namespace ObjectsComparator.Comparator.Helpers
         /// <param name="ignore">Property names to exclude from comparison.</param>
         /// <returns>A <see cref="DeepEqualityResult"/> containing any differences found.</returns>
         public static DeepEqualityResult DeeplyEquals<T>(this T expected, T actual, ComparatorOptions options,
-            params string[] ignore) =>
-            DeeplyEquals(expected, actual, new Strategies<T>(), options, ignore);
+            params string[] ignore)
+        {
+            var ignoreStrategy = CreateIgnoreStrategy(ignore, typeof(T).ToFriendlyTypeName());
+            return DeeplyEquals(expected, actual, new Dictionary<string, ICustomCompareValues>(),
+                ignoreStrategy, options);
+        }
 
         #endregion
 
@@ -219,6 +227,51 @@ namespace ObjectsComparator.Comparator.Helpers
             var ignoreStrategy = CreateIgnoreStrategy(ignore, GetIgnoreTypeName(expected, actual, typeof(T), options));
             var customStrategies = strategies(new Strategies<T>());
             return DeeplyEquals(expected, actual, customStrategies.ToDictionary(x => x.Key, x => x.Value),
+                ignoreStrategy, options);
+        }
+
+        #endregion
+
+        #region Comparisons for Different Types with Strategies
+
+        /// <summary>
+        /// Performs a deep equality comparison between objects of different types with custom strategies.
+        /// Use this when comparing DTOs to entities or similar scenarios where types differ but share property names.
+        /// Strategies are defined based on the expected type (T).
+        /// </summary>
+        /// <typeparam name="T">The type of the expected object (used for strategy definitions).</typeparam>
+        /// <typeparam name="TActual">The type of the actual object.</typeparam>
+        /// <param name="expected">The expected object.</param>
+        /// <param name="actual">The actual object to compare against expected.</param>
+        /// <param name="strategies">A function to configure custom comparison strategies based on the expected type.</param>
+        /// <param name="optionsBuilder">An action to configure comparison options (typically to call AllowDifferentTypes()).</param>
+        /// <param name="ignore">Property names to exclude from comparison.</param>
+        /// <returns>A <see cref="DeepEqualityResult"/> containing any differences found.</returns>
+        /// <example>
+        /// <code>
+        /// // Compare DTO to Entity with custom string handling and ignored properties
+        /// var result = expectedDto.DeeplyEquals(actualEntity,
+        ///     strategy => strategy
+        ///         .Set(x => x.Name, (exp, act) => 
+        ///             (string.IsNullOrEmpty(exp) &amp;&amp; string.IsNullOrEmpty(act)) || exp == act)
+        ///         .Set(x => x.Description, (exp, act) => 
+        ///             (string.IsNullOrEmpty(exp) &amp;&amp; string.IsNullOrEmpty(act)) || exp == act),
+        ///     options => options.AllowDifferentTypes(),
+        ///     "Id", "CreatedDate");
+        /// </code>
+        /// </example>
+        public static DeepEqualityResult DeeplyEquals<T, TActual>(this T expected, TActual actual,
+            Func<Strategies<T>, Strategies<T>> strategies,
+            Action<ComparatorOptions> optionsBuilder,
+            params string[] ignore)
+        {
+            var options = new ComparatorOptions();
+            optionsBuilder?.Invoke(options);
+
+            var ignoreStrategy = CreateIgnoreStrategy(ignore,
+                GetIgnoreTypeName(expected, actual, typeof(T), options));
+            var customStrategies = strategies(new Strategies<T>());
+            return DeeplyEquals<object?>(expected, actual, customStrategies.ToDictionary(x => x.Key, x => x.Value),
                 ignoreStrategy, options);
         }
 
