@@ -151,7 +151,6 @@ namespace ObjectsComparator.Comparator.Helpers
             var ignoreStrategy = _customIgnoreStrategy ?? BuildIgnoreStrategy();
             var customStrategies = _customStrategies ?? new Dictionary<string, ICustomCompareValues>();
 
-            // Merge type strategies from builder into options
             if (_typeStrategies != null)
             {
                 foreach (var kvp in _typeStrategies)

@@ -11,9 +11,6 @@ namespace ObjectsComparator.Comparator.Helpers
         public ISet<StrategyType> SkippedStrategies { get; }
         public bool DifferentTypesAllowed { get; private set; }
         
-        /// <summary>
-        /// Gets the type-based comparison strategies.
-        /// </summary>
         internal Dictionary<Type, ICustomCompareValues> TypeStrategies { get; private set; } = new();
 
         public ComparatorOptions(params StrategyType[] skipList)

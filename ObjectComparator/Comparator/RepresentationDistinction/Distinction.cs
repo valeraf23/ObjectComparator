@@ -42,7 +42,9 @@ public class Distinction : IEquatable<Distinction>
 
     public override string ToString()
     {
-        var info = $"Path: \"{Path}\":\nExpected Value: {ExpectedValue}\nActual Value: {ActualValue}";
+        var expectedDisplay = ExpectedValue ?? "null";
+        var actualDisplay = ActualValue ?? "null";
+        var info = $"Path: \"{Path}\":\nExpected Value: {expectedDisplay}\nActual Value: {actualDisplay}";
         return string.IsNullOrEmpty(Details) ? info : $"{info}\n{nameof(Details)}: {Details}";
     }
 
