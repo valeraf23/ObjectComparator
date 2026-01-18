@@ -4,7 +4,6 @@ using ObjectsComparator.Comparator.Helpers;
 using ObjectsComparator.Comparator.RepresentationDistinction;
 using ObjectsComparator.Tests.TestModels;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace ObjectsComparator.Tests
 {
