@@ -6,9 +6,9 @@
     <LangVersion>latest</LangVersion>
 
     <PackageId>ObjectComparator</PackageId>
-    <Version>3.6.6-beta.4</Version>
-    <AssemblyVersion>3.6.0.0</AssemblyVersion>
-    <FileVersion>3.6.6.0</FileVersion>
+    <Version>3.7.0-beta.1</Version>
+    <AssemblyVersion>3.7.0.0</AssemblyVersion>
+    <FileVersion>3.7.0.0</FileVersion>
 
     <Authors>Valerii Fedorenko</Authors>
     <Copyright>Copyright (c) 2022-2025 Valerii Fedorenko</Copyright>
