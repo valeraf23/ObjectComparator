@@ -1219,7 +1219,7 @@ namespace ObjectsComparator.Tests
                 }
             };
 
-            var result = expected.DeeplyEquals(actual, options => options.AllowDifferentTypes(true));
+            var result = expected.DeeplyEquals(actual, config => config.AllowDifferentTypes());
 
             result.Should().BeEquivalentTo(new[]
             {
@@ -1256,7 +1256,7 @@ namespace ObjectsComparator.Tests
                 }
             };
 
-            var result = expected.DeeplyEquals(actual, options => options.AllowDifferentTypes(true));
+            var result = expected.DeeplyEquals(actual, config => config.AllowDifferentTypes());
 
             result.Should().BeEmpty();
         }
@@ -1284,7 +1284,7 @@ namespace ObjectsComparator.Tests
                 }
             };
 
-            var result = expected.DeeplyEquals(actual, options => options.AllowDifferentTypes());
+            var result = expected.DeeplyEquals(actual, config => config.AllowDifferentTypes());
 
             result.Should().BeEmpty();
         }
@@ -1386,7 +1386,7 @@ namespace ObjectsComparator.Tests
                 new() { Two = new SomeClass() }
             };
 
-            var result = expected.DeeplyEquals(actual, options => options.AllowDifferentTypes(), "Two");
+            var result = expected.DeeplyEquals(actual, config => config.AllowDifferentTypes().Ignore("Two"));
 
             result.Should().BeEmpty();
         }
@@ -1516,9 +1516,69 @@ namespace ObjectsComparator.Tests
 
             // Act: Apply custom strategy to all string properties - treat null and empty as equal
             var result = expected.DeeplyEquals(actual,
-                optionsBuilder: options => options.WithTypeStrategies(s => s.Set(typeof(string), (e, a) =>
+                config => config.WithTypeStrategies(s => s.Set(typeof(string), (e, a) =>
                     (string.IsNullOrEmpty((string?)e) && string.IsNullOrEmpty((string?)a)) || 
                     string.Equals((string?)e, (string?)a, StringComparison.OrdinalIgnoreCase))));
+
+            // Assert
+            result.Should().BeEmpty();
+        }
+
+        [Test]
+        public void DeepCompare_UnifiedConfig_CombinesAllOptions()
+        {
+            // Arrange
+            var expected = new VehicleDto
+            {
+                Id = 1,
+                Model = "",
+                Description = "Test",
+                InternalCode = "ABC"
+            };
+
+            var actual = new VehicleEntity
+            {
+                Id = 1,
+                Model = null,
+                Description = "Test",
+                InternalCode = "XYZ"  // Different but ignored
+            };
+
+            // Act: Use unified config with all features combined
+            var result = expected.DeeplyEquals(actual, config => config
+                .AllowDifferentTypes()
+                .Ignore("InternalCode")
+                .WithTypeStrategies(ts => ts.Set<string>((e, a) =>
+                    (string.IsNullOrEmpty(e) && string.IsNullOrEmpty(a)) || e == a)));
+
+            // Assert
+            result.Should().BeEmpty();
+        }
+
+        [Test]
+        public void DeepCompare_UnifiedConfig_WithPropertyAndTypeStrategies()
+        {
+            // Arrange
+            var expected = new VehicleEntity
+            {
+                Id = 1,
+                Model = "BMW",
+                Description = "Same",
+                InternalCode = "code"  // Different case
+            };
+
+            var actual = new VehicleEntity
+            {
+                Id = 1,
+                Model = "BMW",
+                Description = "Same",
+                InternalCode = "CODE"  // Should match with case-insensitive
+            };
+
+            // Act: Type strategy makes all string comparisons case-insensitive
+            var result = expected.DeepCompare(actual, config => config
+                .WithTypeStrategies(ts => ts.Set<string>((e, a) =>
+                    string.Equals(e, a, StringComparison.OrdinalIgnoreCase))));
 
             // Assert
             result.Should().BeEmpty();

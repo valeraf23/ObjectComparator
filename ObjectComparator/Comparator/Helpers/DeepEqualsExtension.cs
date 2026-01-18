@@ -51,33 +51,29 @@ namespace ObjectsComparator.Comparator.Helpers
         #region Comparisons with Options (Same and Different Types)
 
         /// <summary>
-        /// Performs a deep equality comparison with configurable options.
-        /// Supports comparing objects of different types when <see cref="ComparatorOptions.AllowDifferentTypes"/> is enabled.
+        /// Performs a deep equality comparison with unified fluent configuration.
+        /// This is the recommended way to configure comparisons with multiple options.
         /// </summary>
-        /// <typeparam name="T">The type of the expected object.</typeparam>
+        /// <typeparam name="T">The type of the expected object (used for strategy definitions).</typeparam>
         /// <typeparam name="TActual">The type of the actual object.</typeparam>
         /// <param name="expected">The expected object.</param>
         /// <param name="actual">The actual object to compare against expected.</param>
-        /// <param name="optionsBuilder">An action to configure comparison options.</param>
-        /// <param name="ignore">Property names to exclude from comparison.</param>
+        /// <param name="configure">A function to configure the comparison using fluent API.</param>
         /// <returns>A <see cref="DeepEqualityResult"/> containing any differences found.</returns>
         /// <example>
         /// <code>
-        /// // Compare objects of different types, ignoring type mismatches
-        /// var result = expected.DeeplyEquals(actual, 
-        ///     options => options.AllowDifferentTypes(), 
-        ///     "Id", "Timestamp");
+        /// var result = expected.DeeplyEquals(actual, config => config
+        ///     .Ignore("Id", "CreatedDate")
+        ///     .AllowDifferentTypes()
+        ///     .WithTypeStrategies(ts => ts.Set&lt;string&gt;((e, a) => 
+        ///         string.Equals(e, a, StringComparison.OrdinalIgnoreCase)))
+        ///     .WithStrategies(s => s.Set(x => x.Name, (e, a) => e == a)));
         /// </code>
         /// </example>
         public static DeepEqualityResult DeeplyEquals<T, TActual>(this T expected, TActual actual,
-            Action<ComparatorOptions> optionsBuilder, params string[] ignore)
+            Action<ComparisonConfig<T>> configure)
         {
-            var options = ComparisonHelper.BuildOptions(optionsBuilder);
-            var ignoreStrategy = ComparisonHelper.CreateIgnoreStrategy(ignore,
-                ComparisonHelper.GetIgnoreTypeName(expected, actual, typeof(T), options));
-
-            return DeeplyEquals<object?>(expected, actual, new Dictionary<string, ICustomCompareValues>(),
-                ignoreStrategy, options);
+            return UnifiedComparisonExtensions.DeepCompare(expected, actual, configure);
         }
 
         /// <summary>
