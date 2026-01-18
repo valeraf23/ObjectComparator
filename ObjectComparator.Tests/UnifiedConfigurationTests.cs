@@ -37,7 +37,7 @@ namespace ObjectsComparator.Tests
         }
 
         [Test]
-        public void DeepCompare_UnifiedConfig_CombinesAllOptions()
+        public void DeeplyEquals_UnifiedConfig_CombinesAllOptions()
         {
             var expected = new VehicleDto
             {
@@ -65,7 +65,7 @@ namespace ObjectsComparator.Tests
         }
 
         [Test]
-        public void DeepCompare_UnifiedConfig_WithPropertyAndTypeStrategies()
+        public void DeeplyEquals_UnifiedConfig_WithPropertyAndTypeStrategies()
         {
             var expected = new VehicleEntity
             {
@@ -83,7 +83,7 @@ namespace ObjectsComparator.Tests
                 InternalCode = "CODE"
             };
 
-            var result = expected.DeepCompare(actual, config => config
+            var result = expected.DeeplyEquals(actual, config => config
                 .WithTypeStrategies(ts => ts.Set<string>((e, a) =>
                     string.Equals(e, a, StringComparison.OrdinalIgnoreCase))));
 

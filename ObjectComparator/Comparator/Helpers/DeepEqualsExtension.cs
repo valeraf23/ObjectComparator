@@ -73,7 +73,32 @@ namespace ObjectsComparator.Comparator.Helpers
         public static DeepEqualityResult DeeplyEquals<T, TActual>(this T expected, TActual actual,
             Action<ComparisonConfig<T>> configure)
         {
-            return UnifiedComparisonExtensions.DeepCompare(expected, actual, configure);
+            var config = new ComparisonConfig<T>();
+            configure?.Invoke(config);
+            return ExecuteComparison(expected, actual, config);
+        }
+
+        private static DeepEqualityResult ExecuteComparison<T>(object? expected, object? actual, ComparisonConfig<T> config)
+        {
+            var typeName = ComparisonHelper.GetIgnoreTypeName(expected, actual, typeof(T),
+                new ComparatorOptions().AllowDifferentTypes(config.DifferentTypesAllowed));
+
+            var ignoreStrategy = config.GetCustomIgnoreStrategy()
+                ?? ComparisonHelper.CreateIgnoreStrategy(config.GetIgnoreProperties(), typeName);
+
+            var options = new ComparatorOptions(config.GetSkippedStrategies().ToArray());
+            if (config.DifferentTypesAllowed)
+            {
+                options.AllowDifferentTypes();
+            }
+
+            foreach (var kvp in config.GetTypeStrategies())
+            {
+                options.TypeStrategies[kvp.Key] = kvp.Value;
+            }
+
+            var comparator = new Comparator(config.GetPropertyStrategies(), ignoreStrategy, options);
+            return comparator.Compare(expected, actual);
         }
 
         /// <summary>
