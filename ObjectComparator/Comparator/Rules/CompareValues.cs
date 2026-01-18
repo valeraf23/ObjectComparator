@@ -3,48 +3,66 @@ using ObjectsComparator.Comparator.Strategies.Interfaces;
 using ObjectsComparator.Helpers.Extensions;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace ObjectsComparator.Comparator.Rules
 {
     public class CompareValues
     {
         private readonly Dictionary<string, ICustomCompareValues> _strategies;
-        private readonly ICompareValues _rule;
-        private readonly Func<string, bool> _ignore;
+        private readonly ICompareValues _defaultComparer;
+        private readonly Func<string, bool> _shouldIgnore;
 
-        public CompareValues(ICompareValues rule, Dictionary<string, ICustomCompareValues> strategies,
-            Func<string, bool> ignoreStrategy)
+        public CompareValues(
+            ICompareValues defaultComparer,
+            Dictionary<string, ICustomCompareValues> strategies,
+            Func<string, bool> shouldIgnore)
         {
-            _rule = rule;
+            _defaultComparer = defaultComparer;
             _strategies = strategies;
-            _ignore = ignoreStrategy;
-
+            _shouldIgnore = shouldIgnore;
         }
 
-        public DeepEqualityResult Compare<T>(T expected, T actual, string propertyName)
+        public DeepEqualityResult Compare<T>(T expected, T actual, string propertyPath)
         {
-            if (string.IsNullOrEmpty(propertyName))
-                throw new Exception($"{nameof(propertyName)} should not be null or empty");
+            if (string.IsNullOrEmpty(propertyPath))
+                throw new ArgumentException("Property path cannot be null or empty.", nameof(propertyPath));
 
-            if (_ignore(propertyName))
-            {
+            if (_shouldIgnore(propertyPath))
                 return DeepEqualityResult.None();
-            }
 
-            if (_strategies.IsNotEmpty() && _strategies.Any(x => x.Key == propertyName))
-                return _strategies[propertyName].Compare(expected, actual, propertyName);
+            return TryGetStrategy(propertyPath, out var strategy)
+                ? strategy!.Compare(expected, actual, propertyPath)
+                : CompareOrDefault(expected, actual, propertyPath);
+        }
 
+        private bool TryGetStrategy(string propertyPath, out ICustomCompareValues? strategy)
+        {
+            strategy = null;
+
+            if (_strategies.IsEmpty())
+                return false;
+
+            if (_strategies.TryGetValue(propertyPath, out strategy))
+                return true;
+
+            if (!PropertyPathNormalizer.ContainsIndexer(propertyPath))
+                return false;
+
+            var normalizedPath = PropertyPathNormalizer.Normalize(propertyPath);
+            return _strategies.TryGetValue(normalizedPath, out strategy);
+        }
+
+        private DeepEqualityResult CompareOrDefault<T>(T expected, T actual, string propertyPath)
+        {
             if (expected is null && actual is not null)
-                return DeepEqualityResult.Create(propertyName, "null", actual);
+                return DeepEqualityResult.Create(propertyPath, "null", actual);
 
             if (expected is not null && actual is null)
-                return DeepEqualityResult.Create(propertyName, expected, "null");
+                return DeepEqualityResult.Create(propertyPath, expected, "null");
 
-            if (expected is null)
-                return DeepEqualityResult.None();
-
-            return _rule.Compare(expected, actual, propertyName);
+            return expected is null
+                ? DeepEqualityResult.None() 
+                : _defaultComparer.Compare(expected, actual, propertyPath);
         }
     }
 }

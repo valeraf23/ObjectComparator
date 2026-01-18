@@ -1548,5 +1548,160 @@ namespace ObjectsComparator.Tests
 
         private static string SerializeForDiff(object value) =>
             JsonConvert.SerializeObject(value, CamelCaseIndentedSettings);
+
+        #region Collection Strategies Tests
+
+        [Test]
+        public void DeeplyEquals_Collections_WithCustomStrategy_ShouldApplyToAllElements()
+        {
+            // Arrange: Collections where null and empty strings should be treated as equal
+            var expected = new List<VehicleDto>
+            {
+                new() { Id = 1, Model = "BMW", Description = "", InternalCode = "A" },
+                new() { Id = 2, Model = "Audi", Description = null, InternalCode = "B" },
+                new() { Id = 3, Model = null, Description = "Description", InternalCode = "C" }
+            };
+
+            var actual = new List<VehicleDto>
+            {
+                new() { Id = 1, Model = "BMW", Description = null, InternalCode = "A" },
+                new() { Id = 2, Model = "Audi", Description = "", InternalCode = "B" },
+                new() { Id = 3, Model = "", Description = "Description", InternalCode = "C" }
+            };
+
+            // Act: Custom strategy should apply to all collection elements
+            var result = expected.DeeplyEquals(actual,
+                strategy => strategy
+                    .Set(x => x.Model, (exp, act) =>
+                        (string.IsNullOrEmpty(exp) && string.IsNullOrEmpty(act)) || exp == act)
+                    .Set(x => x.Description, (exp, act) =>
+                        (string.IsNullOrEmpty(exp) && string.IsNullOrEmpty(act)) || exp == act));
+
+            // Assert
+            result.Should().BeEmpty();
+        }
+
+        [Test]
+        public void DeeplyEquals_Collections_DifferentTypes_WithCustomStrategy_ShouldWork()
+        {
+            // Arrange
+            var expected = new List<VehicleDto>
+            {
+                new() { Id = 1, Model = "", Description = "Test1", InternalCode = "A" },
+                new() { Id = 2, Model = null, Description = "Test2", InternalCode = "B" }
+            };
+
+            var actual = new List<VehicleEntity>
+            {
+                new() { Id = 1, Model = null, Description = "Test1", InternalCode = "A" },
+                new() { Id = 2, Model = "", Description = "Test2", InternalCode = "B" }
+            };
+
+            // Act: Compare different types with custom strategy
+            var result = expected.DeeplyEquals(actual,
+                strategy => strategy
+                    .Set(x => x.Model, (exp, act) =>
+                        (string.IsNullOrEmpty(exp) && string.IsNullOrEmpty(act)) || exp == act),
+                options => options.AllowDifferentTypes());
+
+            // Assert
+            result.Should().BeEmpty();
+        }
+
+        [Test]
+        public void DeeplyEquals_Collections_DifferentTypes_WithCustomStrategyAndIgnore_ShouldWork()
+        {
+            // Arrange
+            var expected = new List<VehicleDto>
+            {
+                new() { Id = 1, Model = "", Description = "Test", InternalCode = "ABC" },
+                new() { Id = 2, Model = null, Description = "Test", InternalCode = "DEF" }
+            };
+
+            var actual = new List<VehicleEntity>
+            {
+                new() { Id = 1, Model = null, Description = "Test", InternalCode = "XYZ" },
+                new() { Id = 2, Model = "", Description = "Test", InternalCode = "XYZ" }
+            };
+
+            // Act: Combine strategies, options, and ignore
+            var result = expected.DeeplyEquals(actual,
+                strategy => strategy
+                    .Set(x => x.Model, (exp, act) =>
+                        (string.IsNullOrEmpty(exp) && string.IsNullOrEmpty(act)) || exp == act),
+                options => options.AllowDifferentTypes(),
+                "InternalCode");
+
+            // Assert
+            result.Should().BeEmpty();
+        }
+
+        [Test]
+        public void DeeplyEquals_Collections_DifferentTypes_ShouldReportDifferences()
+        {
+            // Arrange
+            var expected = new List<VehicleDto>
+            {
+                new() { Id = 1, Model = "BMW", Description = "Expected", InternalCode = "A" },
+                new() { Id = 2, Model = "Audi", Description = "Same", InternalCode = "B" }
+            };
+
+            var actual = new List<VehicleEntity>
+            {
+                new() { Id = 1, Model = "Mercedes", Description = "Expected", InternalCode = "A" },
+                new() { Id = 2, Model = "Audi", Description = "Same", InternalCode = "B" }
+            };
+
+            // Act
+            var result = expected.DeeplyEquals(actual,
+                strategy => strategy
+                    .Set(x => x.Description, (exp, act) =>
+                        (string.IsNullOrEmpty(exp) && string.IsNullOrEmpty(act)) || exp == act),
+                options => options.AllowDifferentTypes());
+
+            // Assert: Should report Model difference at index 0
+            result.Should().HaveCount(1);
+            result.First().Path.Should().Contain("[0]");
+            result.First().Path.Should().EndWith("Model");
+            result.First().ExpectedValue.Should().Be("BMW");
+            result.First().ActualValue.Should().Be("Mercedes");
+        }
+
+        [Test]
+        public void DeeplyEquals_Collections_NestedProperties_WithCustomStrategy_ShouldWork()
+        {
+            // Arrange
+            var expected = new List<StudentDto>
+            {
+                new()
+                {
+                    Name = "",
+                    Age = 20,
+                    Courses = new[] { new CourseDto { Name = "Math", Credits = 3 } }
+                }
+            };
+
+            var actual = new List<StudentEntity>
+            {
+                new()
+                {
+                    Name = null,
+                    Age = 20,
+                    Courses = new[] { new CourseEntity { Name = "Math", Credits = 3 } }
+                }
+            };
+
+            // Act
+            var result = expected.DeeplyEquals(actual,
+                strategy => strategy
+                    .Set(x => x.Name, (exp, act) =>
+                        (string.IsNullOrEmpty(exp) && string.IsNullOrEmpty(act)) || exp == act),
+                options => options.AllowDifferentTypes());
+
+            // Assert
+            result.Should().BeEmpty();
+        }
+
+        #endregion
     }
 }
