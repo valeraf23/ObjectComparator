@@ -11,12 +11,18 @@ public sealed class TypeStrategies : IEnumerable<KeyValuePair<Type, ICustomCompa
     private readonly IDictionary<Type, ICustomCompareValues> _strategies =
         new Dictionary<Type, ICustomCompareValues>();
 
-    public IEnumerator<KeyValuePair<Type, ICustomCompareValues>> GetEnumerator() => _strategies.GetEnumerator();
+    public IEnumerator<KeyValuePair<Type, ICustomCompareValues>> GetEnumerator()
+    {
+        return _strategies.GetEnumerator();
+    }
 
-    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        return GetEnumerator();
+    }
 
     /// <summary>
-    /// Sets a custom comparison strategy for all properties of the specified type.
+    ///     Sets a custom comparison strategy for all properties of the specified type.
     /// </summary>
     /// <param name="type">The type to apply the strategy to.</param>
     /// <param name="comparer">The comparison function that returns true if values are considered equal.</param>
@@ -27,7 +33,7 @@ public sealed class TypeStrategies : IEnumerable<KeyValuePair<Type, ICustomCompa
     }
 
     /// <summary>
-    /// Sets a custom comparison strategy for all properties of the specified type with custom display options.
+    ///     Sets a custom comparison strategy for all properties of the specified type with custom display options.
     /// </summary>
     /// <param name="type">The type to apply the strategy to.</param>
     /// <param name="comparer">The comparison function that returns true if values are considered equal.</param>
@@ -36,14 +42,16 @@ public sealed class TypeStrategies : IEnumerable<KeyValuePair<Type, ICustomCompa
     public TypeStrategies Set(Type type, Func<object?, object?, bool> comparer, Func<Display, Display> displayBuilder)
     {
         if (_strategies.ContainsKey(type))
+        {
             throw new InvalidOperationException($"Strategy for type \"{type.Name}\" has already been added");
+        }
 
         _strategies.Add(type, new TypeMemberStrategy(comparer, displayBuilder(new Display())));
         return this;
     }
 
     /// <summary>
-    /// Sets a custom comparison strategy for all properties of the specified type with custom display options.
+    ///     Sets a custom comparison strategy for all properties of the specified type with custom display options.
     /// </summary>
     /// <param name="type">The type to apply the strategy to.</param>
     /// <param name="comparer">The comparison function that returns true if values are considered equal.</param>
@@ -52,14 +60,16 @@ public sealed class TypeStrategies : IEnumerable<KeyValuePair<Type, ICustomCompa
     public TypeStrategies Set(Type type, Func<object?, object?, bool> comparer, Display display)
     {
         if (_strategies.ContainsKey(type))
+        {
             throw new InvalidOperationException($"Strategy for type \"{type.Name}\" has already been added");
+        }
 
         _strategies.Add(type, new TypeMemberStrategy(comparer, display));
         return this;
     }
 
     /// <summary>
-    /// Sets a strongly-typed custom comparison strategy for all properties of the specified type.
+    ///     Sets a strongly-typed custom comparison strategy for all properties of the specified type.
     /// </summary>
     /// <typeparam name="T">The type to apply the strategy to.</typeparam>
     /// <param name="comparer">The comparison expression that returns true if values are considered equal.</param>
@@ -70,7 +80,8 @@ public sealed class TypeStrategies : IEnumerable<KeyValuePair<Type, ICustomCompa
     }
 
     /// <summary>
-    /// Sets a strongly-typed custom comparison strategy for all properties of the specified type with custom display options.
+    ///     Sets a strongly-typed custom comparison strategy for all properties of the specified type with custom display
+    ///     options.
     /// </summary>
     /// <typeparam name="T">The type to apply the strategy to.</typeparam>
     /// <param name="comparer">The comparison expression that returns true if values are considered equal.</param>
@@ -80,14 +91,17 @@ public sealed class TypeStrategies : IEnumerable<KeyValuePair<Type, ICustomCompa
     {
         var type = typeof(T);
         if (_strategies.ContainsKey(type))
+        {
             throw new InvalidOperationException($"Strategy for type \"{type.Name}\" has already been added");
+        }
 
         _strategies.Add(type, new MemberStrategy<T>(comparer, displayBuilder(new Display())));
         return this;
     }
 
     /// <summary>
-    /// Sets a strongly-typed custom comparison strategy for all properties of the specified type with custom display options.
+    ///     Sets a strongly-typed custom comparison strategy for all properties of the specified type with custom display
+    ///     options.
     /// </summary>
     /// <typeparam name="T">The type to apply the strategy to.</typeparam>
     /// <param name="comparer">The comparison expression that returns true if values are considered equal.</param>
@@ -97,7 +111,9 @@ public sealed class TypeStrategies : IEnumerable<KeyValuePair<Type, ICustomCompa
     {
         var type = typeof(T);
         if (_strategies.ContainsKey(type))
+        {
             throw new InvalidOperationException($"Strategy for type \"{type.Name}\" has already been added");
+        }
 
         _strategies.Add(type, new MemberStrategy<T>(comparer, display));
         return this;

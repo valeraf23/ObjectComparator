@@ -1,34 +1,33 @@
 using System.Collections.Generic;
 
-namespace ObjectsComparator.Comparator.Strategies.StrategiesForCertainProperties
+namespace ObjectsComparator.Comparator.Strategies.StrategiesForCertainProperties;
+
+internal static class ReplaceValuesDictionary
 {
-    internal static class ReplaceValuesDictionary
+    private static readonly IList<IDictionary<string, string>> Swaps;
+
+    static ReplaceValuesDictionary()
     {
-        static ReplaceValuesDictionary()
+        IDictionary<string, string> listValues = new Dictionary<string, string>
         {
-            IDictionary<string, string> listValues = new Dictionary<string, string>
-            {
-                [".get_Item"] = "",
-                ["("] = "[",
-                [")"] = "]"
-            };
+            [".get_Item"] = "",
+            ["("] = "[",
+            [")"] = "]"
+        };
 
-            Swaps = new[] { listValues };
-        }
+        Swaps = new[] { listValues };
+    }
 
-        private static readonly IList<IDictionary<string, string>> Swaps;
-
-        public static string Replace(string str)
+    public static string Replace(string str)
+    {
+        foreach (var sw in Swaps)
         {
-            foreach (var sw in Swaps)
+            foreach (var (oldValue, newValue) in sw)
             {
-                foreach (var (oldValue, newValue) in sw)
-                {
-                    str = str.Replace(oldValue, newValue);
-                }
+                str = str.Replace(oldValue, newValue);
             }
-
-            return str;
         }
+
+        return str;
     }
 }

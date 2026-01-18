@@ -3,20 +3,25 @@ using ObjectsComparator.Comparator.Strategies.Interfaces;
 using ObjectsComparator.Helpers.GuardArgument;
 using System;
 
-namespace ObjectsComparator.Comparator.Rules.Implementations
+namespace ObjectsComparator.Comparator.Rules.Implementations;
+
+public class Rule<T> : Rule where T : class, IStrategy
 {
-    public class Rule<T> : Rule where T : class, IStrategy
+    public Rule(T defaultRule)
     {
-        public Rule(T defaultRule)
-        {
-            GuardArgument.ArgumentIsNotNull(defaultRule);
-            Default = defaultRule;
-        }
+        GuardArgument.ArgumentIsNotNull(defaultRule);
+        Default = defaultRule;
+    }
 
-        protected T Default { get; }
+    protected T Default { get; }
 
-        public override ICompareValues Get(Type memberType) => Default;
+    public override ICompareValues Get(Type memberType)
+    {
+        return Default;
+    }
 
-        public override bool IsValid(Type member) => Default.IsValid(member);
+    public override bool IsValid(Type member)
+    {
+        return Default.IsValid(member);
     }
 }

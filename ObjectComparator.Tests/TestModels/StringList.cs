@@ -1,16 +1,24 @@
 using System.Collections;
 using System.Collections.Generic;
 
-namespace ObjectsComparator.Tests.TestModels
+namespace ObjectsComparator.Tests.TestModels;
+
+public class StringList : IEnumerable<string>
 {
-    public class StringList : IEnumerable<string>
+    private readonly List<string> _list = new();
+
+    public IEnumerator<string> GetEnumerator()
     {
-        private readonly List<string> _list = new();
+        return _list.GetEnumerator();
+    }
 
-        public void Add(string item) => _list.Add(item);
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        return GetEnumerator();
+    }
 
-        public IEnumerator<string> GetEnumerator() => _list.GetEnumerator();
-
-        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+    public void Add(string item)
+    {
+        _list.Add(item);
     }
 }

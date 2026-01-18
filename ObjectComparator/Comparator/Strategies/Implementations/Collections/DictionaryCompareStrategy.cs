@@ -87,7 +87,10 @@ public class DictionaryCompareStrategy : BaseCollectionsCompareStrategy
 
     private static string FormatKey<TKey>(TKey key)
     {
-        if (key is null) return "null";
+        if (key is null)
+        {
+            return "null";
+        }
 
         var type = key.GetType();
         if (type == typeof(string) || type.IsPrimitive || type.IsEnum || type.IsToStringOverridden())
@@ -128,8 +131,8 @@ public class DictionaryCompareStrategy : BaseCollectionsCompareStrategy
 
         if (Comparator.Options.DifferentTypesAllowed && expectedType != actualType)
         {
-            if (TryGetDictionaryArguments(expectedType, out var expectedKeyType, out var expectedValueType) == false
-                || TryGetDictionaryArguments(actualType, out var actualKeyType, out var actualValueType) == false
+            if (!TryGetDictionaryArguments(expectedType, out var expectedKeyType, out var expectedValueType)
+                || !TryGetDictionaryArguments(actualType, out var actualKeyType, out var actualValueType)
                 || expectedKeyType != actualKeyType
                 || expectedValueType != actualValueType)
             {
@@ -250,7 +253,7 @@ public class DictionaryCompareStrategy : BaseCollectionsCompareStrategy
                 continue;
             }
 
-            if (TryGetEntryAccessors(entry.GetType(), out var keyProperty, out var valueProperty) == false)
+            if (!TryGetEntryAccessors(entry.GetType(), out var keyProperty, out var valueProperty))
             {
                 continue;
             }
@@ -280,7 +283,10 @@ public class DictionaryCompareStrategy : BaseCollectionsCompareStrategy
 
     public override bool IsValid(Type member)
     {
-        if (member.IsGenericType && member.GetGenericTypeDefinition() == DictionaryType) return true;
+        if (member.IsGenericType && member.GetGenericTypeDefinition() == DictionaryType)
+        {
+            return true;
+        }
 
         return member.GetInterfaces().Any(interfaceType =>
             interfaceType.IsGenericType && interfaceType.GetGenericTypeDefinition() == DictionaryType);
