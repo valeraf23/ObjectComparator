@@ -28,6 +28,7 @@ namespace ObjectsComparator.Comparator.Helpers
         private readonly ComparatorOptions _options = new ComparatorOptions();
         private readonly List<string> _ignoreProperties = new List<string>();
         private Dictionary<string, ICustomCompareValues>? _customStrategies;
+        private Dictionary<Type, ICustomCompareValues>? _typeStrategies;
         private Func<string, bool>? _customIgnoreStrategy;
 
         internal DeepComparisonBuilder(T expected, T actual)
@@ -119,6 +120,16 @@ namespace ObjectsComparator.Comparator.Helpers
             return this;
         }
 
+        public DeepComparisonBuilder<T> WithTypeStrategies(Func<TypeStrategies, TypeStrategies> typeStrategiesBuilder)
+        {
+            if (typeStrategiesBuilder != null)
+            {
+                var typeStrategies = typeStrategiesBuilder(new TypeStrategies());
+                _typeStrategies = typeStrategies.ToDictionary();
+            }
+            return this;
+        }
+
         /// <summary>
         /// Configures a custom ignore strategy function.
         /// When set, this takes precedence over properties specified via <see cref="IgnoreProperties"/>.
@@ -139,6 +150,15 @@ namespace ObjectsComparator.Comparator.Helpers
         {
             var ignoreStrategy = _customIgnoreStrategy ?? BuildIgnoreStrategy();
             var customStrategies = _customStrategies ?? new Dictionary<string, ICustomCompareValues>();
+
+            // Merge type strategies from builder into options
+            if (_typeStrategies != null)
+            {
+                foreach (var kvp in _typeStrategies)
+                {
+                    _options.TypeStrategies[kvp.Key] = kvp.Value;
+                }
+            }
 
             var comparator = new Comparator(customStrategies, ignoreStrategy, _options);
             return comparator.Compare(_expected, _actual);

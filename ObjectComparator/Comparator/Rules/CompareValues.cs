@@ -9,17 +9,20 @@ namespace ObjectsComparator.Comparator.Rules
     public class CompareValues
     {
         private readonly Dictionary<string, ICustomCompareValues> _strategies;
+        private readonly Dictionary<Type, ICustomCompareValues> _typStrategies;
         private readonly ICompareValues _defaultComparer;
         private readonly Func<string, bool> _shouldIgnore;
 
         public CompareValues(
             ICompareValues defaultComparer,
             Dictionary<string, ICustomCompareValues> strategies,
-            Func<string, bool> shouldIgnore)
+            Func<string, bool> shouldIgnore,
+            Dictionary<Type, ICustomCompareValues> typStrategies)
         {
             _defaultComparer = defaultComparer;
             _strategies = strategies;
             _shouldIgnore = shouldIgnore;
+            _typStrategies = typStrategies;
         }
 
         public DeepEqualityResult Compare<T>(T expected, T actual, string propertyPath)
@@ -29,6 +32,9 @@ namespace ObjectsComparator.Comparator.Rules
 
             if (_shouldIgnore(propertyPath))
                 return DeepEqualityResult.None();
+
+            if (_typStrategies.TryGetValue(typeof(T), out var typeStrategy))
+                return typeStrategy.Compare(expected, actual, propertyPath);
 
             return TryGetStrategy(propertyPath, out var strategy)
                 ? strategy!.Compare(expected, actual, propertyPath)

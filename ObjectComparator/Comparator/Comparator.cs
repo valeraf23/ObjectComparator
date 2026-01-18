@@ -64,7 +64,7 @@ public sealed class Comparator
 
         rules.Add(Rule.CreateFor(_compareMembersStrategy));
 
-        RulesHandler = new RulesHandler(rules, customStrategies, ignoreStrategy);
+        RulesHandler = new RulesHandler(rules, customStrategies, ignoreStrategy, Options.TypeStrategies);
     }
 
     public DeepEqualityResult Compare<T>(T expected, T actual)

@@ -499,7 +499,7 @@ namespace ObjectsComparator.Tests
         }
 
         [Test]
-        public void IsObjectsFallTest_Time_ShortDiffTime()
+        public void IsObjectsFallTest_Time_ShortDiff()
         {
             const short actual = 1;
             var time4 = new Time("2016", 1.5F, actual, 1.2, new List<string> { "", "" }, 4, 34);
@@ -1495,6 +1495,36 @@ namespace ObjectsComparator.Tests
         }
 
         [Test]
+        public void DeeplyEquals_WithStringTypeStrategy_TreatsNullAndEmptyAsEqual()
+        {
+            // Arrange
+            var expected = new VehicleEntity
+            {
+                Id = 1,
+                Model = "",
+                Description = null,
+                InternalCode = "CODE"
+            };
+
+            var actual = new VehicleEntity
+            {
+                Id = 1,
+                Model = null,
+                Description = "",
+                InternalCode = "CODE"
+            };
+
+            // Act: Apply custom strategy to all string properties - treat null and empty as equal
+            var result = expected.DeeplyEquals(actual,
+                optionsBuilder: options => options.WithTypeStrategies(s => s.Set(typeof(string), (e, a) =>
+                    (string.IsNullOrEmpty((string?)e) && string.IsNullOrEmpty((string?)a)) || 
+                    string.Equals((string?)e, (string?)a, StringComparison.OrdinalIgnoreCase))));
+
+            // Assert
+            result.Should().BeEmpty();
+        }
+
+        [Test]
         public void DictionaryVerifications_Complex_keys_produce_detailed_differences()
         {
             var sharedKey = new OpaqueKey { Id = 1, Name = "shared" };
@@ -1508,7 +1538,7 @@ namespace ObjectsComparator.Tests
                 }
             };
 
-            var actual = new LibraryWithOpaqueKeys
+            var act = new LibraryWithOpaqueKeys
             {
                 Books = new Dictionary<OpaqueKey, Book>
                 {
@@ -1517,7 +1547,7 @@ namespace ObjectsComparator.Tests
                 }
             };
 
-            var result = expected.DeeplyEquals(actual);
+            var result = expected.DeeplyEquals(act);
 
             var sharedKeyPath = $"LibraryWithOpaqueKeys.Books[{SerializeForDiff(sharedKey)}]";
             var missingKeyPath =
