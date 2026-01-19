@@ -50,9 +50,8 @@ public class IgnoreStrategyTests
 
         var actual = act.DeeplyEquals(exp, propName => propName == "Student.Name");
 
-        var expected =
-            DeepEqualityResult.Create(new Distinction("Student.Courses[0].Name", "CourseName", "CourseName1"));
-        CollectionAssert.AreEquivalent(expected, actual);
+        actual.Should().ContainSingle()
+            .Which.Should().BeEquivalentTo(new Distinction("Student.Courses[0].Name", "CourseName", "CourseName1"));
     }
 
     [Test]

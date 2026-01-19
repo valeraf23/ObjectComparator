@@ -1,3 +1,4 @@
+using FluentAssertions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NUnit.Framework;
@@ -87,6 +88,6 @@ public class JsonSerializationTests
         var expectedJson = JToken.FromObject(expectedStructure, serializer).ToString();
         var actualJsonNormalized = JToken.Parse(actualJson).ToString();
 
-        Assert.AreEqual(expectedJson, actualJsonNormalized);
+        actualJsonNormalized.Should().Be(expectedJson);
     }
 }

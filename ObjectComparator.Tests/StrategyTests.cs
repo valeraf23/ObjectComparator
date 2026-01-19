@@ -52,12 +52,11 @@ namespace ObjectsComparator.Tests
                 str => str.Set(x => x.Courses[0].Duration, (act, exp) => act > TimeSpan.FromHours(3),
                     x => x.SetExpectedInformation("Expected that Duration should be more that 3 hours")), skip);
 
-            var expectedDistinctionsCollection = DeepEqualityResult.Create(new Distinction(
-                "Student.Courses[0].Duration",
-                "Expected that Duration should be more that 3 hours",
-                "04:00:00", "(act:(03:00:00), exp:(04:00:00)) => (act:(03:00:00) > 03:00:00)"));
-
-            CollectionAssert.AreEquivalent(result, expectedDistinctionsCollection);
+            result.Should().ContainSingle()
+                .Which.Should().BeEquivalentTo(new Distinction(
+                    "Student.Courses[0].Duration",
+                    "Expected that Duration should be more that 3 hours",
+                    "04:00:00", "(act:(03:00:00), exp:(04:00:00)) => (act:(03:00:00) > 03:00:00)"));
         }
 
         [Test]
@@ -93,12 +92,11 @@ namespace ObjectsComparator.Tests
                 str => str.Set(x => x.Courses[0].Duration, (act, exp) => act > TimeSpan.FromHours(3),
                     x => x.SetExpectedInformation("Expected that Duration should be more that 3 hours")), skip);
 
-            var expectedDistinctionsCollection = DeepEqualityResult.Create(new Distinction(
-                "StudentNew.Courses[0].Duration",
-                "Expected that Duration should be more that 3 hours",
-                "04:00:00", "(act:(03:00:00), exp:(04:00:00)) => (act:(03:00:00) > 03:00:00)"));
-
-            CollectionAssert.AreEquivalent(result, expectedDistinctionsCollection);
+            result.Should().ContainSingle()
+                .Which.Should().BeEquivalentTo(new Distinction(
+                    "StudentNew.Courses[0].Duration",
+                    "Expected that Duration should be more that 3 hours",
+                    "04:00:00", "(act:(03:00:00), exp:(04:00:00)) => (act:(03:00:00) > 03:00:00)"));
         }
 
         [Test]
@@ -233,7 +231,7 @@ namespace ObjectsComparator.Tests
             var res = act.DeeplyEquals(exp, str => str.Set(x => x.InnerClass[0].Foo,
                 (s, s1) => s == data));
 
-            var expected = DeepEqualityResult.Create(new[]
+            res.Should().BeEquivalentTo(new[]
             {
                 new Distinction("ClassA.ArrayThird[0]", "test", "error"),
                 new Distinction("ClassA.ArrayThird[1]", "test1", "error1"),
@@ -242,8 +240,6 @@ namespace ObjectsComparator.Tests
                     JsonConvert.SerializeObject(new SomeClass { Foo = "someFail1" }, SerializerSettings.Settings),
                     "Added")
             });
-
-            CollectionAssert.AreEquivalent(res, expected);
         }
 
         [Test]

@@ -320,8 +320,7 @@ public class BasicComparisonTests
 
         var actual = act.DeeplyEquals(exp, propName => propName == "StudentIName.Name");
 
-        var expected =
-            DeepEqualityResult.Create(new Distinction("StudentIName.Courses[0].Name", "CourseName", "CourseName1"));
-        CollectionAssert.AreEquivalent(expected, actual);
+        actual.Should().ContainSingle()
+            .Which.Should().BeEquivalentTo(new Distinction("StudentIName.Courses[0].Name", "CourseName", "CourseName1"));
     }
 }

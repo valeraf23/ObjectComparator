@@ -37,7 +37,8 @@ public class DictionaryComparisonTests
         };
 
         var result = exp.DeeplyEquals(act);
-        var expectedDistinctionsCollection = DeepEqualityResult.Create(new[]
+
+        result.Should().BeEquivalentTo(new[]
         {
             new Distinction("Library.Books", null, "Shantaram1", "Added"),
             new Distinction("Library.Books[hobbit].Pages", 1000, 1),
@@ -45,8 +46,6 @@ public class DictionaryComparisonTests
                 "Library.Books[murder in orient express].Text", "murder in orient express Text",
                 "murder in orient express Text1")
         });
-
-        CollectionAssert.AreEquivalent(result, expectedDistinctionsCollection);
     }
 
     [Test]
@@ -72,14 +71,13 @@ public class DictionaryComparisonTests
         };
 
         var result = exp.DeeplyEquals(act);
-        var expectedDistinctionsCollection = DeepEqualityResult.Create(new[]
+
+        result.Should().BeEquivalentTo(new[]
         {
             new Distinction("Library3.Books",
                 $"{new SomeKey("murder in orient express")}, {new SomeKey("Shantaram")}", null, "Removed"),
             new Distinction("Library3.Books[SomeKey { Key = hobbit }].Pages", 1000, 1)
         });
-
-        CollectionAssert.AreEquivalent(result, expectedDistinctionsCollection);
     }
 
     [Test]
@@ -121,12 +119,9 @@ public class DictionaryComparisonTests
         };
 
         var result = exp.DeeplyEquals(act);
-        var expectedDistinctionsCollection = DeepEqualityResult.Create(new[]
-        {
-            new Distinction("Library2.Books[hobbit].Pages", 1000, 1)
-        });
 
-        CollectionAssert.AreEquivalent(result, expectedDistinctionsCollection);
+        result.Should().ContainSingle()
+            .Which.Should().BeEquivalentTo(new Distinction("Library2.Books[hobbit].Pages", 1000, 1));
     }
 
     [Test]
@@ -198,7 +193,7 @@ public class DictionaryComparisonTests
         var extraKeyPath =
             $"LibraryWithOpaqueKeys.Books[{SerializeForDiff(new OpaqueKey { Id = 3, Name = "extra" })}]";
 
-        var expectedDistinctionsCollection = DeepEqualityResult.Create(new[]
+        result.Should().BeEquivalentTo(new[]
         {
             new Distinction(extraKeyPath, null,
                 SerializeForDiff(new Book { Pages = 300, Text = "actual only" }), "Added"),
@@ -206,8 +201,6 @@ public class DictionaryComparisonTests
                 SerializeForDiff(new Book { Pages = 200, Text = "expected only" }), null, "Removed"),
             new Distinction($"{sharedKeyPath}.Pages", 100, 101)
         });
-
-        CollectionAssert.AreEquivalent(result, expectedDistinctionsCollection);
     }
 
     private static readonly JsonSerializerSettings CamelCaseIndentedSettings = new()
