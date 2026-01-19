@@ -106,6 +106,7 @@ public sealed class DeepEqualityResult : IEnumerable<Distinction>
         {
             _list.AddRange(collection._list);
         }
+
         return this;
     }
 

@@ -14,7 +14,9 @@ public static class PropertyPathNormalizer
     public static string Normalize(string propertyPath)
     {
         if (string.IsNullOrEmpty(propertyPath))
+        {
             return propertyPath;
+        }
 
         var pathWithoutIndexers = RemoveIndexers(propertyPath);
 
@@ -50,7 +52,9 @@ public static class PropertyPathNormalizer
         finally
         {
             if (rentedBuffer is not null)
+            {
                 ArrayPool<char>.Shared.Return(rentedBuffer);
+            }
         }
     }
 
@@ -64,7 +68,10 @@ public static class PropertyPathNormalizer
             if (insideIndexer)
             {
                 if (character == ']')
+                {
                     insideIndexer = false;
+                }
+
                 continue;
             }
 
@@ -86,11 +93,15 @@ public static class PropertyPathNormalizer
 
         var genericOpenIndex = span.IndexOf('<');
         if (genericOpenIndex < 0)
+        {
             return genericPath;
+        }
 
         var genericCloseIndex = FindMatchingCloseBracket(span, genericOpenIndex);
         if (genericCloseIndex < 0 || !TryGetPropertyStartIndex(span, genericCloseIndex, out var propertyStartIndex))
+        {
             return genericPath;
+        }
 
         return BuildElementTypePath(genericPath, genericOpenIndex, genericCloseIndex, propertyStartIndex);
     }
@@ -100,6 +111,7 @@ public static class PropertyPathNormalizer
         var depth = 0;
 
         for (var i = openIndex; i < span.Length; i++)
+        {
             switch (span[i])
             {
                 case '<':
@@ -108,6 +120,7 @@ public static class PropertyPathNormalizer
                 case '>' when --depth == 0:
                     return i;
             }
+        }
 
         return -1;
     }
@@ -131,7 +144,10 @@ public static class PropertyPathNormalizer
     {
         var index = startIndex;
         while (index < span.Length && span[index] == '.')
+        {
             index++;
+        }
+
         return index;
     }
 

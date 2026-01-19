@@ -43,7 +43,7 @@ public sealed class ComparablesStrategy : IComparablesStrategy
 
     private bool IsEqual<T>(T expected, T actual) where T : notnull
     {
-        return expected is IComparable<T> compareToMethod && compareToMethod.CompareTo(actual) == 0
+        return (expected is IComparable<T> compareToMethod && compareToMethod.CompareTo(actual) == 0)
                || ForNullable(expected, actual);
     }
 

@@ -1,9 +1,8 @@
-﻿namespace ObjectsComparator.Comparator.Strategies
+﻿namespace ObjectsComparator.Comparator.Strategies;
+
+public enum StrategyType
 {
-    public enum StrategyType
-    {
-        Equality = 0,
-        OverridesEquals = 1,
-        CompareTo = 2
-    }
+    Equality = 0,
+    OverridesEquals = 1,
+    CompareTo = 2
 }

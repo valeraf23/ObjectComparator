@@ -21,15 +21,15 @@ public class CollectionsCompareStrategy : BaseCollectionsCompareStrategy
 
     private static readonly ConcurrentDictionary<Type, Type> GenericArgumentCache = new();
 
+    public CollectionsCompareStrategy(Comparator comparator) : base(comparator)
+    {
+    }
+
     private static string GetIndexedPropertyName(string propertyName, int i)
     {
         return i < 10
             ? $"{propertyName}[{(char)('0' + i)}]"
             : $"{propertyName}[{i}]";
-    }
-
-    public CollectionsCompareStrategy(Comparator comparator) : base(comparator)
-    {
     }
 
     public override bool IsValid(Type member)
