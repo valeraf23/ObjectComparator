@@ -24,6 +24,8 @@ public sealed class CompareMembersStrategy : ICompareMembersStrategy
     private static readonly ConcurrentDictionary<Type, IReadOnlyDictionary<string, MemberAccessor>>
         CachedAccessorsByName = new();
 
+    private static readonly ConcurrentDictionary<(string, string), string> PropertyPathCache = new();
+
     private readonly Comparator _handler;
 
     public CompareMembersStrategy(Comparator handler)
@@ -56,7 +58,8 @@ public sealed class CompareMembersStrategy : ICompareMembersStrategy
         {
             var actualPropertyPath = string.IsNullOrEmpty(propertyName)
                 ? accessor.Name
-                : $"{propertyName}.{accessor.Name}";
+                : PropertyPathCache.GetOrAdd((propertyName, accessor.Name),
+                    static key => $"{key.Item1}.{key.Item2}");
 
             var firstValue = accessor.Getter(expected);
             var secondValue = accessor.Getter(actual);
@@ -102,7 +105,8 @@ public sealed class CompareMembersStrategy : ICompareMembersStrategy
 
             var actualPropertyPath = string.IsNullOrEmpty(propertyName)
                 ? accessor.Key
-                : $"{propertyName}.{accessor.Key}";
+                : PropertyPathCache.GetOrAdd((propertyName, accessor.Key),
+                    static key => $"{key.Item1}.{key.Item2}");
 
             var expectedValue = accessor.Value.Getter(expected);
             var actualValue = actualAccessor.Getter(actual);

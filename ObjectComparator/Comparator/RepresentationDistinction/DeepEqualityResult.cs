@@ -102,7 +102,10 @@ public sealed class DeepEqualityResult : IEnumerable<Distinction>
 
     public DeepEqualityResult AddRange(DeepEqualityResult collection)
     {
-        _list.AddRange(collection);
+        if (collection._list.Count > 0)
+        {
+            _list.AddRange(collection._list);
+        }
         return this;
     }
 

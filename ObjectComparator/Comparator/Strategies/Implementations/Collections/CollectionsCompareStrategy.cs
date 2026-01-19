@@ -5,6 +5,7 @@ using ObjectsComparator.Comparator.Rules;
 using ObjectsComparator.Helpers.Extensions;
 using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -17,6 +18,15 @@ public class CollectionsCompareStrategy : BaseCollectionsCompareStrategy
         typeof(CollectionsCompareStrategy).GetTypeInfo().GetDeclaredMethod(nameof(CompareCollections))!;
 
     private static readonly Type ListType = typeof(IEnumerable<>);
+
+    private static readonly ConcurrentDictionary<Type, Type> GenericArgumentCache = new();
+
+    private static string GetIndexedPropertyName(string propertyName, int i)
+    {
+        return i < 10
+            ? $"{propertyName}[{(char)('0' + i)}]"
+            : $"{propertyName}[{i}]";
+    }
 
     public CollectionsCompareStrategy(Comparator comparator) : base(comparator)
     {
@@ -52,9 +62,10 @@ public class CollectionsCompareStrategy : BaseCollectionsCompareStrategy
 
     private static Type GetGenericArgument(Type type)
     {
-        return type.GetInterfaces().Prepend(type)
-            .Where(i => i.IsGenericType && i.GetGenericTypeDefinition() == ListType)
-            .Select(i => i.GetGenericArguments()[0]).First();
+        return GenericArgumentCache.GetOrAdd(type, static t =>
+            t.GetInterfaces().Prepend(t)
+                .Where(i => i.IsGenericType && i.GetGenericTypeDefinition() == ListType)
+                .Select(i => i.GetGenericArguments()[0]).First());
     }
 
     private static bool TryGetGenericArgument(Type type, out Type genericArgument)
@@ -88,14 +99,15 @@ public class CollectionsCompareStrategy : BaseCollectionsCompareStrategy
     {
         for (var i = startIndex; i < source.Count; i++)
         {
+            var indexedName = GetIndexedPropertyName(propertyName, i);
             var value = GetFormattedValue(source[i], isPrimitive, couldToString);
             if (action == "Removed")
             {
-                diff.Add(new Distinction($"{propertyName}[{i}]", value, null, action));
+                diff.Add(new Distinction(indexedName, value, null, action));
             }
             else if (action == "Added")
             {
-                diff.Add(new Distinction($"{propertyName}[{i}]", null, value, action));
+                diff.Add(new Distinction(indexedName, null, value, action));
             }
         }
     }
@@ -115,7 +127,8 @@ public class CollectionsCompareStrategy : BaseCollectionsCompareStrategy
 
         for (var i = 0; i < minCount; i++)
         {
-            var elementDiff = handler.Compare(expected[i], actual[i], $"{propertyName}[{i}]");
+            var indexedName = GetIndexedPropertyName(propertyName, i);
+            var elementDiff = handler.Compare(expected[i], actual[i], indexedName);
             diff.AddRange(elementDiff);
         }
 
@@ -218,7 +231,8 @@ public class CollectionsCompareStrategy : BaseCollectionsCompareStrategy
             var expectedValueType = expectedValue?.GetType() ?? expectedElementType;
             var actualValueType = actualValue?.GetType() ?? actualElementType;
 
-            var elementDiff = Comparator.CompareWithTypes(expectedValue, actualValue, $"{propertyName}[{i}]",
+            var indexedName = GetIndexedPropertyName(propertyName, i);
+            var elementDiff = Comparator.CompareWithTypes(expectedValue, actualValue, indexedName,
                 expectedValueType, actualValueType);
 
             diff.AddRange(elementDiff);
@@ -245,14 +259,15 @@ public class CollectionsCompareStrategy : BaseCollectionsCompareStrategy
     {
         for (var i = startIndex; i < source.Count; i++)
         {
+            var indexedName = GetIndexedPropertyName(propertyName, i);
             var value = FormatValue(source[i]);
             if (action == "Removed")
             {
-                diff.Add(new Distinction($"{propertyName}[{i}]", value, null, action));
+                diff.Add(new Distinction(indexedName, value, null, action));
             }
             else if (action == "Added")
             {
-                diff.Add(new Distinction($"{propertyName}[{i}]", null, value, action));
+                diff.Add(new Distinction(indexedName, null, value, action));
             }
         }
     }
