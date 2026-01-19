@@ -62,10 +62,10 @@ ObjectComparator targets modern .NET versions (netstandard2.1 and higher). Insta
 ```csharp
 using ObjectsComparator;
 
-var result = actual.DeeplyEquals(expected);
+var result = expected.DeeplyEquals(actual);
 ```
 
-The returned `DeepEqualityResult` contains one entry per difference. When there are no differences, `result.IsEmpty` is `true` and the compared objects are considered deeply equal.
+The returned `DeepEqualityResult` contains one entry per difference. When there are no differences, `result.IsEmpty` is `true` and the compared objects are considered deeply equal. Use `expected.DeeplyEquals(actual)` so the "Expected Value" and "Actual Value" labels map to the correct inputs.
 
 ## Usage Examples
 
@@ -120,7 +120,7 @@ var expected = new Student
     }
 };
 
-var result = actual.DeeplyEquals(expected);
+var result = expected.DeeplyEquals(actual);
 
 /*
     Path: "Student.Name":
@@ -236,8 +236,8 @@ var result = expected.DeeplyEquals(actual, config => config
 Define specific strategies for comparing properties.
 
 ```csharp
-var result = actual.DeeplyEquals(
-    expected,
+var result = expected.DeeplyEquals(
+    actual,
     strategy => strategy
         .Set(x => x.Vehicle.Model, (act, exp) => act.Length == exp.Length)
         .Set(x => x.Courses[1].Name, (act, exp) => act.StartsWith('L') && exp.StartsWith('L')));
@@ -315,7 +315,7 @@ Omit certain properties or fields from the comparison.
 
 ```csharp
 var ignore = new[] { "Name", "Courses", "Vehicle" };
-var result = actual.DeeplyEquals(expected, ignore);
+var result = expected.DeeplyEquals(actual, ignore);
 
 /*
     Objects are deeply equal
@@ -327,8 +327,8 @@ var result = actual.DeeplyEquals(expected, ignore);
 Provide specific strategies and display the differences.
 
 ```csharp
-var result = actual.DeeplyEquals(
-    expected,
+var result = expected.DeeplyEquals(
+    actual,
     strategy => strategy
         .Set(x => x.Vehicle.Model, (act, exp) => act.StartsWith('A') && exp.StartsWith('A')),
     "Name",
@@ -491,7 +491,7 @@ var exp = new Student
     }
 };
 
-var distinctions = act.DeeplyEquals(exp, propName => propName.EndsWith("Name"));
+var distinctions = exp.DeeplyEquals(act, propName => propName.EndsWith("Name"));
 /*
     Objects are deeply equal
 */
@@ -503,7 +503,7 @@ var distinctions = act.DeeplyEquals(exp, propName => propName.EndsWith("Name"));
 var actual = new SomeTest("A");
 var expected = new SomeTest("B");
 
-var result = exp.DeeplyEquals(act);
+var result = expected.DeeplyEquals(actual);
 
 /*
     Path: "SomeTest":
@@ -556,7 +556,7 @@ Detect differences when dealing with anonymous types.
 var actual = new { Integer = 1, String = "Test", Nested = new byte[] { 1, 2, 3 } };
 var expected = new { Integer = 1, String = "Test", Nested = new byte[] { 1, 2, 4 } };
 
-var result = exp.DeeplyEquals(act);
+var result = expected.DeeplyEquals(actual);
 
 /*
     Path: "AnonymousType<Int32, String, Byte[]>.Nested[2]":
