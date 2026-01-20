@@ -1,9 +1,9 @@
 using FluentAssertions;
 using NUnit.Framework;
+using ObjectsComparator.Comparator.RepresentationDistinction;
 using ObjectsComparator.Comparator.Rules;
 using ObjectsComparator.Comparator.Rules.Interfaces;
 using ObjectsComparator.Comparator.Strategies.Interfaces;
-using ObjectsComparator.Comparator.RepresentationDistinction;
 using System;
 using System.Collections.Generic;
 
@@ -101,32 +101,48 @@ public class RulePriorityTests
     }
 
     /// <summary>
-    /// Fake strategy for testing that is never valid.
+    ///     Fake strategy for testing that is never valid.
     /// </summary>
     private class FakeStrategy : IStrategy
     {
         private readonly string _name;
 
-        public FakeStrategy(string name) => _name = name;
+        public FakeStrategy(string name)
+        {
+            _name = name;
+        }
 
-        public bool IsValid(Type member) => false;
+        public bool IsValid(Type member)
+        {
+            return false;
+        }
 
         public DeepEqualityResult Compare<T>(T expected, T actual, string propertyName) where T : notnull
-            => DeepEqualityResult.None();
+        {
+            return DeepEqualityResult.None();
+        }
     }
 
     /// <summary>
-    /// Strategy that is always valid for testing priority ordering.
+    ///     Strategy that is always valid for testing priority ordering.
     /// </summary>
     private class AlwaysValidStrategy : IStrategy
     {
         private readonly string _name;
 
-        public AlwaysValidStrategy(string name) => _name = name;
+        public AlwaysValidStrategy(string name)
+        {
+            _name = name;
+        }
 
-        public bool IsValid(Type member) => true;
+        public bool IsValid(Type member)
+        {
+            return true;
+        }
 
         public DeepEqualityResult Compare<T>(T expected, T actual, string propertyName) where T : notnull
-            => DeepEqualityResult.None();
+        {
+            return DeepEqualityResult.None();
+        }
     }
 }

@@ -8,17 +8,18 @@ using System.Linq;
 namespace ObjectsComparator.Comparator.Rules;
 
 /// <summary>
-/// Manages comparison rules and selects the appropriate comparer based on type and priority.
-/// Rules are automatically sorted by priority (lower values first).
+///     Manages comparison rules and selects the appropriate comparer based on type and priority.
+///     Rules are automatically sorted by priority (lower values first).
 /// </summary>
 internal sealed class RulesHandler
 {
+    private readonly Func<Type, ICompareValues> _findComparerFunc;
     private readonly Func<string, bool> _ignoreStrategy;
+
+    private readonly ConcurrentDictionary<Type, ICompareValues> _ruleCache = new();
     private readonly Rule[] _rules;
     private readonly Dictionary<string, ICustomCompareValues> _strategies;
     private readonly Dictionary<Type, ICustomCompareValues> _typeStrategies;
-    
-    private readonly ConcurrentDictionary<Type, ICompareValues> _ruleCache = new();
 
     public RulesHandler(List<Rule> rules, Dictionary<string, ICustomCompareValues> strategies,
         Func<string, bool> ignoreStrategy, Dictionary<Type, ICustomCompareValues>? typeStrategies = null)
@@ -27,17 +28,26 @@ internal sealed class RulesHandler
         _ignoreStrategy = ignoreStrategy;
         _typeStrategies = typeStrategies ?? new Dictionary<Type, ICustomCompareValues>();
         _rules = rules.OrderBy(r => r.Priority).ToArray();
+        _findComparerFunc = FindComparer;
     }
 
     public CompareValues GetFor(Type memberType)
     {
-        var comparer = _ruleCache.GetOrAdd(memberType, type =>
-        {
-            var rule = _rules.FirstOrDefault(r => r.IsValid(type))?.Get(type);
-            return rule ?? throw new NotSupportedException($"Not Satisfied Rule for {type.FullName}");
-        });
-
+        var comparer = _ruleCache.GetOrAdd(memberType, _findComparerFunc);
         return new CompareValues(comparer, _strategies, _ignoreStrategy, _typeStrategies);
+    }
+
+    private ICompareValues FindComparer(Type memberType)
+    {
+        for (var i = 0; i < _rules.Length; i++)
+        {
+            if (_rules[i].IsValid(memberType))
+            {
+                return _rules[i].Get(memberType);
+            }
+        }
+
+        throw new NotSupportedException($"Not Satisfied Rule for {memberType.FullName}");
     }
 
     internal bool IsIgnored(string propertyName)

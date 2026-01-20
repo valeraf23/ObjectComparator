@@ -5,7 +5,7 @@ using System;
 namespace ObjectsComparator.Comparator.Rules.Interfaces;
 
 /// <summary>
-/// Abstract base class for comparison rules with explicit priority ordering.
+///     Abstract base class for comparison rules with explicit priority ordering.
 /// </summary>
 public abstract class Rule : IGetRule<ICompareValues>, IValidator
 {
@@ -27,7 +27,7 @@ public abstract class Rule : IGetRule<ICompareValues>, IValidator
 
     public static Rule CreateFor<T>(T strategy) where T : class, IStrategy
     {
-        return new Rule<T>(strategy, RulePriority.Members);
+        return new Rule<T>(strategy);
     }
 
     public static Rule CreateFor<T>(T defaultRule, params T[] others) where T : class, IStrategy

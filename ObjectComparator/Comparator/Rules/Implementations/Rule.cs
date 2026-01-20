@@ -6,7 +6,7 @@ using System;
 namespace ObjectsComparator.Comparator.Rules.Implementations;
 
 /// <summary>
-/// A rule that wraps a single strategy with an explicit priority.
+///     A rule that wraps a single strategy with an explicit priority.
 /// </summary>
 internal class Rule<T> : Rule where T : class, IStrategy
 {

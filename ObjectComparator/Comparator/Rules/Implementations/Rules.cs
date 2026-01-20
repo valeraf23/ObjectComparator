@@ -1,5 +1,4 @@
-﻿using ObjectsComparator.Comparator.Rules.Interfaces;
-using ObjectsComparator.Comparator.Strategies.Interfaces;
+﻿using ObjectsComparator.Comparator.Strategies.Interfaces;
 using ObjectsComparator.Helpers.GuardArgument;
 using System;
 using System.Linq;
@@ -7,7 +6,7 @@ using System.Linq;
 namespace ObjectsComparator.Comparator.Rules.Implementations;
 
 /// <summary>
-/// A rule that wraps multiple strategies, selecting the first valid one.
+///     A rule that wraps multiple strategies, selecting the first valid one.
 /// </summary>
 internal sealed class Rules<T> : Rule<T> where T : class, IStrategy
 {

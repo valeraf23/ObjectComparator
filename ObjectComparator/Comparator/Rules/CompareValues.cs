@@ -8,14 +8,13 @@ namespace ObjectsComparator.Comparator.Rules;
 
 internal sealed class CompareValues
 {
+    private static readonly ConcurrentDictionary<string, string> NormalizedPathCache = new();
     private readonly ICompareValues _defaultComparer;
+    private readonly bool _hasPropertyStrategies;
+    private readonly bool _hasTypeStrategies;
     private readonly Func<string, bool> _shouldIgnore;
     private readonly Dictionary<string, ICustomCompareValues> _strategies;
     private readonly Dictionary<Type, ICustomCompareValues> _typStrategies;
-    private readonly bool _hasPropertyStrategies;
-    private readonly bool _hasTypeStrategies;
-    
-    private static readonly ConcurrentDictionary<string, string> NormalizedPathCache = new();
 
     public CompareValues(
         ICompareValues defaultComparer,
@@ -54,7 +53,6 @@ internal sealed class CompareValues
         }
 
         return CompareOrDefault(expected, actual, propertyPath);
-
     }
 
     private bool TryGetStrategy(string propertyPath, out ICustomCompareValues? strategy)

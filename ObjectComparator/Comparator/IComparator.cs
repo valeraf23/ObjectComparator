@@ -1,5 +1,6 @@
 using ObjectsComparator.Comparator.Helpers;
 using ObjectsComparator.Comparator.RepresentationDistinction;
+using System;
 
 namespace ObjectsComparator.Comparator;
 
@@ -10,5 +11,5 @@ public interface IComparator
     DeepEqualityResult Compare<T>(T expected, T actual);
 
     DeepEqualityResult CompareWithTypes(object? expected, object? actual, string propertyName,
-        System.Type expectedType, System.Type actualType);
+        Type expectedType, Type actualType);
 }

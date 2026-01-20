@@ -58,7 +58,7 @@ public sealed class Comparator : IComparator
             : Rule.CreateFor(new ComparablesStrategy(true), RulePriority.Comparable));
 
         rules.Add(Rule.CreateFor<ICollectionsCompareStrategy>(
-            _collectionsCompareStrategy, 
+            _collectionsCompareStrategy,
             RulePriority.Collection,
             _dictionaryCompareStrategy));
 

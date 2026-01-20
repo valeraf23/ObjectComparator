@@ -75,7 +75,8 @@ public class CompareValuesPriorityTests
         // Assert
         propertyStrategy.WasCalled.Should().BeTrue("property strategy should be used first");
         typeStrategy.WasCalled.Should().BeFalse("type strategy should not be called when property strategy exists");
-        defaultComparer.WasCalled.Should().BeFalse("default comparer should not be called when property strategy exists");
+        defaultComparer.WasCalled.Should()
+            .BeFalse("default comparer should not be called when property strategy exists");
     }
 
     [Test]
@@ -199,7 +200,7 @@ public class CompareValuesPriorityTests
             new Dictionary<Type, ICustomCompareValues>());
 
         // Act
-        var result = compareValues.Compare<string?>(null, "actual", TestPropertyPath);
+        var result = compareValues.Compare(null, "actual", TestPropertyPath);
 
         // Assert
         result.IsEmpty().Should().BeFalse();
@@ -221,7 +222,7 @@ public class CompareValuesPriorityTests
             new Dictionary<Type, ICustomCompareValues>());
 
         // Act
-        var result = compareValues.Compare<string?>("expected", null, TestPropertyPath);
+        var result = compareValues.Compare("expected", null, TestPropertyPath);
 
         // Assert
         result.IsEmpty().Should().BeFalse();
@@ -289,7 +290,7 @@ public class CompareValuesPriorityTests
     }
 
     /// <summary>
-    /// A test comparer that tracks whether it was called.
+    ///     A test comparer that tracks whether it was called.
     /// </summary>
     private class TrackingComparer : ICompareValues, ICustomCompareValues
     {
