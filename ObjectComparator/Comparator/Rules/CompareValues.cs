@@ -37,14 +37,18 @@ public class CompareValues
             return DeepEqualityResult.None();
         }
 
+        if (TryGetStrategy(propertyPath, out var strategy))
+        {
+            return strategy!.Compare(expected, actual, propertyPath);
+        }
+
         if (_typStrategies.TryGetValue(typeof(T), out var typeStrategy))
         {
             return typeStrategy.Compare(expected, actual, propertyPath);
         }
 
-        return TryGetStrategy(propertyPath, out var strategy)
-            ? strategy!.Compare(expected, actual, propertyPath)
-            : CompareOrDefault(expected, actual, propertyPath);
+        return CompareOrDefault(expected, actual, propertyPath);
+
     }
 
     private bool TryGetStrategy(string propertyPath, out ICustomCompareValues? strategy)

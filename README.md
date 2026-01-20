@@ -9,6 +9,7 @@ ObjectComparator is a high-performance .NET library designed for deep comparison
 
 ## Table of Contents
 - [Key Features](#key-features)
+- [Strategy Priority Order](#strategy-priority-order)
 - [Installation](#installation)
 - [Getting Started](#getting-started)
 - [Usage Examples](#usage-examples)
@@ -38,10 +39,42 @@ ObjectComparator is a high-performance .NET library designed for deep comparison
 - **Deep member-by-member comparisons:** Unravel every detail and identify even the slightest differences between complex objects.
 - **Customizable rules:** Define bespoke comparison criteria for properties or fields so that you remain in control of the comparison process.
 - **Type-based strategies:** Apply custom comparison logic to all properties of a specific type (e.g., case-insensitive string comparison everywhere).
+- **Strategy priority system:** Property-specific strategies take precedence over type-based strategies, which take precedence over default comparers—giving you precise control.
 - **Unified fluent API:** Configure all comparison options in one place using a clean, chainable builder pattern.
 - **Collection support:** Compare collections with custom strategies that apply to all elements automatically.
 - **Performance focused:** Despite its comprehensive comparisons, ObjectComparator is optimized for speed and minimal allocations.
 - **Friendly diagnostics:** Differences are captured with paths, expected values, actual values, and optional details, making debugging straightforward.
+
+## Strategy Priority Order
+
+When comparing values, ObjectComparator applies strategies in the following priority order:
+
+| Priority | Strategy | Description |
+|----------|----------|-------------|
+| 1 | **Ignore** | If the property path matches an ignore rule, the comparison is skipped entirely |
+| 2 | **Property Strategy** | Custom comparison logic defined for a specific property path (e.g., `x => x.Name`) |
+| 3 | **Type Strategy** | Custom comparison logic applied to all properties of a specific type (e.g., all `string` properties) |
+| 4 | **Default Comparer** | Built-in comparison rules based on the property type |
+
+This means that **property-specific strategies always take precedence over type-based strategies**, giving you fine-grained control when needed while still benefiting from broad type-level rules.
+
+**Example:**
+
+```csharp
+var result = expected.DeeplyEquals(actual, config => config
+    // Type strategy: case-insensitive for ALL strings
+    .WithTypeStrategies(ts => ts.Set<string>((e, a) => 
+        string.Equals(e, a, StringComparison.OrdinalIgnoreCase)))
+    // Property strategy: exact match for Name property (overrides type strategy)
+    .WithStrategies(s => s.Set(x => x.Name, (e, a) => e == a))
+    // Ignore: skip Description property entirely (highest priority)
+    .Ignore("Description"));
+```
+
+In this example:
+- `Description` is ignored completely (priority 1)
+- `Name` uses exact string comparison (priority 2 - property strategy overrides type strategy)
+- All other `string` properties use case-insensitive comparison (priority 3)
 
 ## Installation
 
