@@ -15,7 +15,7 @@ using System.Linq.Expressions;
 
 namespace ObjectsComparator.Comparator;
 
-public sealed class Comparator
+public sealed class Comparator : IComparator
 {
     private const string NullDisplayValue = "null";
 
@@ -28,7 +28,7 @@ public sealed class Comparator
     private readonly CollectionsCompareStrategy _collectionsCompareStrategy;
     private readonly CompareMembersStrategy _compareMembersStrategy;
     private readonly DictionaryCompareStrategy _dictionaryCompareStrategy;
-    public readonly RulesHandler RulesHandler;
+    internal readonly RulesHandler RulesHandler;
 
     public Comparator(Dictionary<string, ICustomCompareValues> customStrategies, Func<string, bool> ignoreStrategy,
         ComparatorOptions options)
@@ -40,32 +40,34 @@ public sealed class Comparator
 
         var rules = new List<Rule>(6)
         {
-            Rule.CreateFor(new ComparePrimitiveTypesStrategy())
+            Rule.CreateFor(new ComparePrimitiveTypesStrategy(), RulePriority.Primitive)
         };
 
         if (!Options.IsSkipped(StrategyType.Equality))
         {
-            rules.Add(Rule.CreateFor(new EqualityStrategy()));
+            rules.Add(Rule.CreateFor(new EqualityStrategy(), RulePriority.Equality));
         }
 
         if (!Options.IsSkipped(StrategyType.OverridesEquals))
         {
-            rules.Add(Rule.CreateFor(new OverridesEqualsStrategy()));
+            rules.Add(Rule.CreateFor(new OverridesEqualsStrategy(), RulePriority.OverridesEquals));
         }
 
         rules.Add(!Options.IsSkipped(StrategyType.CompareTo)
-            ? Rule.CreateFor(new ComparablesStrategy())
-            : Rule.CreateFor(new ComparablesStrategy(true)));
+            ? Rule.CreateFor(new ComparablesStrategy(), RulePriority.Comparable)
+            : Rule.CreateFor(new ComparablesStrategy(true), RulePriority.Comparable));
 
-        rules.Add(Rule.CreateFor<ICollectionsCompareStrategy>(_collectionsCompareStrategy,
+        rules.Add(Rule.CreateFor<ICollectionsCompareStrategy>(
+            _collectionsCompareStrategy, 
+            RulePriority.Collection,
             _dictionaryCompareStrategy));
 
-        rules.Add(Rule.CreateFor(_compareMembersStrategy));
+        rules.Add(Rule.CreateFor(_compareMembersStrategy, RulePriority.Members));
 
         RulesHandler = new RulesHandler(rules, customStrategies, ignoreStrategy, Options.TypeStrategies);
     }
 
-    internal ComparatorOptions Options { get; }
+    public ComparatorOptions Options { get; }
 
     public DeepEqualityResult Compare<T>(T expected, T actual)
     {
@@ -113,7 +115,7 @@ public sealed class Comparator
             .Compare(expected, actual, typeName);
     }
 
-    internal DeepEqualityResult CompareWithTypes(object? expected, object? actual, string propertyName,
+    public DeepEqualityResult CompareWithTypes(object? expected, object? actual, string propertyName,
         Type expectedType,
         Type actualType)
     {

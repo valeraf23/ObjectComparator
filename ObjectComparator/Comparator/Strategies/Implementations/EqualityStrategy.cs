@@ -7,7 +7,7 @@ using System.Reflection;
 
 namespace ObjectsComparator.Comparator.Strategies.Implementations;
 
-public sealed class EqualityStrategy : IEqualityStrategy
+internal sealed class EqualityStrategy : IEqualityStrategy
 {
     private const string Details = "== (Equality Operator)";
     private const string OpEquality = "op_Equality";

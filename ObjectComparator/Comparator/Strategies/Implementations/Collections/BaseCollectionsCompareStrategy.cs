@@ -5,7 +5,7 @@ using System;
 
 namespace ObjectsComparator.Comparator.Strategies.Implementations.Collections;
 
-public abstract class BaseCollectionsCompareStrategy : ICollectionsCompareStrategy
+internal abstract class BaseCollectionsCompareStrategy : ICollectionsCompareStrategy
 {
     protected BaseCollectionsCompareStrategy(Comparator comparator)
     {

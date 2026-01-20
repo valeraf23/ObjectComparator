@@ -1,13 +1,17 @@
-﻿using ObjectsComparator.Comparator.Strategies.Interfaces;
+﻿using ObjectsComparator.Comparator.Rules.Interfaces;
+using ObjectsComparator.Comparator.Strategies.Interfaces;
 using ObjectsComparator.Helpers.GuardArgument;
 using System;
 using System.Linq;
 
 namespace ObjectsComparator.Comparator.Rules.Implementations;
 
-public class Rules<T> : Rule<T> where T : class, IStrategy
+/// <summary>
+/// A rule that wraps multiple strategies, selecting the first valid one.
+/// </summary>
+internal sealed class Rules<T> : Rule<T> where T : class, IStrategy
 {
-    public Rules(T defaultRule, params T[] others) : base(defaultRule)
+    public Rules(T defaultRule, RulePriority priority, params T[] others) : base(defaultRule, priority)
     {
         GuardArgument.ArgumentIsNotNull(others);
         Strategies = others;

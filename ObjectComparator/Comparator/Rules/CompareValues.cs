@@ -1,17 +1,21 @@
 using ObjectsComparator.Comparator.RepresentationDistinction;
 using ObjectsComparator.Comparator.Strategies.Interfaces;
-using ObjectsComparator.Helpers.Extensions;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 
 namespace ObjectsComparator.Comparator.Rules;
 
-public class CompareValues
+internal sealed class CompareValues
 {
     private readonly ICompareValues _defaultComparer;
     private readonly Func<string, bool> _shouldIgnore;
     private readonly Dictionary<string, ICustomCompareValues> _strategies;
     private readonly Dictionary<Type, ICustomCompareValues> _typStrategies;
+    private readonly bool _hasPropertyStrategies;
+    private readonly bool _hasTypeStrategies;
+    
+    private static readonly ConcurrentDictionary<string, string> NormalizedPathCache = new();
 
     public CompareValues(
         ICompareValues defaultComparer,
@@ -23,6 +27,8 @@ public class CompareValues
         _strategies = strategies;
         _shouldIgnore = shouldIgnore;
         _typStrategies = typStrategies;
+        _hasPropertyStrategies = strategies.Count > 0;
+        _hasTypeStrategies = typStrategies.Count > 0;
     }
 
     public DeepEqualityResult Compare<T>(T expected, T actual, string propertyPath)
@@ -37,12 +43,12 @@ public class CompareValues
             return DeepEqualityResult.None();
         }
 
-        if (TryGetStrategy(propertyPath, out var strategy))
+        if (_hasPropertyStrategies && TryGetStrategy(propertyPath, out var strategy))
         {
             return strategy!.Compare(expected, actual, propertyPath);
         }
 
-        if (_typStrategies.TryGetValue(typeof(T), out var typeStrategy))
+        if (_hasTypeStrategies && _typStrategies.TryGetValue(typeof(T), out var typeStrategy))
         {
             return typeStrategy.Compare(expected, actual, propertyPath);
         }
@@ -53,13 +59,6 @@ public class CompareValues
 
     private bool TryGetStrategy(string propertyPath, out ICustomCompareValues? strategy)
     {
-        strategy = null;
-
-        if (_strategies.IsEmpty())
-        {
-            return false;
-        }
-
         if (_strategies.TryGetValue(propertyPath, out strategy))
         {
             return true;
@@ -70,7 +69,7 @@ public class CompareValues
             return false;
         }
 
-        var normalizedPath = PropertyPathNormalizer.Normalize(propertyPath);
+        var normalizedPath = NormalizedPathCache.GetOrAdd(propertyPath, PropertyPathNormalizer.Normalize);
         return _strategies.TryGetValue(normalizedPath, out strategy);
     }
 

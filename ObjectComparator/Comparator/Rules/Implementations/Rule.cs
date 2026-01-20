@@ -5,15 +5,23 @@ using System;
 
 namespace ObjectsComparator.Comparator.Rules.Implementations;
 
-public class Rule<T> : Rule where T : class, IStrategy
+/// <summary>
+/// A rule that wraps a single strategy with an explicit priority.
+/// </summary>
+internal class Rule<T> : Rule where T : class, IStrategy
 {
-    public Rule(T defaultRule)
+    private readonly RulePriority _priority;
+
+    public Rule(T defaultRule, RulePriority priority = RulePriority.Members)
     {
         GuardArgument.ArgumentIsNotNull(defaultRule);
         Default = defaultRule;
+        _priority = priority;
     }
 
     protected T Default { get; }
+
+    public override RulePriority Priority => _priority;
 
     public override ICompareValues Get(Type memberType)
     {

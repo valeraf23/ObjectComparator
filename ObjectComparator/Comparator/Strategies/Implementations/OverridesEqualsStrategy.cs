@@ -5,7 +5,7 @@ using System;
 
 namespace ObjectsComparator.Comparator.Strategies.Implementations;
 
-public sealed class OverridesEqualsStrategy : IOverridesEqualsStrategy
+internal sealed class OverridesEqualsStrategy : IOverridesEqualsStrategy
 {
     private const string Details = "Was used override 'Equals()'";
 

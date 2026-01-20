@@ -7,7 +7,7 @@ namespace ObjectsComparator.Comparator.Rules;
 ///     Normalizes property paths by removing collection indexers and extracting element types from generics.
 ///     Example: "List<Person>[0].Name" becomes "Person.Name"
 /// </summary>
-public static class PropertyPathNormalizer
+internal static class PropertyPathNormalizer
 {
     private const int StackAllocThreshold = 256;
 

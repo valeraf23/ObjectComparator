@@ -11,7 +11,7 @@ using System.Reflection;
 
 namespace ObjectsComparator.Comparator.Strategies.Implementations.Collections;
 
-public class DictionaryCompareStrategy : BaseCollectionsCompareStrategy
+internal sealed class DictionaryCompareStrategy : BaseCollectionsCompareStrategy
 {
     private static readonly MethodInfo CompareMethod = typeof(DictionaryCompareStrategy).GetTypeInfo()
         .GetDeclaredMethod(nameof(CompareDictionary))!;

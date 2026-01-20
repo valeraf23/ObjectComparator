@@ -12,7 +12,7 @@ using System.Reflection;
 
 namespace ObjectsComparator.Comparator.Strategies.Implementations.Collections;
 
-public class CollectionsCompareStrategy : BaseCollectionsCompareStrategy
+internal sealed class CollectionsCompareStrategy : BaseCollectionsCompareStrategy
 {
     private static readonly MethodInfo CompareCollectionsMethod =
         typeof(CollectionsCompareStrategy).GetTypeInfo().GetDeclaredMethod(nameof(CompareCollections))!;

@@ -7,7 +7,7 @@ using System.Reflection;
 
 namespace ObjectsComparator.Comparator.Strategies.Implementations;
 
-public sealed class ComparablesStrategy : IComparablesStrategy
+internal sealed class ComparablesStrategy : IComparablesStrategy
 {
     private const string MethodName = "CompareTo";
     private const string Details = $"used_{MethodName}()";

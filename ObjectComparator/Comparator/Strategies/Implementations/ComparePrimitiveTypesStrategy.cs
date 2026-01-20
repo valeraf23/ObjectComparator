@@ -5,7 +5,7 @@ using System;
 
 namespace ObjectsComparator.Comparator.Strategies.Implementations;
 
-public sealed class ComparePrimitiveTypesStrategy : ICompareStructStrategy
+internal sealed class ComparePrimitiveTypesStrategy : ICompareStructStrategy
 {
     public bool IsValid(Type member)
     {

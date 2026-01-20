@@ -11,7 +11,7 @@ using System.Reflection;
 
 namespace ObjectsComparator.Comparator.Strategies.Implementations;
 
-public sealed class CompareMembersStrategy : ICompareMembersStrategy
+internal sealed class CompareMembersStrategy : ICompareMembersStrategy
 {
     private const string NullDisplayValue = "null";
 
