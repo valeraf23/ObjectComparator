@@ -14,9 +14,11 @@ namespace ObjectsComparator.Comparator.Rules;
 internal sealed class RulesHandler
 {
     private readonly Func<Type, ICompareValues> _findComparerFunc;
+    private readonly Func<Type, CompareValues> _createCompareValuesFunc;
     private readonly Func<string, bool> _ignoreStrategy;
 
     private readonly ConcurrentDictionary<Type, ICompareValues> _ruleCache = new();
+    private readonly ConcurrentDictionary<Type, CompareValues> _compareValuesCache = new();
     private readonly Rule[] _rules;
     private readonly Dictionary<string, ICustomCompareValues> _strategies;
     private readonly Dictionary<Type, ICustomCompareValues> _typeStrategies;
@@ -29,9 +31,15 @@ internal sealed class RulesHandler
         _typeStrategies = typeStrategies ?? new Dictionary<Type, ICustomCompareValues>();
         _rules = rules.OrderBy(r => r.Priority).ToArray();
         _findComparerFunc = FindComparer;
+        _createCompareValuesFunc = CreateCompareValues;
     }
 
     public CompareValues GetFor(Type memberType)
+    {
+        return _compareValuesCache.GetOrAdd(memberType, _createCompareValuesFunc);
+    }
+
+    private CompareValues CreateCompareValues(Type memberType)
     {
         var comparer = _ruleCache.GetOrAdd(memberType, _findComparerFunc);
         return new CompareValues(comparer, _strategies, _ignoreStrategy, _typeStrategies);
