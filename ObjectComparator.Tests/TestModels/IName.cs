@@ -1,7 +1,6 @@
-﻿namespace ObjectsComparator.Tests.TestModels
+﻿namespace ObjectsComparator.Tests.TestModels;
+
+internal interface IName
 {
-    internal interface IName
-    {
-        string Name { get; set; }
-    }
+    string Name { get; set; }
 }

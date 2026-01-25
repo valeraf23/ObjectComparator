@@ -1,8 +1,7 @@
-﻿namespace ObjectsComparator.Tests.TestModels
+﻿namespace ObjectsComparator.Tests.TestModels;
+
+internal class Book
 {
-    internal class Book
-    {
-        public int Pages { get; set; }
-        public string Text { get; set; }
-    }
+    public int Pages { get; set; }
+    public string Text { get; set; }
 }

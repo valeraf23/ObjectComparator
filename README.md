@@ -9,11 +9,15 @@ ObjectComparator is a high-performance .NET library designed for deep comparison
 
 ## Table of Contents
 - [Key Features](#key-features)
+- [Strategy Priority Order](#strategy-priority-order)
 - [Installation](#installation)
 - [Getting Started](#getting-started)
 - [Usage Examples](#usage-examples)
   - [Basic Comparison](#basic-comparison)
+  - [Unified Fluent Configuration (Recommended)](#unified-fluent-configuration-recommended)
+  - [Type-Based Comparison Strategies](#type-based-comparison-strategies)
   - [Custom Strategies for Comparison](#custom-strategies-for-comparison)
+  - [Collection Comparison with Custom Strategies](#collection-comparison-with-custom-strategies)
   - [Ignoring Specific Properties or Fields](#ignoring-specific-properties-or-fields)
   - [Display Distinctions with Custom Strategy](#display-distinctions-with-custom-strategy)
   - [Comparison for Collection Types](#comparison-for-collection-types)
@@ -23,6 +27,7 @@ ObjectComparator is a high-performance .NET library designed for deep comparison
   - [DeeplyEquals when Equality Operator Is Overridden](#deeplyequals-when-equality-operator-is-overridden)
   - [Display Distinctions for Dictionary Types](#display-distinctions-for-dictionary-types)
   - [Comparison for Anonymous Types](#comparison-for-anonymous-types)
+  - [Comparison for Different Types](#comparison-for-different-types)
   - [Convert Comparison Result to JSON](#convert-comparison-result-to-json)
   - [Configuring the Comparison Pipeline](#configuring-the-comparison-pipeline)
 - [Working with the Source](#working-with-the-source)
@@ -33,8 +38,43 @@ ObjectComparator is a high-performance .NET library designed for deep comparison
 
 - **Deep member-by-member comparisons:** Unravel every detail and identify even the slightest differences between complex objects.
 - **Customizable rules:** Define bespoke comparison criteria for properties or fields so that you remain in control of the comparison process.
+- **Type-based strategies:** Apply custom comparison logic to all properties of a specific type (e.g., case-insensitive string comparison everywhere).
+- **Strategy priority system:** Property-specific strategies take precedence over type-based strategies, which take precedence over default comparers—giving you precise control.
+- **Unified fluent API:** Configure all comparison options in one place using a clean, chainable builder pattern.
+- **Collection support:** Compare collections with custom strategies that apply to all elements automatically.
 - **Performance focused:** Despite its comprehensive comparisons, ObjectComparator is optimized for speed and minimal allocations.
 - **Friendly diagnostics:** Differences are captured with paths, expected values, actual values, and optional details, making debugging straightforward.
+
+## Strategy Priority Order
+
+When comparing values, ObjectComparator applies strategies in the following priority order:
+
+| Priority | Strategy | Description |
+|----------|----------|-------------|
+| 1 | **Ignore** | If the property path matches an ignore rule, the comparison is skipped entirely |
+| 2 | **Property Strategy** | Custom comparison logic defined for a specific property path (e.g., `x => x.Name`) |
+| 3 | **Type Strategy** | Custom comparison logic applied to all properties of a specific type (e.g., all `string` properties) |
+| 4 | **Default Comparer** | Built-in comparison rules based on the property type |
+
+This means that **property-specific strategies always take precedence over type-based strategies**, giving you fine-grained control when needed while still benefiting from broad type-level rules.
+
+**Example:**
+
+```csharp
+var result = expected.DeeplyEquals(actual, config => config
+    // Type strategy: case-insensitive for ALL strings
+    .WithTypeStrategies(ts => ts.Set<string>((e, a) => 
+        string.Equals(e, a, StringComparison.OrdinalIgnoreCase)))
+    // Property strategy: exact match for Name property (overrides type strategy)
+    .WithStrategies(s => s.Set(x => x.Name, (e, a) => e == a))
+    // Ignore: skip Description property entirely (highest priority)
+    .Ignore("Description"));
+```
+
+In this example:
+- `Description` is ignored completely (priority 1)
+- `Name` uses exact string comparison (priority 2 - property strategy overrides type strategy)
+- All other `string` properties use case-insensitive comparison (priority 3)
 
 ## Installation
 
@@ -55,10 +95,10 @@ ObjectComparator targets modern .NET versions (netstandard2.1 and higher). Insta
 ```csharp
 using ObjectsComparator;
 
-var result = actual.DeeplyEquals(expected);
+var result = expected.DeeplyEquals(actual);
 ```
 
-The returned `DeepEqualityResult` contains one entry per difference. When there are no differences, `result.IsEmpty` is `true` and the compared objects are considered deeply equal.
+The returned `DeepEqualityResult` contains one entry per difference. When there are no differences, `result.IsEmpty` is `true` and the compared objects are considered deeply equal. Use `expected.DeeplyEquals(actual)` so the "Expected Value" and "Actual Value" labels map to the correct inputs.
 
 ## Usage Examples
 
@@ -113,7 +153,7 @@ var expected = new Student
     }
 };
 
-var result = actual.DeeplyEquals(expected);
+var result = expected.DeeplyEquals(actual);
 
 /*
     Path: "Student.Name":
@@ -134,13 +174,103 @@ var result = actual.DeeplyEquals(expected);
 */
 ```
 
+### Unified Fluent Configuration (Recommended)
+
+The unified fluent API allows you to configure all comparison options in one place using a clean, chainable builder pattern. This is the recommended approach for complex comparison scenarios.
+
+```csharp
+var expected = new VehicleDto
+{
+    Id = 1,
+    Model = "",
+    Description = "Test",
+    InternalCode = "ABC"
+};
+
+var actual = new VehicleEntity
+{
+    Id = 1,
+    Model = null,
+    Description = "Test",
+    InternalCode = "XYZ"  // Different but will be ignored
+};
+
+// Combine all configuration in one fluent call
+var result = expected.DeeplyEquals(actual, config => config
+    .AllowDifferentTypes()
+    .Ignore("InternalCode")
+    .WithTypeStrategies(ts => ts.Set<string>((e, a) =>
+        (string.IsNullOrEmpty(e) && string.IsNullOrEmpty(a)) || e == a))
+    .WithStrategies(s => s.Set(x => x.Description, (e, a) => e == a)));
+
+// Objects are deeply equal - null and empty strings treated as equal,
+// InternalCode ignored, and different types allowed
+```
+
+**Available configuration options:**
+
+| Method | Description |
+|--------|-------------|
+| `.AllowDifferentTypes()` | Enable comparing objects of different types by matching property names |
+| `.Ignore("Prop1", "Prop2")` | Ignore specific properties by name |
+| `.IgnoreWhen(path => path.EndsWith("Id"))` | Ignore properties matching a predicate |
+| `.Skip(StrategyType.OverridesEquals)` | Skip specific comparison strategies |
+| `.WithTypeStrategies(...)` | Apply custom comparison to all properties of a type |
+| `.WithStrategies(...)` | Apply custom comparison to specific properties |
+
+### Type-Based Comparison Strategies
+
+Apply custom comparison logic to all properties of a specific type. This is useful for scenarios like case-insensitive string comparison or treating null and empty strings as equal across all string properties.
+
+```csharp
+var expected = new Person
+{
+    FirstName = "JOHN",
+    LastName = "DOE",
+    Email = ""
+};
+
+var actual = new Person
+{
+    FirstName = "john",
+    LastName = "Doe",
+    Email = null
+};
+
+// Case-insensitive comparison for all strings, treating null/empty as equal
+var result = expected.DeeplyEquals(actual, config => config
+    .WithTypeStrategies(ts => ts.Set<string>((e, a) =>
+        (string.IsNullOrEmpty(e) && string.IsNullOrEmpty(a)) ||
+        string.Equals(e, a, StringComparison.OrdinalIgnoreCase))));
+
+// Objects are deeply equal
+```
+
+**Multiple type strategies:**
+
+```csharp
+var result = expected.DeeplyEquals(actual, config => config
+    .WithTypeStrategies(ts => ts
+        .Set<string>((e, a) => string.Equals(e, a, StringComparison.OrdinalIgnoreCase))
+        .Set<DateTime>((e, a) => e.Date == a.Date)  // Compare dates only, ignore time
+        .Set<decimal>((e, a) => Math.Abs(e - a) < 0.01m)));  // Tolerance for decimals
+```
+
+**Using runtime Type:**
+
+```csharp
+var result = expected.DeeplyEquals(actual, config => config
+    .WithTypeStrategies(ts => ts.Set(typeof(string), (e, a) =>
+        string.Equals((string?)e, (string?)a, StringComparison.OrdinalIgnoreCase))));
+```
+
 ### Custom Strategies for Comparison
 
 Define specific strategies for comparing properties.
 
 ```csharp
-var result = actual.DeeplyEquals(
-    expected,
+var result = expected.DeeplyEquals(
+    actual,
     strategy => strategy
         .Set(x => x.Vehicle.Model, (act, exp) => act.Length == exp.Length)
         .Set(x => x.Courses[1].Name, (act, exp) => act.StartsWith('L') && exp.StartsWith('L')));
@@ -156,13 +286,69 @@ var result = actual.DeeplyEquals(
 */
 ```
 
+### Collection Comparison with Custom Strategies
+
+When comparing collections, you can apply custom strategies that automatically apply to all elements. This is useful for comparing lists of DTOs with entities or applying consistent comparison rules across collection items.
+
+```csharp
+var expected = new List<VehicleDto>
+{
+    new() { Id = 1, Model = "BMW", Description = "", InternalCode = "A" },
+    new() { Id = 2, Model = "Audi", Description = null, InternalCode = "B" },
+    new() { Id = 3, Model = null, Description = "Description", InternalCode = "C" }
+};
+
+var actual = new List<VehicleDto>
+{
+    new() { Id = 1, Model = "BMW", Description = null, InternalCode = "A" },
+    new() { Id = 2, Model = "Audi", Description = "", InternalCode = "B" },
+    new() { Id = 3, Model = "", Description = "Description", InternalCode = "C" }
+};
+
+// Custom strategy applies to all collection elements
+var result = expected.DeeplyEquals(actual,
+    strategy => strategy
+        .Set(x => x.Model, (exp, act) =>
+            (string.IsNullOrEmpty(exp) && string.IsNullOrEmpty(act)) || exp == act)
+        .Set(x => x.Description, (exp, act) =>
+            (string.IsNullOrEmpty(exp) && string.IsNullOrEmpty(act)) || exp == act));
+
+// Objects are deeply equal - null and empty strings treated as equal for Model and Description
+```
+
+**Comparing collections of different types:**
+
+```csharp
+var expected = new List<VehicleDto>
+{
+    new() { Id = 1, Model = "", Description = "Test", InternalCode = "ABC" },
+    new() { Id = 2, Model = null, Description = "Test", InternalCode = "DEF" }
+};
+
+var actual = new List<VehicleEntity>
+{
+    new() { Id = 1, Model = null, Description = "Test", InternalCode = "XYZ" },
+    new() { Id = 2, Model = "", Description = "Test", InternalCode = "XYZ" }
+};
+
+// Compare different types with custom strategy and ignore
+var result = expected.DeeplyEquals(actual,
+    strategy => strategy
+        .Set(x => x.Model, (exp, act) =>
+            (string.IsNullOrEmpty(exp) && string.IsNullOrEmpty(act)) || exp == act),
+    options => options.AllowDifferentTypes(),
+    "InternalCode");
+
+// Objects are deeply equal
+```
+
 ### Ignoring Specific Properties or Fields
 
 Omit certain properties or fields from the comparison.
 
 ```csharp
 var ignore = new[] { "Name", "Courses", "Vehicle" };
-var result = actual.DeeplyEquals(expected, ignore);
+var result = expected.DeeplyEquals(actual, ignore);
 
 /*
     Objects are deeply equal
@@ -174,8 +360,8 @@ var result = actual.DeeplyEquals(expected, ignore);
 Provide specific strategies and display the differences.
 
 ```csharp
-var result = actual.DeeplyEquals(
-    expected,
+var result = expected.DeeplyEquals(
+    actual,
     strategy => strategy
         .Set(x => x.Vehicle.Model, (act, exp) => act.StartsWith('A') && exp.StartsWith('A')),
     "Name",
@@ -338,7 +524,7 @@ var exp = new Student
     }
 };
 
-var distinctions = act.DeeplyEquals(exp, propName => propName.EndsWith("Name"));
+var distinctions = exp.DeeplyEquals(act, propName => propName.EndsWith("Name"));
 /*
     Objects are deeply equal
 */
@@ -350,7 +536,7 @@ var distinctions = act.DeeplyEquals(exp, propName => propName.EndsWith("Name"));
 var actual = new SomeTest("A");
 var expected = new SomeTest("B");
 
-var result = exp.DeeplyEquals(act);
+var result = expected.DeeplyEquals(actual);
 
 /*
     Path: "SomeTest":
@@ -403,13 +589,70 @@ Detect differences when dealing with anonymous types.
 var actual = new { Integer = 1, String = "Test", Nested = new byte[] { 1, 2, 3 } };
 var expected = new { Integer = 1, String = "Test", Nested = new byte[] { 1, 2, 4 } };
 
-var result = exp.DeeplyEquals(act);
+var result = expected.DeeplyEquals(actual);
 
 /*
     Path: "AnonymousType<Int32, String, Byte[]>.Nested[2]":
     Expected Value :3
     Actually Value :4
 */
+```
+
+### Comparison for Different Types
+
+Compare objects with different types that share the same shape or property names. This is useful when comparing DTOs to entities or migrating between different model versions.
+
+```csharp
+var expected = new StudentDto
+{
+    Name = "Alex",
+    Age = 20
+};
+
+var actual = new StudentEntity
+{
+    Name = "Alex",
+    Age = 21
+};
+
+// Using unified configuration (recommended)
+var result = expected.DeeplyEquals(actual, config => config.AllowDifferentTypes());
+
+/*
+    Path: "StudentDto.Age":
+    Expected Value: 20
+    Actual Value: 21
+*/
+```
+
+**Combining different types with custom strategies:**
+
+```csharp
+var expected = new VehicleDto
+{
+    Id = 1,
+    Model = "",
+    Description = null,
+    InternalCode = "CODE"
+};
+
+var actual = new VehicleEntity
+{
+    Id = 1,
+    Model = null,
+    Description = "",
+    InternalCode = "CODE"
+};
+
+// Different types + type strategies + ignore in one call
+var result = expected.DeeplyEquals(actual, config => config
+    .AllowDifferentTypes()
+    .Ignore("Id")
+    .WithTypeStrategies(ts => ts.Set<string>((e, a) =>
+        (string.IsNullOrEmpty(e) && string.IsNullOrEmpty(a)) ||
+        string.Equals(e, a, StringComparison.OrdinalIgnoreCase))));
+
+// Objects are deeply equal
 ```
 
 ### Convert Comparison Result to JSON

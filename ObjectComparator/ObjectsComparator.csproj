@@ -1,14 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net6.0;netstandard2.1</TargetFrameworks>
+    <TargetFrameworks>netstandard2.1</TargetFrameworks>
     <Nullable>enable</Nullable>
     <LangVersion>latest</LangVersion>
 
     <PackageId>ObjectComparator</PackageId>
-    <Version>3.6.5</Version>
-    <AssemblyVersion>3.6.0.0</AssemblyVersion>
-    <FileVersion>3.6.5.0</FileVersion>
+    <Version>3.7.0.0</Version>
+    <AssemblyVersion>3.7.0.0</AssemblyVersion>
+    <FileVersion>3.7.0.0</FileVersion>
 
     <Authors>Valerii Fedorenko</Authors>
     <Copyright>Copyright (c) 2022-2025 Valerii Fedorenko</Copyright>
@@ -26,7 +26,10 @@
     <Description>High-performance deep object comparison for .NET with customizable rules and strategy skipping.</Description>
     <PackageTags>ObjectComparison;DeepComparison;Equality;Diff;Reflection;Performance</PackageTags>
 
-    <PackageReleaseNotes>Performance improvements</PackageReleaseNotes>
+    <PackageReleaseNotes>Added opt‑in support for deep comparison across different runtime types with ComparatorOptions.AllowDifferentTypes(true).
+New DeeplyEqualsIgnoreObjectTypes convenience overload for cross‑type comparisons.
+Cross‑type comparisons now work for collections and dictionaries (element/value comparisons by matching members).
+Ignore‑path handling updated to respect the selected root type when comparing different types.</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>
@@ -47,7 +50,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="10.0.102" PrivateAssets="All" />
   </ItemGroup>
 
   <ItemGroup>

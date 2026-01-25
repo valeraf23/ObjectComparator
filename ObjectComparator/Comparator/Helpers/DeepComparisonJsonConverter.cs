@@ -51,7 +51,6 @@ internal static class DeepComparisonJsonConverter
     private static void HandleFinalSegment(IDictionary<string, object> parentNode, PathSegment segment, string key,
         Distinction distinction)
     {
-
         if (segment.IsDictionary || segment.IsArray)
         {
             var containerNode = EnsureDictionaryNode(parentNode, segment.Name);
@@ -117,7 +116,9 @@ internal static class DeepComparisonJsonConverter
         var dotIndex = pathSpan.IndexOf('.');
 
         if (dotIndex >= 0)
+        {
             pathSpan = pathSpan[(dotIndex + 1)..];
+        }
 
         while ((dotIndex = pathSpan.IndexOf('.')) >= 0)
         {
@@ -126,7 +127,10 @@ internal static class DeepComparisonJsonConverter
             AddPathSegment(partSpan, segments);
         }
 
-        if (!pathSpan.IsEmpty) AddPathSegment(pathSpan, segments);
+        if (!pathSpan.IsEmpty)
+        {
+            AddPathSegment(pathSpan, segments);
+        }
 
         return segments;
     }
@@ -141,10 +145,14 @@ internal static class DeepComparisonJsonConverter
             var bracketValueSpan = partSpan.Slice(bracketIndex + 1, bracketEnd - bracketIndex - 1);
 
             if (int.TryParse(bracketValueSpan, out var index))
+            {
                 segments.Add(new PathSegment(nameSpan.ToString(), true, index));
+            }
             else
+            {
                 segments.Add(new PathSegment(nameSpan.ToString(), isDictionary: true,
                     dictKey: bracketValueSpan.ToString()));
+            }
         }
         else
         {

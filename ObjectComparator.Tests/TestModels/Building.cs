@@ -1,8 +1,7 @@
-﻿namespace ObjectsComparator.Tests.TestModels
+﻿namespace ObjectsComparator.Tests.TestModels;
+
+internal class Building
 {
-    internal class Building
-    {
-        public string Address { get; set; }
-        public int[] ListOfAppNumbers { get; set; }
-    }
+    public string Address { get; set; }
+    public int[] ListOfAppNumbers { get; set; }
 }

@@ -1,25 +1,24 @@
 ﻿using System;
 
-namespace ObjectsComparator.Tests.TestModels
+namespace ObjectsComparator.Tests.TestModels;
+
+internal class CourseE
 {
-    internal class CourseE
+    public string Name { get; set; }
+    public TimeSpan? Duration { get; set; }
+
+    public override bool Equals(object obj)
     {
-        public string Name { get; set; }
-        public TimeSpan? Duration { get; set; }
+        return Equals((CourseE)obj);
+    }
 
-        public override bool Equals(object obj)
-        {
-            return Equals((CourseE) obj);
-        }
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(Name, Duration);
+    }
 
-        public override int GetHashCode()
-        {
-            return HashCode.Combine(Name, Duration);
-        }
-
-        public bool Equals(CourseE obj)
-        {
-            return Name == obj.Name;
-        }
+    public bool Equals(CourseE obj)
+    {
+        return Name == obj.Name;
     }
 }

@@ -1,28 +1,38 @@
 ﻿using System;
 
-namespace ObjectsComparator.Helpers.GuardArgument
+namespace ObjectsComparator.Helpers.GuardArgument;
+
+public static class GuardArgument
 {
-    public static class GuardArgument
+    public static void ArgumentIsNotNull<T>(T value) where T : class
     {
-        public static void ArgumentIsNotNull<T>(T value) where T : class
+        if (value == null)
         {
-            if (value == null) throw new ArgumentNullException(nameof(value));
+            throw new ArgumentNullException(nameof(value));
         }
+    }
 
-        public static void ArgumentIsNotNull<T>(T value, string argument) where T : class
+    public static void ArgumentIsNotNull<T>(T value, string argument) where T : class
+    {
+        if (value == null)
         {
-            if (value == null) throw new ArgumentNullException(argument);
+            throw new ArgumentNullException(argument);
         }
+    }
 
-        public static void ArgumentOutOfCondition<T>(T value, Func<T, bool> condition, string argument) where T : notnull
+    public static void ArgumentOutOfCondition<T>(T value, Func<T, bool> condition, string argument) where T : notnull
+    {
+        if (!condition(value))
         {
-            if (!condition(value)) throw new ArgumentOutOfRangeException(value.ToString(), argument);
+            throw new ArgumentOutOfRangeException(value.ToString(), argument);
         }
+    }
 
-        public static void ArgumentIsNotNull(string value)
+    public static void ArgumentIsNotNull(string value)
+    {
+        if (string.IsNullOrEmpty(value))
         {
-            if (string.IsNullOrEmpty(value))
-                throw new ArgumentException($"{value} argument should be not NullOrEmpty");
+            throw new ArgumentException($"{value} argument should be not NullOrEmpty");
         }
     }
 }

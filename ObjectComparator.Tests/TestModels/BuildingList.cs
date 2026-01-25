@@ -1,10 +1,9 @@
 ﻿using System.Collections.Generic;
 
-namespace ObjectsComparator.Tests.TestModels
+namespace ObjectsComparator.Tests.TestModels;
+
+internal class BuildingList
 {
-    internal class BuildingList
-    {
-        public string Address { get; set; }
-        public IList<int> ListOfAppNumbers { get; set; }
-    }
+    public string Address { get; set; }
+    public IList<int> ListOfAppNumbers { get; set; }
 }

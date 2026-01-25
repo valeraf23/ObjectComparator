@@ -1,8 +1,7 @@
-﻿namespace ObjectsComparator.Tests.TestModels
+﻿namespace ObjectsComparator.Tests.TestModels;
+
+internal enum TestEnum
 {
-    internal enum TestEnum
-    {
-        First,
-        Second
-    }
+    First,
+    Second
 }

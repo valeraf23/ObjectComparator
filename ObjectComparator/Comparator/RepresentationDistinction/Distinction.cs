@@ -8,27 +8,34 @@ public class Distinction : IEquatable<Distinction>
     public Distinction(string path, object? expectedValue, object? actualValue)
     {
         GuardArgument.ArgumentIsNotNull(path, $"{nameof(path)} cannot be null or empty");
-            
+
         Path = path;
         ExpectedValue = expectedValue;
         ActualValue = actualValue;
         Details = string.Empty;
     }
 
-    public Distinction(string path, object expectedValue, object actualValue, string details) 
-        : this(path, expectedValue, actualValue) => 
+    public Distinction(string path, object expectedValue, object actualValue, string details)
+        : this(path, expectedValue, actualValue)
+    {
         Details = details;
+    }
 
     public string Path { get; }
     public string Details { get; }
     public object? ExpectedValue { get; }
     public object? ActualValue { get; }
 
-    public override bool Equals(object? obj) => Equals(obj as Distinction);
+    public bool Equals(Distinction? other)
+    {
+        return other != null &&
+               (ReferenceEquals(this, other) || StructuralEquality(other));
+    }
 
-    public bool Equals(Distinction? other) =>
-        other != null && 
-        (ReferenceEquals(this, other) || StructuralEquality(other));
+    public override bool Equals(object? obj)
+    {
+        return Equals(obj as Distinction);
+    }
 
     private bool StructuralEquality(Distinction other)
     {
@@ -38,15 +45,26 @@ public class Distinction : IEquatable<Distinction>
                && Equals(ActualValue, other.ActualValue);
     }
 
-    public override int GetHashCode() => HashCode.Combine(Path, Details, ExpectedValue, ActualValue);
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(Path, Details, ExpectedValue, ActualValue);
+    }
 
     public override string ToString()
     {
-        var info = $"Path: \"{Path}\":\nExpected Value: {ExpectedValue}\nActual Value: {ActualValue}";
+        var expectedDisplay = ExpectedValue ?? "null";
+        var actualDisplay = ActualValue ?? "null";
+        var info = $"Path: \"{Path}\":\nExpected Value: {expectedDisplay}\nActual Value: {actualDisplay}";
         return string.IsNullOrEmpty(Details) ? info : $"{info}\n{nameof(Details)}: {Details}";
     }
 
-    public static bool operator ==(Distinction? left, Distinction? right) => Equals(left, right);
+    public static bool operator ==(Distinction? left, Distinction? right)
+    {
+        return Equals(left, right);
+    }
 
-    public static bool operator !=(Distinction? left, Distinction? right) => !Equals(left, right);
+    public static bool operator !=(Distinction? left, Distinction? right)
+    {
+        return !Equals(left, right);
+    }
 }

@@ -1,10 +1,9 @@
-﻿namespace ObjectsComparator.Tests.TestModels
+﻿namespace ObjectsComparator.Tests.TestModels;
+
+internal class StudentEq
 {
-    internal class StudentEq
-    {
-        public string Name { get; set; }
-        public int Age { get; set; }
-        public Vehicle Vehicle { get; set; }
-        public CourseE[] Courses { get; set; }
-    }
+    public string Name { get; set; }
+    public int Age { get; set; }
+    public Vehicle Vehicle { get; set; }
+    public CourseE[] Courses { get; set; }
 }

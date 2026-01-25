@@ -1,4 +1,5 @@
-﻿namespace ObjectsComparator.Comparator.Strategies.Interfaces
+﻿namespace ObjectsComparator.Comparator.Strategies.Interfaces;
+
+public interface IOverridesEqualsStrategy : IStrategy
 {
-    public interface IOverridesEqualsStrategy : IStrategy {}
 }

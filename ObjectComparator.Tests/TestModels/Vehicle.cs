@@ -1,38 +1,39 @@
 ﻿using System.Collections.Generic;
 
-namespace ObjectsComparator.Tests.TestModels
+namespace ObjectsComparator.Tests.TestModels;
+
+internal class Vehicle
 {
-    internal class Vehicle
-    {
-        public string Model { get; set; }
-    }
-    public class A
-    {
-        public List<B> B { get; set; }
-    }
+    public string Model { get; set; }
+}
 
-    public class B
-    {
-        public string C { get; set; }
-    }
+public class A
+{
+    public List<B> B { get; set; }
+}
 
-    public static class Ignore
+public class B
+{
+    public string C { get; set; }
+}
+
+public static class Ignore
+{
+    public static bool IgnoreProperty(string propertyPath)
     {
-        public static bool IgnoreProperty(string propertyPath)
+        var ignoreProperties = new[]
         {
-            var ignoreProperties = new[] {
-                "C"
-            };
+            "C"
+        };
 
-            foreach (var ignoreProperty in ignoreProperties)
+        foreach (var ignoreProperty in ignoreProperties)
+        {
+            if (propertyPath.EndsWith(ignoreProperty))
             {
-                if (propertyPath.EndsWith(ignoreProperty))
-                {
-                    return true;
-                }
+                return true;
             }
-
-            return false;
         }
+
+        return false;
     }
 }

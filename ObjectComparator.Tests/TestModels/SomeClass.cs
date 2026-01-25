@@ -1,7 +1,6 @@
-﻿namespace ObjectsComparator.Tests.TestModels
+﻿namespace ObjectsComparator.Tests.TestModels;
+
+internal class SomeClass
 {
-    internal class SomeClass
-    {
-        public string Foo { get; set; }
-    }
+    public string Foo { get; set; }
 }

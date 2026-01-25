@@ -1,0 +1,8 @@
+
+[*]
+
+# Microsoft .NET properties
+csharp_prefer_braces = true:none
+
+# ReSharper properties
+resharper_braces_redundant = true

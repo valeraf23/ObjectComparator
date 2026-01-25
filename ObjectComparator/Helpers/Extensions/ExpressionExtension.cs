@@ -1,147 +1,163 @@
+#nullable disable
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 
-#nullable disable
-namespace ObjectsComparator.Helpers.Extensions
+namespace ObjectsComparator.Helpers.Extensions;
+
+public static class ExpressionExtension
 {
-    public static class ExpressionExtension
+    private static string ReplaceNull(object value)
     {
-        private static string ReplaceNull(object value) => value is null ? "null" : $"{value}";
+        return value is null ? "null" : $"{value}";
+    }
 
-        public static string GetLambdaString(this LambdaExpression compareFunc, object argument,
-            params object[] arguments)
+    public static string GetLambdaString(this LambdaExpression compareFunc, object argument,
+        params object[] arguments)
+    {
+        var parametersName = compareFunc.Parameters.Select(c => c.Name).ToArray();
+
+        var argList = new List<object> { argument };
+        if (arguments.IsNotEmpty())
         {
-            var parametersName = compareFunc.Parameters.Select(c => c.Name).ToArray();
-
-            var argList = new List<object> {argument};
-            if (arguments.IsNotEmpty())
-            {
-                argList.AddRange(arguments);
-            }
-
-            var tLength = parametersName.Length;
-
-            if (argList.Count < tLength)
-            {
-                throw new Exception("Provided more arguments");
-            }
-
-            if (argList.Count > tLength)
-            {
-                throw new Exception("Was provided more arguments than need");
-            }
-
-            var bExp = Get(compareFunc).ToString();
-
-            var sb = new StringBuilder(bExp);
-            for (var i = 0; i < parametersName.Length; i++)
-            {
-                ref var parameterName = ref parametersName[i];
-                sb.Replace(parameterName!, $"{parameterName}:({ReplaceNull(argList[i])})");
-            }
-
-            return sb.ToString();
+            argList.AddRange(arguments);
         }
 
-        public static Expression<Func<TIn, TIn, TOut>> Get<TIn, TOut>(Expression<Func<TIn, TIn, TOut>> expression)
+        var tLength = parametersName.Length;
+
+        if (argList.Count < tLength)
         {
-            return (Expression<Func<TIn, TIn, TOut>>) PartialEval(expression);
+            throw new Exception("Provided more arguments");
         }
 
-        public static Expression Get(Expression expression)
+        if (argList.Count > tLength)
         {
-            return PartialEval(expression);
+            throw new Exception("Was provided more arguments than need");
         }
 
-        private static Expression PartialEval(Expression expression, Func<Expression, bool> fnCanBeEvaluated)
+        var bExp = Get(compareFunc).ToString();
+
+        var sb = new StringBuilder(bExp);
+        for (var i = 0; i < parametersName.Length; i++)
         {
-            return new SubtreeEvaluator(new Nominator(fnCanBeEvaluated).Nominate(expression)).Eval(expression);
+            ref var parameterName = ref parametersName[i];
+            sb.Replace(parameterName!, $"{parameterName}:({ReplaceNull(argList[i])})");
         }
 
-        private static Expression PartialEval(Expression expression)
+        return sb.ToString();
+    }
+
+    public static Expression<Func<TIn, TIn, TOut>> Get<TIn, TOut>(Expression<Func<TIn, TIn, TOut>> expression)
+    {
+        return (Expression<Func<TIn, TIn, TOut>>)PartialEval(expression);
+    }
+
+    public static Expression Get(Expression expression)
+    {
+        return PartialEval(expression);
+    }
+
+    private static Expression PartialEval(Expression expression, Func<Expression, bool> fnCanBeEvaluated)
+    {
+        return new SubtreeEvaluator(new Nominator(fnCanBeEvaluated).Nominate(expression)).Eval(expression);
+    }
+
+    private static Expression PartialEval(Expression expression)
+    {
+        return PartialEval(expression, CanBeEvaluatedLocally);
+    }
+
+    private static bool CanBeEvaluatedLocally(Expression expression)
+    {
+        return expression.NodeType != ExpressionType.Parameter;
+    }
+
+    private class SubtreeEvaluator : ExpressionVisitor
+    {
+        private readonly HashSet<Expression> _candidates;
+
+        internal SubtreeEvaluator(HashSet<Expression> candidates)
         {
-            return PartialEval(expression, CanBeEvaluatedLocally);
+            _candidates = candidates;
         }
 
-        private static bool CanBeEvaluatedLocally(Expression expression)
+        internal Expression Eval(Expression exp)
         {
-            return expression.NodeType != ExpressionType.Parameter;
+            return Visit(exp);
         }
 
-        private class SubtreeEvaluator : ExpressionVisitor
+        public override Expression Visit(Expression exp)
         {
-            private readonly HashSet<Expression> _candidates;
-
-            internal SubtreeEvaluator(HashSet<Expression> candidates)
+            if (exp is null)
             {
-                _candidates = candidates;
+                return null;
             }
 
-            internal Expression Eval(Expression exp)
-            {
-                return Visit(exp);
-            }
-
-            public override Expression Visit(Expression exp)
-            {
-                if (exp is null) return null;
-
-                return _candidates.Contains(exp) ? Evaluate(exp) : base.Visit(exp);
-            }
-
-            private static Expression Evaluate(Expression e)
-            {
-                if (e.NodeType == ExpressionType.Constant) return e;
-
-                var lambda = Expression.Lambda(e);
-                var fn = lambda.Compile();
-                return Expression.Constant(fn.DynamicInvoke(null), e.Type);
-            }
+            return _candidates.Contains(exp) ? Evaluate(exp) : base.Visit(exp);
         }
 
-        private class Nominator : ExpressionVisitor
+        private static Expression Evaluate(Expression e)
         {
-            private readonly Func<Expression, bool> _fnCanBeEvaluated;
-            private HashSet<Expression> _candidates;
-            private bool _cannotBeEvaluated;
-
-            internal Nominator(Func<Expression, bool> fnCanBeEvaluated)
+            if (e.NodeType == ExpressionType.Constant)
             {
-                _fnCanBeEvaluated = fnCanBeEvaluated;
+                return e;
             }
 
-            internal HashSet<Expression> Nominate(Expression expression)
+            var lambda = Expression.Lambda(e);
+            var fn = lambda.Compile();
+            return Expression.Constant(fn.DynamicInvoke(null), e.Type);
+        }
+    }
+
+    private class Nominator : ExpressionVisitor
+    {
+        private readonly Func<Expression, bool> _fnCanBeEvaluated;
+        private HashSet<Expression> _candidates;
+        private bool _cannotBeEvaluated;
+
+        internal Nominator(Func<Expression, bool> fnCanBeEvaluated)
+        {
+            _fnCanBeEvaluated = fnCanBeEvaluated;
+        }
+
+        internal HashSet<Expression> Nominate(Expression expression)
+        {
+            _candidates = new HashSet<Expression>();
+            Visit(expression);
+            return _candidates;
+        }
+
+        public override Expression Visit(Expression expression)
+        {
+            if (expression is null)
             {
-                _candidates = new HashSet<Expression>();
-                Visit(expression);
-                return _candidates;
+                return null;
             }
 
-            public override Expression Visit(Expression expression)
+            var saveCannotBeEvaluated = _cannotBeEvaluated;
+
+            _cannotBeEvaluated = false;
+
+            base.Visit(expression);
+
+            if (!_cannotBeEvaluated)
             {
-                if (expression is null) return null;
-                var saveCannotBeEvaluated = _cannotBeEvaluated;
-
-                _cannotBeEvaluated = false;
-
-                base.Visit(expression);
-
-                if (!_cannotBeEvaluated)
+                if (_fnCanBeEvaluated(expression))
                 {
-                    if (_fnCanBeEvaluated(expression))
-                        _candidates.Add(expression);
-
-                    else
-                        _cannotBeEvaluated = true;
+                    _candidates.Add(expression);
                 }
 
-                _cannotBeEvaluated |= saveCannotBeEvaluated;
-
-                return expression;
+                else
+                {
+                    _cannotBeEvaluated = true;
+                }
             }
+
+            _cannotBeEvaluated |= saveCannotBeEvaluated;
+
+            return expression;
         }
     }
 }

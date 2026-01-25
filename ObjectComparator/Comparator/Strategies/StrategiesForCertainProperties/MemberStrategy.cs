@@ -5,36 +5,38 @@ using System;
 using System.Linq;
 using System.Linq.Expressions;
 
-namespace ObjectsComparator.Comparator.Strategies.StrategiesForCertainProperties
+namespace ObjectsComparator.Comparator.Strategies.StrategiesForCertainProperties;
+
+public class MemberStrategy<T> : MemberStrategyBase, ICustomCompareValues
 {
-    public class MemberStrategy<T> : MemberStrategyBase, ICustomCompareValues
+    private readonly Expression<Func<T, T, bool>> _compareFunc;
+    private readonly Display _display;
+
+    public MemberStrategy(Expression<Func<T, T, bool>> compareFunc, Display display)
     {
-        private readonly Display _display;
-        private readonly Expression<Func<T, T, bool>> _compareFunc;
+        _display = display;
+        _compareFunc = compareFunc;
+    }
 
-        public MemberStrategy(Expression<Func<T, T, bool>> compareFunc, Display display)
+    public DeepEqualityResult Compare<T1>(T1 expected, T1 actual, string propertyName)
+    {
+        return CastParameters<T1>(propertyName)(expected, actual)
+            ? DeepEqualityResult.None()
+            : DeepEqualityResult.Create(_display.GetDistinction(expected, actual, propertyName,
+                _compareFunc.GetLambdaString(expected, actual)));
+    }
+
+    private Func<T1, T1, bool> CastParameters<T1>(string propertyName)
+    {
+        var key = $"{propertyName}:{_compareFunc}";
+        return (Func<T1, T1, bool>)Cache.GetOrAdd(key, _ =>
         {
-            _display = display;
-            _compareFunc = compareFunc;
-        }
-
-        public DeepEqualityResult Compare<T1>(T1 expected, T1 actual, string propertyName) =>
-            CastParameters<T1>(propertyName)(expected, actual)
-                ? DeepEqualityResult.None()
-                : DeepEqualityResult.Create(_display.GetDistinction(expected, actual, propertyName,
-                    _compareFunc.GetLambdaString(expected, actual)));
-
-        private Func<T1, T1, bool> CastParameters<T1>(string propertyName)
-        {
-            var key = $"{propertyName}:{_compareFunc}";
-            return (Func<T1, T1, bool>)Cache.GetOrAdd(key, _ =>
-           {
-               var castParameterExpressions = _compareFunc.Parameters.Select(p => Expression.Parameter(p.Type, p.Name)).ToList();
-               var invocationExpression = Expression.Invoke(_compareFunc, castParameterExpressions);
-               var lambda = Expression.Lambda(invocationExpression, castParameterExpressions);
-               var func = lambda.Compile();
-               return func;
-           });
-        }
+            var castParameterExpressions =
+                _compareFunc.Parameters.Select(p => Expression.Parameter(p.Type, p.Name)).ToList();
+            var invocationExpression = Expression.Invoke(_compareFunc, castParameterExpressions);
+            var lambda = Expression.Lambda(invocationExpression, castParameterExpressions);
+            var func = lambda.Compile();
+            return func;
+        });
     }
 }
