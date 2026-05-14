@@ -89,4 +89,26 @@ public class UnifiedConfigurationTests
 
         result.Should().BeEmpty();
     }
+
+    [Test]
+    public void DeeplyEquals_WithReusableComparisonConfig_WorksAcrossMultipleComparisons()
+    {
+        var config = new ComparisonConfig<VehicleDto>()
+            .AllowDifferentTypes()
+            .Ignore("InternalCode")
+            .WithTypeStrategies(ts => ts.Set<string>((e, a) =>
+                (string.IsNullOrEmpty(e) && string.IsNullOrEmpty(a)) || e == a));
+
+        var expected1 = new VehicleDto { Id = 1, Model = "", Description = "Test", InternalCode = "ABC" };
+        var actual1 = new VehicleEntity { Id = 1, Model = null, Description = "Test", InternalCode = "XYZ" };
+
+        var expected2 = new VehicleDto { Id = 2, Model = "BMW", Description = "Same", InternalCode = "AAA" };
+        var actual2 = new VehicleEntity { Id = 2, Model = "BMW", Description = "Same", InternalCode = "BBB" };
+
+        var firstResult = expected1.DeeplyEquals(actual1, config);
+        var secondResult = expected2.DeeplyEquals(actual2, config);
+
+        firstResult.Should().BeEmpty();
+        secondResult.Should().BeEmpty();
+    }
 }
