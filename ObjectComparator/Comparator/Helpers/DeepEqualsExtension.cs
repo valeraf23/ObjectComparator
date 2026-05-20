@@ -121,6 +121,21 @@ public static class DeepEqualsExtension
         return ExecuteComparison(expected, actual, config);
     }
 
+    /// <summary>
+    ///     Performs a deep equality comparison using a pre-built reusable comparison configuration.
+    /// </summary>
+    /// <typeparam name="T">The type of the expected object (used for strategy definitions).</typeparam>
+    /// <typeparam name="TActual">The type of the actual object.</typeparam>
+    /// <param name="expected">The expected object.</param>
+    /// <param name="actual">The actual object to compare against expected.</param>
+    /// <param name="config">A pre-configured comparison config to reuse across comparisons.</param>
+    /// <returns>A <see cref="DeepEqualityResult" /> containing any differences found.</returns>
+    public static DeepEqualityResult DeeplyEquals<T, TActual>(this T expected, TActual actual,
+        ComparisonConfig<T> config)
+    {
+        return ExecuteComparison(expected, actual, config ?? new ComparisonConfig<T>());
+    }
+
     private static DeepEqualityResult ExecuteComparison<T>(object? expected, object? actual, ComparisonConfig<T> config)
     {
         var typeName = ComparisonHelper.GetIgnoreTypeName(expected, actual, typeof(T),
