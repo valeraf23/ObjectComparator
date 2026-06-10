@@ -10,7 +10,6 @@ using ObjectsComparator.Helpers.Extensions;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
 
 namespace ObjectsComparator.Comparator;
@@ -19,12 +18,7 @@ public sealed class Comparator : IComparator
 {
     private const string NullDisplayValue = "null";
 
-    private static readonly Type DictionaryType = typeof(IDictionary<,>);
-    private static readonly Type EnumerableType = typeof(IEnumerable<>);
-
     private static readonly ConcurrentDictionary<Type, CompareValuesDelegate> CompareValuesDelegates = new();
-    private static readonly ConcurrentDictionary<Type, bool> IsDictionaryCache = new();
-    private static readonly ConcurrentDictionary<Type, bool> IsCollectionCache = new();
     private readonly CollectionsCompareStrategy _collectionsCompareStrategy;
     private readonly CompareMembersStrategy _compareMembersStrategy;
     private readonly DictionaryCompareStrategy _dictionaryCompareStrategy;
@@ -40,22 +34,22 @@ public sealed class Comparator : IComparator
 
         var rules = new List<Rule>(6)
         {
-            Rule.CreateFor(new ComparePrimitiveTypesStrategy(), RulePriority.Primitive)
+            Rule.CreateFor(ComparePrimitiveTypesStrategy.Instance, RulePriority.Primitive)
         };
 
         if (!Options.IsSkipped(StrategyType.Equality))
         {
-            rules.Add(Rule.CreateFor(new EqualityStrategy(), RulePriority.Equality));
+            rules.Add(Rule.CreateFor(EqualityStrategy.Instance, RulePriority.Equality));
         }
 
         if (!Options.IsSkipped(StrategyType.OverridesEquals))
         {
-            rules.Add(Rule.CreateFor(new OverridesEqualsStrategy(), RulePriority.OverridesEquals));
+            rules.Add(Rule.CreateFor(OverridesEqualsStrategy.Instance, RulePriority.OverridesEquals));
         }
 
         rules.Add(!Options.IsSkipped(StrategyType.CompareTo)
-            ? Rule.CreateFor(new ComparablesStrategy(), RulePriority.Comparable)
-            : Rule.CreateFor(new ComparablesStrategy(true), RulePriority.Comparable));
+            ? Rule.CreateFor(ComparablesStrategy.Instance, RulePriority.Comparable)
+            : Rule.CreateFor(ComparablesStrategy.StructsOnlyInstance, RulePriority.Comparable));
 
         rules.Add(Rule.CreateFor<ICollectionsCompareStrategy>(
             _collectionsCompareStrategy,
@@ -71,6 +65,11 @@ public sealed class Comparator : IComparator
 
     public DeepEqualityResult Compare<T>(T expected, T actual)
     {
+        if (default(T) is null && ReferenceEquals(expected, actual))
+        {
+            return DeepEqualityResult.None();
+        }
+
         var type = expected?.GetType() ?? typeof(T);
         var actualType = actual?.GetType() ?? typeof(T);
         var typeName = type.ToFriendlyTypeName();
@@ -191,21 +190,12 @@ public sealed class Comparator : IComparator
 
     private static bool IsDictionaryType(Type type)
     {
-        return IsDictionaryCache.GetOrAdd(type, static t =>
-            t.GetInterfaces().Prepend(t)
-                .Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == DictionaryType));
+        return type.IsGenericDictionary();
     }
 
     private static bool IsCollectionType(Type type)
     {
-        if (type == typeof(string))
-        {
-            return false;
-        }
-
-        return IsCollectionCache.GetOrAdd(type, static t =>
-            t.GetInterfaces().Prepend(t)
-                .Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == EnumerableType));
+        return type != typeof(string) && type.IsGenericEnumerable();
     }
 
     private static bool IsCompatible(Type expectedType, Type actualType, object? expected, object? actual)

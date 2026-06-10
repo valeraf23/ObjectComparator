@@ -9,6 +9,9 @@ namespace ObjectsComparator.Comparator.Strategies.Implementations;
 
 internal sealed class ComparablesStrategy : IComparablesStrategy
 {
+    internal static readonly ComparablesStrategy Instance = new();
+    internal static readonly ComparablesStrategy StructsOnlyInstance = new(true);
+
     private const string MethodName = "CompareTo";
     private const string Details = $"used_{MethodName}()";
     private static readonly Type ObjectType = typeof(object);
@@ -22,7 +25,9 @@ internal sealed class ComparablesStrategy : IComparablesStrategy
 
     public DeepEqualityResult Compare<T>(T expected, T actual, string propertyName) where T : notnull
     {
-        return DeepEqualityResult.CreateFor(propertyName, expected, actual, Details).WhenNot(IsEqual);
+        return IsEqual(expected, actual)
+            ? DeepEqualityResult.None()
+            : DeepEqualityResult.Create(new Distinction(propertyName, expected, actual, Details));
     }
 
     public bool IsValid(Type member)

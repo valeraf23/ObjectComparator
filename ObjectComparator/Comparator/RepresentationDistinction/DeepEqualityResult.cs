@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -9,16 +10,18 @@ namespace ObjectsComparator.Comparator.RepresentationDistinction;
 [DebuggerDisplay("{" + nameof(ToString) + "()}")]
 public sealed class DeepEqualityResult : IEnumerable<Distinction>
 {
-    private readonly List<Distinction> _list;
+    private List<Distinction>? _list;
 
     private DeepEqualityResult()
     {
-        _list = new List<Distinction>();
     }
 
-    private DeepEqualityResult(int capacity) : this()
+    private DeepEqualityResult(int capacity)
     {
-        _list = new List<Distinction>(capacity);
+        if (capacity > 0)
+        {
+            _list = new List<Distinction>(capacity);
+        }
     }
 
     private DeepEqualityResult(IEnumerable<Distinction> collection)
@@ -28,13 +31,14 @@ public sealed class DeepEqualityResult : IEnumerable<Distinction>
 
     public Distinction this[int i]
     {
-        get => _list[i];
-        set => _list.Add(value);
+        get => _list is null ? throw new ArgumentOutOfRangeException(nameof(i)) : _list[i];
+        set => Add(value);
     }
 
     public IEnumerator<Distinction> GetEnumerator()
     {
-        return _list.GetEnumerator();
+        return _list?.GetEnumerator()
+               ?? Enumerable.Empty<Distinction>().GetEnumerator();
     }
 
     IEnumerator IEnumerable.GetEnumerator()
@@ -81,13 +85,13 @@ public sealed class DeepEqualityResult : IEnumerable<Distinction>
 
     public DeepEqualityResult Add(Distinction input)
     {
-        _list.Add(input);
+        (_list ??= new List<Distinction>()).Add(input);
         return this;
     }
 
     public bool IsEmpty()
     {
-        return _list.Count == 0;
+        return _list is null || _list.Count == 0;
     }
 
     public bool IsNotEmpty()
@@ -97,14 +101,15 @@ public sealed class DeepEqualityResult : IEnumerable<Distinction>
 
     public int Count()
     {
-        return _list.Count;
+        return _list?.Count ?? 0;
     }
 
     public DeepEqualityResult AddRange(DeepEqualityResult collection)
     {
-        if (collection._list.Count > 0)
+        var source = collection._list;
+        if (source is { Count: > 0 })
         {
-            _list.AddRange(collection._list);
+            (_list ??= new List<Distinction>(source.Count)).AddRange(source);
         }
 
         return this;
@@ -118,7 +123,7 @@ public sealed class DeepEqualityResult : IEnumerable<Distinction>
         }
 
 
-        return _list.Aggregate(new StringBuilder(),
+        return _list!.Aggregate(new StringBuilder(),
             (sb, distinction) =>
             {
                 sb.AppendLine(distinction.ToString());
