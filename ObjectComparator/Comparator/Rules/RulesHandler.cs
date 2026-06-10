@@ -3,7 +3,6 @@ using ObjectsComparator.Comparator.Strategies.Interfaces;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace ObjectsComparator.Comparator.Rules;
 
@@ -29,7 +28,8 @@ internal sealed class RulesHandler
         _strategies = strategies;
         _ignoreStrategy = ignoreStrategy;
         _typeStrategies = typeStrategies ?? new Dictionary<Type, ICustomCompareValues>();
-        _rules = rules.OrderBy(r => r.Priority).ToArray();
+        // Comparator supplies rules already sorted by ascending priority.
+        _rules = rules.ToArray();
         _findComparerFunc = FindComparer;
         _createCompareValuesFunc = CreateCompareValues;
     }

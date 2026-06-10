@@ -6,9 +6,9 @@
     <LangVersion>latest</LangVersion>
 
     <PackageId>ObjectComparator</PackageId>
-    <Version>3.7.0.1</Version>
-    <AssemblyVersion>3.7.0.1</AssemblyVersion>
-    <FileVersion>3.7.0.1</FileVersion>
+    <Version>3.8.0</Version>
+    <AssemblyVersion>3.8.0.0</AssemblyVersion>
+    <FileVersion>3.8.0.0</FileVersion>
 
     <Authors>Valerii Fedorenko</Authors>
     <Copyright>Copyright (c) 2022-2026 Valerii Fedorenko</Copyright>
@@ -26,9 +26,11 @@
     <Description>High-performance deep object comparison for .NET with customizable rules and strategy skipping.</Description>
     <PackageTags>ObjectComparison;DeepComparison;Equality;Diff;Reflection;Performance</PackageTags>
 
-  <PackageReleaseNotes>Added reusable ComparisonConfig overload for DeeplyEquals.
-  ComparisonConfig instances can now be pre-built and reused across multiple comparisons.
-  This avoids recreating fluent comparison configuration for repeated comparison workloads.</PackageReleaseNotes>
+  <PackageReleaseNotes>Performance release: 40-77% faster comparisons with 30-55% fewer allocations in common scenarios.
+  - Cached reflection probes and compiled dispatch delegates for collections, dictionaries and equality operators (no MethodInfo.Invoke on hot paths).
+  - Removed per-call allocations: lazy distinction lists, strategy singletons, same-reference fast path, single-pass dictionary comparison.
+  - Bounded growth of property-path caches for indexed paths (e.g. Items[123].Name).
+  - Fixed: members declared as a base type holding derived instances were reported as not equal even when the inherited == operator considered them equal.</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>
@@ -47,7 +49,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="10.0.102" PrivateAssets="All" />
   </ItemGroup>

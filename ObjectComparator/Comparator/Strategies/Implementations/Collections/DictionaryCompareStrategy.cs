@@ -7,6 +7,7 @@ using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection;
 
 namespace ObjectsComparator.Comparator.Strategies.Implementations.Collections;
@@ -18,6 +19,7 @@ internal sealed class DictionaryCompareStrategy : BaseCollectionsCompareStrategy
 
     private static readonly Type DictionaryType = typeof(IDictionary<,>);
     private static readonly ConcurrentDictionary<Type, (PropertyInfo? Key, PropertyInfo? Value)> EntryAccessors = new();
+    private static readonly ConcurrentDictionary<Type, CompareDictionaryDelegate> CompareDelegates = new();
 
     public DictionaryCompareStrategy(Comparator comparator) : base(comparator)
     {
@@ -27,62 +29,83 @@ internal sealed class DictionaryCompareStrategy : BaseCollectionsCompareStrategy
         IDictionary<TKey, TValue> actual, string propertyName) where TKey : notnull
     {
         var diff = DeepEqualityResult.None();
+        var commonDiff = DeepEqualityResult.None();
 
-        var expectedKeys = expected.Keys.ToHashSet();
-        var actualKeys = actual.Keys.ToHashSet();
+        List<KeyValuePair<TKey, TValue>>? removedEntries = null;
+        List<KeyValuePair<TKey, TValue>>? addedEntries = null;
 
-        var addedKeys = actualKeys.Except(expectedKeys).ToList();
-        var removedKeys = expectedKeys.Except(actualKeys).ToList();
+        var valueComparer = RulesHandler.GetFor(typeof(TValue));
+
+        foreach (var pair in expected)
+        {
+            if (actual.TryGetValue(pair.Key, out var actualValue))
+            {
+                var diffRes = valueComparer.Compare(pair.Value, actualValue,
+                    $"{propertyName}[{FormatKey(pair.Key)}]");
+                commonDiff.AddRange(diffRes);
+            }
+            else
+            {
+                (removedEntries ??= new List<KeyValuePair<TKey, TValue>>()).Add(pair);
+            }
+        }
+
+        var commonCount = expected.Count - (removedEntries?.Count ?? 0);
+        if (actual.Count > commonCount)
+        {
+            foreach (var pair in actual)
+            {
+                if (!expected.ContainsKey(pair.Key))
+                {
+                    (addedEntries ??= new List<KeyValuePair<TKey, TValue>>()).Add(pair);
+                }
+            }
+        }
 
         var keyType = typeof(TKey);
 
         if (keyType == typeof(string) || keyType.IsPrimitive || keyType.IsEnum || keyType.IsToStringOverridden())
         {
-            if (addedKeys.Count > 0)
+            if (addedEntries is not null)
             {
-                diff.Add(new Distinction($"{propertyName}", null, string.Join(", ", addedKeys), "Added"));
+                diff.Add(new Distinction(propertyName, null,
+                    string.Join(", ", addedEntries.Select(pair => pair.Key)), "Added"));
             }
 
-            if (removedKeys.Count > 0)
+            if (removedEntries is not null)
             {
-                diff.Add(new Distinction($"{propertyName}", string.Join(", ", removedKeys), null, "Removed"));
+                diff.Add(new Distinction(propertyName,
+                    string.Join(", ", removedEntries.Select(pair => pair.Key)), null, "Removed"));
             }
         }
         else
         {
-            foreach (var key in removedKeys)
+            if (removedEntries is not null)
             {
-                diff.Add(new Distinction(
-                    $"{propertyName}[{FormatKey(key)}]",
-                    FormatValue(expected[key]),
-                    null,
-                    "Removed"));
+                foreach (var pair in removedEntries)
+                {
+                    diff.Add(new Distinction(
+                        $"{propertyName}[{FormatKey(pair.Key)}]",
+                        FormatValue(pair.Value),
+                        null,
+                        "Removed"));
+                }
             }
 
-            foreach (var key in addedKeys)
+            if (addedEntries is not null)
             {
-                diff.Add(new Distinction(
-                    $"{propertyName}[{FormatKey(key)}]",
-                    null,
-                    FormatValue(actual[key]),
-                    "Added"));
+                foreach (var pair in addedEntries)
+                {
+                    diff.Add(new Distinction(
+                        $"{propertyName}[{FormatKey(pair.Key)}]",
+                        null,
+                        FormatValue(pair.Value),
+                        "Added"));
+                }
             }
         }
 
-        var commonKeys = expectedKeys.Intersect(actualKeys);
-
-        foreach (var key in commonKeys)
-        {
-            var expectedValue = expected[key];
-            var actualValue = actual[key];
-
-            var diffRes = RulesHandler.GetFor(typeof(TValue))
-                .Compare(expectedValue, actualValue, $"{propertyName}[{FormatKey(key)}]");
-
-            diff.AddRange(diffRes);
-        }
-
-        return diff;
+        return diff.AddRange(commonDiff);
     }
 
     private static string FormatKey<TKey>(TKey key)
@@ -140,10 +163,32 @@ internal sealed class DictionaryCompareStrategy : BaseCollectionsCompareStrategy
             }
         }
 
-        var genericArguments = GetGenericArguments(expectedType);
-        return (DeepEqualityResult)CompareMethod.MakeGenericMethod(genericArguments)
-            .Invoke(this, new[] { (object)expected, actual, propertyName })!;
+        var compareDelegate = CompareDelegates.GetOrAdd(expectedType, CreateCompareDelegate);
+        return compareDelegate(this, expected!, actual!, propertyName);
     }
+
+    private static CompareDictionaryDelegate CreateCompareDelegate(Type dictionaryType)
+    {
+        var genericArguments = GetGenericArguments(dictionaryType);
+        var method = CompareMethod.MakeGenericMethod(genericArguments);
+        var interfaceType = DictionaryType.MakeGenericType(genericArguments);
+
+        var selfParameter = Expression.Parameter(typeof(DictionaryCompareStrategy), "self");
+        var expectedParameter = Expression.Parameter(typeof(object), "expected");
+        var actualParameter = Expression.Parameter(typeof(object), "actual");
+        var propertyNameParameter = Expression.Parameter(typeof(string), "propertyName");
+
+        var call = Expression.Call(selfParameter, method,
+            Expression.Convert(expectedParameter, interfaceType),
+            Expression.Convert(actualParameter, interfaceType),
+            propertyNameParameter);
+
+        return Expression.Lambda<CompareDictionaryDelegate>(call, selfParameter, expectedParameter,
+            actualParameter, propertyNameParameter).Compile();
+    }
+
+    private delegate DeepEqualityResult CompareDictionaryDelegate(DictionaryCompareStrategy self, object expected,
+        object actual, string propertyName);
 
     private static bool TryGetDictionaryArguments(Type type, out Type keyType, out Type valueType)
     {
@@ -189,47 +234,44 @@ internal sealed class DictionaryCompareStrategy : BaseCollectionsCompareStrategy
             ? actValueType
             : typeof(object);
 
-        var expectedKeys = expectedEntries.Keys.ToHashSet();
-        var actualKeys = actualEntries.Keys.ToHashSet();
+        var commonDiff = DeepEqualityResult.None();
 
-        var addedKeys = actualKeys.Except(expectedKeys).ToList();
-        var removedKeys = expectedKeys.Except(actualKeys).ToList();
-
-        foreach (var key in removedKeys)
+        foreach (var pair in expectedEntries)
         {
-            diff.Add(new Distinction(
-                $"{propertyName}[{FormatKey(key)}]",
-                FormatValue(expectedEntries[key]),
-                null,
-                "Removed"));
+            if (actualEntries.TryGetValue(pair.Key, out var actualValue))
+            {
+                var expectedValue = pair.Value;
+                var expectedValueRuntimeType = expectedValue?.GetType() ?? expectedValueType;
+                var actualValueRuntimeType = actualValue?.GetType() ?? actualValueType;
+
+                var diffRes = Comparator.CompareWithTypes(expectedValue, actualValue,
+                    $"{propertyName}[{FormatKey(pair.Key)}]", expectedValueRuntimeType, actualValueRuntimeType);
+
+                commonDiff.AddRange(diffRes);
+            }
+            else
+            {
+                diff.Add(new Distinction(
+                    $"{propertyName}[{FormatKey(pair.Key)}]",
+                    FormatValue(pair.Value),
+                    null,
+                    "Removed"));
+            }
         }
 
-        foreach (var key in addedKeys)
+        foreach (var pair in actualEntries)
         {
-            diff.Add(new Distinction(
-                $"{propertyName}[{FormatKey(key)}]",
-                null,
-                FormatValue(actualEntries[key]),
-                "Added"));
+            if (!expectedEntries.ContainsKey(pair.Key))
+            {
+                diff.Add(new Distinction(
+                    $"{propertyName}[{FormatKey(pair.Key)}]",
+                    null,
+                    FormatValue(pair.Value),
+                    "Added"));
+            }
         }
 
-        var commonKeys = expectedKeys.Intersect(actualKeys);
-
-        foreach (var key in commonKeys)
-        {
-            var expectedValue = expectedEntries[key];
-            var actualValue = actualEntries[key];
-
-            var expectedValueRuntimeType = expectedValue?.GetType() ?? expectedValueType;
-            var actualValueRuntimeType = actualValue?.GetType() ?? actualValueType;
-
-            var diffRes = Comparator.CompareWithTypes(expectedValue, actualValue,
-                $"{propertyName}[{FormatKey(key)}]", expectedValueRuntimeType, actualValueRuntimeType);
-
-            diff.AddRange(diffRes);
-        }
-
-        return diff;
+        return diff.AddRange(commonDiff);
     }
 
     private static Dictionary<object?, object?> ToObjectDictionary(IEnumerable source)
@@ -283,12 +325,6 @@ internal sealed class DictionaryCompareStrategy : BaseCollectionsCompareStrategy
 
     public override bool IsValid(Type member)
     {
-        if (member.IsGenericType && member.GetGenericTypeDefinition() == DictionaryType)
-        {
-            return true;
-        }
-
-        return member.GetInterfaces().Any(interfaceType =>
-            interfaceType.IsGenericType && interfaceType.GetGenericTypeDefinition() == DictionaryType);
+        return member.IsGenericDictionary();
     }
 }

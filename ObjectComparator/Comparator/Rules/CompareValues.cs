@@ -8,6 +8,9 @@ namespace ObjectsComparator.Comparator.Rules;
 
 internal sealed class CompareValues
 {
+    // Normalized paths are keyed by indexer-bearing paths, which can be near-unique
+    // (e.g. "Items[12345].Name"); the cap keeps the cache from growing unboundedly.
+    private const int NormalizedPathCacheLimit = 10_000;
     private static readonly ConcurrentDictionary<string, string> NormalizedPathCache = new();
     private readonly ICompareValues _defaultComparer;
     private readonly bool _hasPropertyStrategies;
@@ -67,7 +70,9 @@ internal sealed class CompareValues
             return false;
         }
 
-        var normalizedPath = NormalizedPathCache.GetOrAdd(propertyPath, PropertyPathNormalizer.Normalize);
+        var normalizedPath = NormalizedPathCache.Count >= NormalizedPathCacheLimit
+            ? PropertyPathNormalizer.Normalize(propertyPath)
+            : NormalizedPathCache.GetOrAdd(propertyPath, PropertyPathNormalizer.Normalize);
         return _strategies.TryGetValue(normalizedPath, out strategy);
     }
 

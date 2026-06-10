@@ -39,10 +39,10 @@ ObjectComparator is a high-performance .NET library designed for deep comparison
 - **Deep member-by-member comparisons:** Unravel every detail and identify even the slightest differences between complex objects.
 - **Customizable rules:** Define bespoke comparison criteria for properties or fields so that you remain in control of the comparison process.
 - **Type-based strategies:** Apply custom comparison logic to all properties of a specific type (e.g., case-insensitive string comparison everywhere).
-- **Strategy priority system:** Property-specific strategies take precedence over type-based strategies, which take precedence over default comparers�giving you precise control.
+- **Strategy priority system:** Property-specific strategies take precedence over type-based strategies, which take precedence over default comparers — giving you precise control.
 - **Unified fluent API:** Configure all comparison options in one place using a clean, chainable builder pattern.
 - **Collection support:** Compare collections with custom strategies that apply to all elements automatically.
-- **Performance focused:** Despite its comprehensive comparisons, ObjectComparator is optimized for speed and minimal allocations.
+- **Performance focused:** Comparison pipelines are compiled and cached — no per-call reflection on hot paths — keeping comparisons fast with minimal allocations. A BenchmarkDotNet suite lives under `PerformanceTests`.
 - **Friendly diagnostics:** Differences are captured with paths, expected values, actual values, and optional details, making debugging straightforward.
 
 ## Strategy Priority Order
@@ -79,26 +79,26 @@ In this example:
 ## Installation
 
 ### NuGet Package Manager Console
-```bash
+```powershell
 Install-Package ObjectComparator
 ```
 
-#### Install with .NET CLI
-```
+### .NET CLI
+```bash
 dotnet add package ObjectComparator
 ```
 
 ## Getting Started
 
-ObjectComparator targets modern .NET versions (netstandard2.1 and higher). Install the NuGet package and add `using ObjectComparator;` to access the extension methods. The library works seamlessly in unit tests, integration tests, and production services.
+ObjectComparator targets netstandard2.1, so it runs on all modern .NET versions. Install the NuGet package and add `using ObjectsComparator.Comparator.Helpers;` to access the `DeeplyEquals` extension methods. The library works seamlessly in unit tests, integration tests, and production services.
 
 ```csharp
-using ObjectsComparator;
+using ObjectsComparator.Comparator.Helpers;
 
 var result = expected.DeeplyEquals(actual);
 ```
 
-The returned `DeepEqualityResult` contains one entry per difference. When there are no differences, `result.IsEmpty` is `true` and the compared objects are considered deeply equal. Use `expected.DeeplyEquals(actual)` so the "Expected Value" and "Actual Value" labels map to the correct inputs.
+The returned `DeepEqualityResult` contains one entry per difference. When there are no differences, `result.IsEmpty()` returns `true` and the compared objects are considered deeply equal. The result also converts implicitly to `bool`, so `if (result)` means "the objects are deeply equal". Use `expected.DeeplyEquals(actual)` so the "Expected Value" and "Actual Value" labels map to the correct inputs.
 
 ## Usage Examples
 
@@ -157,20 +157,20 @@ var result = expected.DeeplyEquals(actual);
 
 /*
     Path: "Student.Name":
-    Expected Value :Alex
-    Actually Value :Bob
+    Expected Value: Bob
+    Actual Value: Alex
 
     Path: "Student.Vehicle.Model":
-    Expected Value :Audi
-    Actually Value :Opel
+    Expected Value: Opel
+    Actual Value: Audi
 
     Path: "Student.Courses[0].Duration":
-    Expected Value :04:00:00
-    Actually Value :03:00:00
+    Expected Value: 03:00:00
+    Actual Value: 04:00:00
 
     Path: "Student.Courses[1].Name":
-    Expected Value :Liter
-    Actually Value :Literature
+    Expected Value: Literature
+    Actual Value: Liter
 */
 ```
 
@@ -272,17 +272,17 @@ Define specific strategies for comparing properties.
 var result = expected.DeeplyEquals(
     actual,
     strategy => strategy
-        .Set(x => x.Vehicle.Model, (act, exp) => act.Length == exp.Length)
-        .Set(x => x.Courses[1].Name, (act, exp) => act.StartsWith('L') && exp.StartsWith('L')));
+        .Set(x => x.Vehicle.Model, (exp, act) => exp.Length == act.Length)
+        .Set(x => x.Courses[1].Name, (exp, act) => exp.StartsWith('L') && act.StartsWith('L')));
 
 /*
     Path: "Student.Name":
-    Expected Value :Alex
-    Actually Value :Bob
+    Expected Value: Bob
+    Actual Value: Alex
 
     Path: "Student.Courses[0].Duration":
-    Expected Value :04:00:00
-    Actually Value :03:00:00
+    Expected Value: 03:00:00
+    Actual Value: 04:00:00
 */
 ```
 
@@ -363,15 +363,15 @@ Provide specific strategies and display the differences.
 var result = expected.DeeplyEquals(
     actual,
     strategy => strategy
-        .Set(x => x.Vehicle.Model, (act, exp) => act.StartsWith('A') && exp.StartsWith('A')),
+        .Set(x => x.Vehicle.Model, (exp, act) => exp.StartsWith('A') && act.StartsWith('A')),
     "Name",
     "Courses");
 
 /*
     Path: "Student.Vehicle.Model":
-    Expected Value :Audi
-    Actually Value :Opel
-    Details : (act:(Audi), exp:(Opel)) => (act:(Audi).StartsWith(A) AndAlso exp:(Opel).StartsWith(A))
+    Expected Value: Opel
+    Actual Value: Audi
+    Details: (exp:(Opel), act:(Audi)) => (exp:(Opel).StartsWith(A) AndAlso act:(Audi).StartsWith(A))
 */
 
 var skip = new[] { "Vehicle", "Name", "Courses[1].Name" };
@@ -379,15 +379,15 @@ var resultWithDisplay = expected.DeeplyEquals(
     actual,
     str => str.Set(
         x => x.Courses[0].Duration,
-        (act, exp) => act > TimeSpan.FromHours(3),
-        new Display { Expected = "Expected that Duration should be more that 3 hours" }),
+        (exp, act) => exp > TimeSpan.FromHours(3),
+        new Display { Expected = "Expected that Duration should be more than 3 hours" }),
     skip);
 
 /*
     Path: "Student.Courses[0].Duration":
-    Expected Value :Expected that Duration should be more that 3 hours
-    Actually Value :04:00:00
-    Details : (act:(03:00:00), exp:(04:00:00)) => (act:(03:00:00) > 03:00:00)
+    Expected Value: Expected that Duration should be more than 3 hours
+    Actual Value: 04:00:00
+    Details: (exp:(03:00:00), act:(04:00:00)) => (exp:(03:00:00) > 03:00:00)
 */
 ```
 
@@ -435,12 +435,12 @@ var result = expected.DeeplyEquals(actual);
 
     Path: "GroupPortals.Portals[4]":
     Expected Value: 7
-    Actual Value:
+    Actual Value: null
     Details: Removed
 
     Path: "GroupPortals.Portals[5]":
     Expected Value: 0
-    Actual Value:
+    Actual Value: null
     Details: Removed
 
     Path: "GroupPortals.Portals1[0].Courses[0].Name":
@@ -479,7 +479,7 @@ var result = expected.DeeplyEquals(actual);
 
 /*
     Path: "Library.Books":
-    Expected Value:
+    Expected Value: null
     Actual Value: Shantaram1
     Details: Added
 
@@ -532,6 +532,8 @@ var distinctions = exp.DeeplyEquals(act, propName => propName.EndsWith("Name"));
 
 ### DeeplyEquals when Equals Is Overridden
 
+When a type overrides `Equals()`, the comparison short-circuits to that override instead of walking members (unless you skip the strategy — see [Configuring the Comparison Pipeline](#configuring-the-comparison-pipeline)).
+
 ```csharp
 var actual = new SomeTest("A");
 var expected = new SomeTest("B");
@@ -540,20 +542,37 @@ var result = expected.DeeplyEquals(actual);
 
 /*
     Path: "SomeTest":
-    Expected Value :ObjectsComparator.Tests.SomeTest
-    Actually Value :ObjectsComparator.Tests.SomeTest
-    Details : Was used override 'Equals()'
+    Expected Value: ObjectsComparator.Tests.SomeTest
+    Actual Value: ObjectsComparator.Tests.SomeTest
+    Details: Was used override 'Equals()'
 */
 ```
 
 ### DeeplyEquals when Equality Operator Is Overridden
 
+Types that define `operator ==` are compared with that operator (it has priority over an `Equals()` override).
+
 ```csharp
+internal class Money
+{
+    public decimal Amount { get; set; }
+
+    public static bool operator ==(Money a, Money b) => a?.Amount == b?.Amount;
+    public static bool operator !=(Money a, Money b) => !(a == b);
+    public override bool Equals(object? obj) => obj is Money other && this == other;
+    public override int GetHashCode() => Amount.GetHashCode();
+}
+
+var expected = new Money { Amount = 100m };
+var actual = new Money { Amount = 200m };
+
+var result = expected.DeeplyEquals(actual);
+
 /*
-    Path: "SomeTest":
-    Expected Value :ObjectsComparator.Tests.SomeTest
-    Actually Value :ObjectsComparator.Tests.SomeTest
-    Details : == (Equality Operator)
+    Path: "Money":
+    Expected Value: MyApp.Money
+    Actual Value: MyApp.Money
+    Details: == (Equality Operator)
 */
 ```
 
@@ -576,8 +595,8 @@ var result = firstDictionary.DeeplyEquals(secondDictionary);
 
 /*
     Path: "Dictionary<String, String>[AnotherKey]":
-    Expected Value :Value
-    Actually Value :AnotherValue
+    Expected Value: Value
+    Actual Value: AnotherValue
 */
 ```
 
@@ -593,8 +612,8 @@ var result = expected.DeeplyEquals(actual);
 
 /*
     Path: "AnonymousType<Int32, String, Byte[]>.Nested[2]":
-    Expected Value :3
-    Actually Value :4
+    Expected Value: 4
+    Actual Value: 3
 */
 ```
 

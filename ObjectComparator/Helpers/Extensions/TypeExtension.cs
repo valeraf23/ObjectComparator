@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -9,6 +10,14 @@ namespace ObjectsComparator.Helpers.Extensions;
 public static class TypeExtension
 {
     private static readonly ConcurrentDictionary<Type, string> TypeNames = new();
+    private static readonly ConcurrentDictionary<Type, bool> OverridesEqualsCache = new();
+    private static readonly ConcurrentDictionary<Type, bool> OverridesToStringCache = new();
+    private static readonly ConcurrentDictionary<(Type Type, Type Interface), bool> GenericInterfaceCache = new();
+    private static readonly ConcurrentDictionary<Type, bool> GenericEnumerableCache = new();
+    private static readonly ConcurrentDictionary<Type, bool> GenericDictionaryCache = new();
+
+    private static readonly Type GenericEnumerableType = typeof(IEnumerable<>);
+    private static readonly Type GenericDictionaryType = typeof(IDictionary<,>);
 
     public static bool IsPrimitiveOrString(this Type type)
     {
@@ -49,10 +58,31 @@ public static class TypeExtension
 
     public static bool ImplementsGenericInterface(this Type type, Type interfaceType)
     {
-        return type
+        return GenericInterfaceCache.GetOrAdd((type, interfaceType), static key => key.Type
             .GetTypeInfo()
             .ImplementedInterfaces
-            .Any(x => x.GetTypeInfo().IsGenericType && x.GetGenericTypeDefinition() == interfaceType);
+            .Any(x => x.GetTypeInfo().IsGenericType && x.GetGenericTypeDefinition() == key.Interface));
+    }
+
+    /// <summary>
+    ///     Determines whether the type is (or implements) <see cref="IEnumerable{T}" />.
+    ///     Note: returns true for <see cref="string" />; callers that must exclude strings should check first.
+    /// </summary>
+    internal static bool IsGenericEnumerable(this Type type)
+    {
+        return GenericEnumerableCache.GetOrAdd(type, static t =>
+            t.GetInterfaces().Prepend(t)
+                .Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == GenericEnumerableType));
+    }
+
+    /// <summary>
+    ///     Determines whether the type is (or implements) <see cref="IDictionary{TKey,TValue}" />.
+    /// </summary>
+    internal static bool IsGenericDictionary(this Type type)
+    {
+        return GenericDictionaryCache.GetOrAdd(type, static t =>
+            t.GetInterfaces().Prepend(t)
+                .Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == GenericDictionaryType));
     }
 
     public static bool IsAnonymousType(Type type)
@@ -71,19 +101,25 @@ public static class TypeExtension
 
     public static bool IsOverridesEqualsMethod(this Type type)
     {
-        var equalsMethod = type.GetMethods().FirstOrDefault(m => m.Name == "Equals" && m.DeclaringType == type);
-        if (equalsMethod is not null)
+        return OverridesEqualsCache.GetOrAdd(type, static t =>
         {
-            return equalsMethod.DeclaringType != typeof(object) && !IsAnonymousType(type);
-        }
+            var equalsMethod = t.GetMethods().FirstOrDefault(m => m.Name == "Equals" && m.DeclaringType == t);
+            if (equalsMethod is not null)
+            {
+                return equalsMethod.DeclaringType != typeof(object) && !IsAnonymousType(t);
+            }
 
-        return false;
+            return false;
+        });
     }
 
     public static bool IsToStringOverridden(this Type type)
     {
-        var toStringMethod = type.GetMethod(nameof(ToString), Type.EmptyTypes);
-        return toStringMethod != null && toStringMethod.DeclaringType != typeof(object);
+        return OverridesToStringCache.GetOrAdd(type, static t =>
+        {
+            var toStringMethod = t.GetMethod(nameof(ToString), Type.EmptyTypes);
+            return toStringMethod != null && toStringMethod.DeclaringType != typeof(object);
+        });
     }
 
     public static bool IsClassAndNotString(this Type type)

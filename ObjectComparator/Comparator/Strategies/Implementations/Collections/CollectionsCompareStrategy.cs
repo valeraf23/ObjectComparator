@@ -21,6 +21,9 @@ internal sealed class CollectionsCompareStrategy : BaseCollectionsCompareStrateg
 
     private static readonly ConcurrentDictionary<Type, Type> GenericArgumentCache = new();
 
+    private static readonly ConcurrentDictionary<Type, Func<object, object, string, RulesHandler, DeepEqualityResult>>
+        CompareDelegates = new();
+
     public CollectionsCompareStrategy(Comparator comparator) : base(comparator)
     {
     }
@@ -34,8 +37,7 @@ internal sealed class CollectionsCompareStrategy : BaseCollectionsCompareStrateg
 
     public override bool IsValid(Type member)
     {
-        return member.GetInterfaces().Prepend(member).Any(interfaceType =>
-            interfaceType.IsGenericType && interfaceType.GetGenericTypeDefinition() == ListType);
+        return member.IsGenericEnumerable();
     }
 
     public override DeepEqualityResult Compare<T>(T expected, T actual, string propertyName)
@@ -56,8 +58,10 @@ internal sealed class CollectionsCompareStrategy : BaseCollectionsCompareStrateg
         }
 
         var genericType = GetGenericArgument(expectedType);
-        var compareCollectionsMethod = CompareCollectionsMethod.MakeGenericMethod(genericType);
-        return CollectionHelper.GetDelegateFor(compareCollectionsMethod)(expected, actual, propertyName, RulesHandler);
+        var compareDelegate = CompareDelegates.GetOrAdd(genericType,
+            static elementType => CollectionHelper.GetDelegateFor(
+                CompareCollectionsMethod.MakeGenericMethod(elementType)));
+        return compareDelegate(expected!, actual!, propertyName, RulesHandler);
     }
 
     private static Type GetGenericArgument(Type type)

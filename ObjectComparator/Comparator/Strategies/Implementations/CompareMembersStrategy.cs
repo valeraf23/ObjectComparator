@@ -54,12 +54,18 @@ internal sealed class CompareMembersStrategy : ICompareMembersStrategy
             return CompareDifferentTypes(expected, actual, propertyName);
         }
 
+        var hasParentPath = !string.IsNullOrEmpty(propertyName);
+        // Indexed parents ("Items[123]") are near-unique keys that would grow the cache forever.
+        var isCacheablePath = hasParentPath && propertyName.IndexOf('[') < 0;
+
         foreach (var accessor in CachedAccessors.GetOrAdd(type, CreateAccessors))
         {
-            var actualPropertyPath = string.IsNullOrEmpty(propertyName)
+            var actualPropertyPath = !hasParentPath
                 ? accessor.Name
-                : PropertyPathCache.GetOrAdd((propertyName, accessor.Name),
-                    static key => $"{key.Item1}.{key.Item2}");
+                : isCacheablePath
+                    ? PropertyPathCache.GetOrAdd((propertyName, accessor.Name),
+                        static key => $"{key.Item1}.{key.Item2}")
+                    : $"{propertyName}.{accessor.Name}";
 
             var firstValue = accessor.Getter(expected);
             var secondValue = accessor.Getter(actual);
@@ -96,6 +102,9 @@ internal sealed class CompareMembersStrategy : ICompareMembersStrategy
         var expectedAccessors = CachedAccessorsByName.GetOrAdd(expectedType, CreateAccessorsByName);
         var actualAccessors = CachedAccessorsByName.GetOrAdd(actualType, CreateAccessorsByName);
 
+        var hasParentPath = !string.IsNullOrEmpty(propertyName);
+        var isCacheablePath = hasParentPath && propertyName.IndexOf('[') < 0;
+
         foreach (var accessor in expectedAccessors)
         {
             if (!actualAccessors.TryGetValue(accessor.Key, out var actualAccessor))
@@ -103,10 +112,12 @@ internal sealed class CompareMembersStrategy : ICompareMembersStrategy
                 continue;
             }
 
-            var actualPropertyPath = string.IsNullOrEmpty(propertyName)
+            var actualPropertyPath = !hasParentPath
                 ? accessor.Key
-                : PropertyPathCache.GetOrAdd((propertyName, accessor.Key),
-                    static key => $"{key.Item1}.{key.Item2}");
+                : isCacheablePath
+                    ? PropertyPathCache.GetOrAdd((propertyName, accessor.Key),
+                        static key => $"{key.Item1}.{key.Item2}")
+                    : $"{propertyName}.{accessor.Key}";
 
             var expectedValue = accessor.Value.Getter(expected);
             var actualValue = actualAccessor.Getter(actual);
