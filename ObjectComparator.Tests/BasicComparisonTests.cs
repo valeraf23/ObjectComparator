@@ -2,6 +2,7 @@ using FluentAssertions;
 using NUnit.Framework;
 using ObjectsComparator.Comparator.Helpers;
 using ObjectsComparator.Comparator.RepresentationDistinction;
+using ObjectsComparator.Comparator.Strategies;
 using ObjectsComparator.Tests.TestModels;
 using System;
 using System.Collections.Generic;
@@ -242,6 +243,31 @@ public class BasicComparisonTests
         new { Integer = 1, String = "Test", Nested = new byte[] { 1, 2, 3 } }
             .DeeplyEquals(new { Integer = 1, String = "Test", Nested = new byte[] { 1, 2, 4 } }).Any().Should()
             .BeTrue();
+    }
+
+    class TestClass
+    {
+        public byte[] Bytes { get; set; }
+    }
+
+    [Test]
+    public void ByteArrayField()
+    {
+        var result = new TestClass { Bytes = [11, 22, 33, 44] }
+            .DeeplyEquals(new TestClass { Bytes = [1, 2, 4, 3] });
+
+        result.Any().Should().BeTrue();
+    }
+
+    [Test]
+    public void ByteArrayFieldWithTypeStrategy()
+    {
+        var result = new TestClass { Bytes = [11, 22, 33, 44] }
+            .DeeplyEquals(new TestClass { Bytes = [1, 2, 4, 3] }, config => config
+                .Skip(StrategyType.Equality, StrategyType.OverridesEquals)
+                .WithTypeStrategies(str => str.Set<byte[]>((a, b) => a.SequenceEqual(b))));
+
+        result.Any().Should().BeTrue();
     }
 
     [Test]
