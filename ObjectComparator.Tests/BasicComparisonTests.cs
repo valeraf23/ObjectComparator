@@ -262,12 +262,36 @@ public class BasicComparisonTests
     [Test]
     public void ByteArrayFieldWithTypeStrategy()
     {
-        var result = new TestClass { Bytes = [11, 22, 33, 44] }
-            .DeeplyEquals(new TestClass { Bytes = [1, 2, 4, 3] }, config => config
+        var object1 = new TestClass { Bytes = [11, 22, 33, 44] };
+        var object2 = new TestClass { Bytes = [1, 2, 4, 3] };
+        
+        var result = object1.DeeplyEquals(object2, config => config
                 .Skip(StrategyType.Equality, StrategyType.OverridesEquals)
                 .WithTypeStrategies(str => str.Set<byte[]>((a, b) => a.SequenceEqual(b))));
 
-        result.Any().Should().BeTrue();
+        var distinction = result.Should().ContainSingle().Which;
+        distinction.Path.Should().Be("TestClass.Bytes");
+        distinction.ExpectedValue.Should().Be("System.Byte[]");
+        distinction.ActualValue.Should().Be("System.Byte[]");
+    }
+
+    [Test]
+    public void ByteArrayFieldWithTypeStrategy_KeepOriginalValues()
+    {
+        var object1 = new TestClass { Bytes = [11, 22, 33, 44] };
+        var object2 = new TestClass { Bytes = [1, 2, 4, 3] };
+
+        var result = object1.DeeplyEquals(object2, config => config
+            .Skip(StrategyType.Equality, StrategyType.OverridesEquals)
+            .WithTypeStrategies(str => str.Set<byte[]>((a, b) => a.SequenceEqual(b),
+                display => display.KeepOriginalValues())));
+
+        var distinction = result.Should().ContainSingle().Which;
+        distinction.Path.Should().Be("TestClass.Bytes");
+        distinction.ExpectedValue.Should().BeOfType<byte[]>();
+        distinction.ActualValue.Should().BeOfType<byte[]>();
+        ((byte[])distinction.ExpectedValue!).Should().Equal(11, 22, 33, 44);
+        ((byte[])distinction.ActualValue!).Should().Equal(1, 2, 4, 3);
     }
 
     [Test]

@@ -15,7 +15,7 @@ public class Distinction : IEquatable<Distinction>
         Details = string.Empty;
     }
 
-    public Distinction(string path, object expectedValue, object actualValue, string details)
+    public Distinction(string path, object? expectedValue, object? actualValue, string details)
         : this(path, expectedValue, actualValue)
     {
         Details = details;
