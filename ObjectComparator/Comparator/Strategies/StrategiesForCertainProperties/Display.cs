@@ -4,13 +4,23 @@ namespace ObjectsComparator.Comparator.Strategies.StrategiesForCertainProperties
 
 public sealed class Display
 {
+    private bool _preserveOriginalValues;
+
     public string Expected { get; set; } = string.Empty;
     public string Actually { get; set; } = string.Empty;
 
     public Distinction GetDistinction<T>(T expected, T actual, string propertyName, string lambdaExpression)
     {
-        var expectedValue = string.IsNullOrEmpty(Expected) ? ReplaceNull(expected) : Expected;
-        var actuallyValue = string.IsNullOrEmpty(Actually) ? ReplaceNull(actual) : Actually;
+        object? expectedValue = string.IsNullOrEmpty(Expected)
+            ? _preserveOriginalValues
+                ? expected
+                : ReplaceNull(expected)
+            : Expected;
+        object? actuallyValue = string.IsNullOrEmpty(Actually)
+            ? _preserveOriginalValues
+                ? actual
+                : ReplaceNull(actual)
+            : Actually;
         return new Distinction(propertyName, expectedValue, actuallyValue, lambdaExpression);
     }
 
@@ -28,6 +38,15 @@ public sealed class Display
     public Display SetActuallyInformation(string text)
     {
         Actually = text;
+        return this;
+    }
+
+    /// <summary>
+    /// Preserves original expected and actual values in the distinction.
+    /// </summary>
+    public Display KeepOriginalValues()
+    {
+        _preserveOriginalValues = true;
         return this;
     }
 }

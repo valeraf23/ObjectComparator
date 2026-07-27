@@ -391,6 +391,27 @@ var resultWithDisplay = expected.DeeplyEquals(
 */
 ```
 
+### Keep Original Values in Distinctions
+
+Use `KeepOriginalValues()` when you want `Distinction.ExpectedValue` and `Distinction.ActualValue`
+to hold the original objects instead of string-converted values.
+
+```csharp
+var expected = new BinaryPayload { Bytes = new byte[] { 1, 2, 3 } };
+var actual = new BinaryPayload { Bytes = new byte[] { 1, 2, 4 } };
+
+var result = expected.DeeplyEquals(actual, config => config
+    .WithTypeStrategies(ts => ts.Set<byte[]>(
+        (exp, act) => exp.SequenceEqual(act),
+        display => display.KeepOriginalValues())));
+
+var distinction = result.Single();
+
+// Preserved original references, not stringified values.
+var sameExpectedReference = ReferenceEquals(distinction.ExpectedValue, expected.Bytes); // true
+var sameActualReference = ReferenceEquals(distinction.ActualValue, actual.Bytes); // true
+```
+
 ### Comparison for Collection Types
 
 Identify differences between two list or array-based collection objects, including nested structures.
