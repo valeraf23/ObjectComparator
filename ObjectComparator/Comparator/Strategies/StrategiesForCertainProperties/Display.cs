@@ -41,6 +41,9 @@ public sealed class Display
         return this;
     }
 
+    /// <summary>
+    /// Preserves original expected and actual values in the distinction.
+    /// </summary>
     public Display KeepOriginalValues()
     {
         _preserveOriginalValues = true;
