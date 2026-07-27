@@ -6,9 +6,9 @@
     <LangVersion>latest</LangVersion>
 
     <PackageId>ObjectComparator</PackageId>
-    <Version>3.8.0</Version>
-    <AssemblyVersion>3.8.0.0</AssemblyVersion>
-    <FileVersion>3.8.0.0</FileVersion>
+    <Version>3.9.0</Version>
+    <AssemblyVersion>3.9.0.0</AssemblyVersion>
+    <FileVersion>3.9.0.0</FileVersion>
 
     <Authors>Valerii Fedorenko</Authors>
     <Copyright>Copyright (c) 2022-2026 Valerii Fedorenko</Copyright>
@@ -23,14 +23,13 @@
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
 
-    <Description>High-performance deep object comparison for .NET with customizable rules and strategy skipping.</Description>
-    <PackageTags>ObjectComparison;DeepComparison;Equality;Diff;Reflection;Performance</PackageTags>
+    <Description>High-performance deep object comparison for .NET with customizable rules and precise difference diagnostics.</Description>
+    <PackageTags>ObjectComparison;DeepComparison;Equality;Diff;Reflection;Performance;Diagnostics</PackageTags>
 
-  <PackageReleaseNotes>Performance release: 40-77% faster comparisons with 30-55% fewer allocations in common scenarios.
-  - Cached reflection probes and compiled dispatch delegates for collections, dictionaries and equality operators (no MethodInfo.Invoke on hot paths).
-  - Removed per-call allocations: lazy distinction lists, strategy singletons, same-reference fast path, single-pass dictionary comparison.
-  - Bounded growth of property-path caches for indexed paths (e.g. Items[123].Name).
-  - Fixed: members declared as a base type holding derived instances were reported as not equal even when the inherited == operator considered them equal.</PackageReleaseNotes>
+    <PackageReleaseNotes>Added opt-in preservation of original values for custom comparison strategies.
+    - New Display.KeepOriginalValues() keeps the original expected and actual objects in Distinction.
+    - Useful for arrays, binary payloads, and other values whose ToString() representation loses detail.
+    - String-based display remains the default for backward compatibility.</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>

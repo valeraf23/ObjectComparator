@@ -20,6 +20,7 @@ ObjectComparator is a high-performance .NET library designed for deep comparison
   - [Collection Comparison with Custom Strategies](#collection-comparison-with-custom-strategies)
   - [Ignoring Specific Properties or Fields](#ignoring-specific-properties-or-fields)
   - [Display Distinctions with Custom Strategy](#display-distinctions-with-custom-strategy)
+  - [Keep Original Values in Distinctions](#keep-original-values-in-distinctions)
   - [Comparison for Collection Types](#comparison-for-collection-types)
   - [Comparison for Dictionary Types](#comparison-for-dictionary-types)
   - [Ignore Strategy](#ignore-strategy)
