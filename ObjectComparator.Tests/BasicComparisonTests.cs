@@ -266,7 +266,6 @@ public class BasicComparisonTests
         var object2 = new TestClass { Bytes = [1, 2, 4, 3] };
         
         var result = object1.DeeplyEquals(object2, config => config
-                .Skip(StrategyType.Equality, StrategyType.OverridesEquals)
                 .WithTypeStrategies(str => str.Set<byte[]>((a, b) => a.SequenceEqual(b))));
 
         var distinction = result.Should().ContainSingle().Which;
@@ -282,7 +281,6 @@ public class BasicComparisonTests
         var object2 = new TestClass { Bytes = [1, 2, 4, 3] };
 
         var result = object1.DeeplyEquals(object2, config => config
-            .Skip(StrategyType.Equality, StrategyType.OverridesEquals)
             .WithTypeStrategies(str => str.Set<byte[]>((a, b) => a.SequenceEqual(b),
                 display => display.KeepOriginalValues())));
 
