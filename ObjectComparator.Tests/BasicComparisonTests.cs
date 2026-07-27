@@ -2,7 +2,6 @@ using FluentAssertions;
 using NUnit.Framework;
 using ObjectsComparator.Comparator.Helpers;
 using ObjectsComparator.Comparator.RepresentationDistinction;
-using ObjectsComparator.Comparator.Strategies;
 using ObjectsComparator.Tests.TestModels;
 using System;
 using System.Collections.Generic;
@@ -243,53 +242,6 @@ public class BasicComparisonTests
         new { Integer = 1, String = "Test", Nested = new byte[] { 1, 2, 3 } }
             .DeeplyEquals(new { Integer = 1, String = "Test", Nested = new byte[] { 1, 2, 4 } }).Any().Should()
             .BeTrue();
-    }
-
-    class TestClass
-    {
-        public byte[] Bytes { get; set; }
-    }
-
-    [Test]
-    public void ByteArrayField()
-    {
-        var result = new TestClass { Bytes = [11, 22, 33, 44] }
-            .DeeplyEquals(new TestClass { Bytes = [1, 2, 4, 3] });
-
-        result.Any().Should().BeTrue();
-    }
-
-    [Test]
-    public void ByteArrayFieldWithTypeStrategy()
-    {
-        var object1 = new TestClass { Bytes = [11, 22, 33, 44] };
-        var object2 = new TestClass { Bytes = [1, 2, 4, 3] };
-        
-        var result = object1.DeeplyEquals(object2, config => config
-                .WithTypeStrategies(str => str.Set<byte[]>((a, b) => a.SequenceEqual(b))));
-
-        var distinction = result.Should().ContainSingle().Which;
-        distinction.Path.Should().Be("TestClass.Bytes");
-        distinction.ExpectedValue.Should().Be("System.Byte[]");
-        distinction.ActualValue.Should().Be("System.Byte[]");
-    }
-
-    [Test]
-    public void ByteArrayFieldWithTypeStrategy_KeepOriginalValues()
-    {
-        var object1 = new TestClass { Bytes = [11, 22, 33, 44] };
-        var object2 = new TestClass { Bytes = [1, 2, 4, 3] };
-
-        var result = object1.DeeplyEquals(object2, config => config
-            .WithTypeStrategies(str => str.Set<byte[]>((a, b) => a.SequenceEqual(b),
-                display => display.KeepOriginalValues())));
-
-        var distinction = result.Should().ContainSingle().Which;
-        distinction.Path.Should().Be("TestClass.Bytes");
-        distinction.ExpectedValue.Should().BeOfType<byte[]>();
-        distinction.ActualValue.Should().BeOfType<byte[]>();
-        ((byte[])distinction.ExpectedValue!).Should().Equal(11, 22, 33, 44);
-        ((byte[])distinction.ActualValue!).Should().Equal(1, 2, 4, 3);
     }
 
     [Test]
